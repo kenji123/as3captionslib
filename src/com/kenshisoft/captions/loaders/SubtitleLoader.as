@@ -1,21 +1,21 @@
-﻿/**
- * Copyright 2011-2012 Jamal Edey
- * 
- * This file is part of as3captionslib.
- * 
- * as3captionslib is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * as3captionslib is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public License
- * along with as3captionslib.  If not, see <http://www.gnu.org/licenses/>.
- */
+﻿//
+// Copyright 2011-2012 Jamal Edey
+// 
+// This file is part of as3captionslib.
+// 
+// as3captionslib is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// as3captionslib is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public License
+// along with as3captionslib.  If not, see <http://www.gnu.org/licenses/>.
+//
 
 package com.kenshisoft.captions.loaders
 {
@@ -28,13 +28,26 @@ package com.kenshisoft.captions.loaders
 	
 	import org.osflash.signals.Signal;
 	
+	/**
+	 * The SubtitleLoader class downloads subtitle resources.
+	 * 
+	 * @playerversion Flash 10.3
+	 * @langversion 3.0
+	 */
 	public class SubtitleLoader
 	{
 		private var _subtitleUrl:String;
 		private var _urlLoader:URLLoader;
 		
+		/**
+		* Dispatched when a subtitle resource is loaded. 
+		* Returns the loaded subtitle resource as a string.
+		*/
 		public var subtitleLoadedSignal:Signal = new Signal(Object);
 		
+		/**
+		 * Creates a SubtitleLoder object.
+		 */
 		public function SubtitleLoader()
 		{
 			super();
@@ -72,6 +85,11 @@ package com.kenshisoft.captions.loaders
 			//trace("SubtitleLoader onHttpStatus: " + event.status);
 		}
 		
+		/**
+		 * Begins the process of downloading the subtitle resource.
+		 * 
+		 * @param	url	The resource locator of the subtitle.
+		 */
 		public function load(url:String):void
 		{
 			_subtitleUrl = url;
@@ -79,6 +97,10 @@ package com.kenshisoft.captions.loaders
 			downloadSubtitle();
 		}
 		
+		/**
+		 * Stops the download of the subtitle resource. 
+		 * If the download is already complete, this function has no affect.
+		 */
 		public function cancel():void
 		{
 			if (_urlLoader != null)

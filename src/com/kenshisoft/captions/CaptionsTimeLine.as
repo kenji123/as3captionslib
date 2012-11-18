@@ -1,21 +1,21 @@
-﻿/**
- * Copyright 2011-2012 Jamal Edey
- * 
- * This file is part of as3captionslib.
- * 
- * as3captionslib is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * as3captionslib is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public License
- * along with as3captionslib.  If not, see <http://www.gnu.org/licenses/>.
- */
+﻿//
+// Copyright 2011-2012 Jamal Edey
+// 
+// This file is part of as3captionslib.
+// 
+// as3captionslib is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// as3captionslib is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public License
+// along with as3captionslib.  If not, see <http://www.gnu.org/licenses/>.
+//
 
 package com.kenshisoft.captions
 {
@@ -35,15 +35,36 @@ package com.kenshisoft.captions
 	import com.kenshisoft.captions.misc.Size;
 	import com.kenshisoft.captions.models.ass.ASSSubtitle;
 	
+	/**
+	 * The CaptionTimeLine class manages the buffering and the displayment of captions.
+	 * 
+	 * @playerversion Flash 10.3
+	 * @langversion 3.0
+	 */
 	public class CaptionsTimeLine
 	{
 		private const BUFFER_LENGTH:int = 30; // buffer in seconds
 		
+		/**
+		 * Format of the current subtile object.
+		 */
 		public var format:SubtitleFormat;
+		/**
+		 * Parsed subtitle object.
+		 */
 		public var captions:ASSSubtitle;
+		/**
+		 * Font class objects of loaded fonts.
+		 */
 		public var fontClasses:Vector.<FontClass>;
-		public var renderer:ASSRenderer;
+		/**
+		 * Whether captions are animated.
+		 */
 		public var animated:Boolean;
+		/**
+		 * The relevant rendering object that will render the captions of the subtitle object.
+		 */
+		public var renderer:ASSRenderer;
 		
 		private var _container:DisplayObjectContainer;
 		private var _stream:NetStream;
@@ -59,11 +80,28 @@ package com.kenshisoft.captions
 		private var _currentTime:Number = 0;
 		private var _lastBufferIndex:int = 0;
 		
+		/**
+		* Dispatched when a caption is addded to the captions container. 
+		* Returns the ASSCaption object displayed.
+		*/
 		public var captionDisplaySignal:Signal = new Signal(ASSCaption);
+		/**
+		* Dispatched when a caption is removed from the captions container. 
+		* Returns the ASSCaption object removed.
+		*/
 		public var captionRemoveSignal:Signal = new Signal(ASSCaption);
 		
 		public var sync:Number = 0;
 		
+		/**
+		 * Creates a CaptionsTimeLine object.
+		 * 
+		 * @param	format		Format of the current subtile object.
+		 * @param	captions	Parsed subtitle object.
+		 * @param	fontClasses	A collection of FontClass objects of the loaded fonts.
+		 * @param	animated	Whether captions are animated.
+		 * @param	renderer	The relevant rendering object that will render the captions of the subtitle object.
+		 */
 		public function CaptionsTimeLine(format:SubtitleFormat, captions:ASSSubtitle, fontClasses:Vector.<FontClass>, animated:Boolean, renderer:ASSRenderer)
 		{
 			super();
@@ -84,6 +122,11 @@ package com.kenshisoft.captions
 			//_stageTimer.addEventListener(TimerEvent.TIMER, stage);
 		}
 		
+		/**
+		 * Fills the captions buffer by prerendering captions up to the number of seconds assigned to BUFFER_LENGTH.
+		 * 
+		 * @param	event	The event dispatched by the associated Timer object.
+		 */
 		public function buffer(event:TimerEvent):void
 		{
 			_currentTime = _stream.time - sync;
@@ -270,6 +313,9 @@ package com.kenshisoft.captions
 			}
 		}
 		
+		/**
+		 * Starts the internal timer and buffer of the timeline.
+		 */
 		public function start():void
 		{
 			_captionsEnabled = true;
@@ -279,6 +325,9 @@ package com.kenshisoft.captions
 			//_stageTimer.start();
 		}
 		
+		/**
+		 * Pauses (stops) the internal timer and buffer of the timeline.
+		 */
 		public function pause():void
 		{
 			_captionsEnabled = false;
@@ -288,11 +337,19 @@ package com.kenshisoft.captions
 			_stageTimer.stop();
 		}
 		
+		/**
+		 * Resumes the internal timer and buffer of the timeline.
+		 */
 		public function resume():void
 		{
 			start();
 		}
 		
+		/**
+		 * Empties the captions buffer and resets the buffer caption index.
+		 * 
+		 * @param	time	The time to reset the buffer index to. The currently associated NetStream.time is used by default.
+		 */
 		public function flushBuffer(time:Number = -1):void
 		{
 			_captionsBuffer = new Vector.<ASSCaption>;
@@ -311,6 +368,9 @@ package com.kenshisoft.captions
 			}
 		}
 		
+		/**
+		 * Removes all captions currently in the caption display container.
+		 */
 		public function flushDisplay():void
 		{
 			_captionsOnDisplay = new Vector.<ASSCaption>;
@@ -324,26 +384,47 @@ package com.kenshisoft.captions
 			} catch (error:Error) { }
 		}
 		
+		/**
+		 * Sets the associated captions container.
+		 * 
+		 * @param	container	The captions container.
+		 */
 		public function setContainer(container:DisplayObjectContainer):void
 		{
 			_container = container;
 		}
 		
+		/**
+		 * Sets the associated NetStream of the video.
+		 * 
+		 * @param	stream	The NetStream of the video.
+		 */
 		public function setStream(stream:NetStream):void
 		{
 			_stream = stream;
 		}
 		
+		/**
+		 * Sets the associated video position resolution/bounds.
+		 * 
+		 * @param	videoRect	Position and size of the associated video.
+		 */
 		public function setVideoRect(videoRect:Rectangle):void
 		{
 			_videoRect = videoRect;
 		}
 		
+		/**
+		 * Vector object of the captions buffer.
+		 */
 		public function get captionsBuffer():Vector.<ASSCaption>
 		{
 			return _captionsBuffer;
 		}
 		
+		/**
+		 * The captions currently on display.
+		 */
 		public function get captionsOnDisplay():Vector.<ASSCaption>
 		{
 			return _captionsOnDisplay;

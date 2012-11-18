@@ -1,8 +1,10 @@
 package com.kenshisoft.captions.plugins.flowplayer
 {
+	import flash.display.Shape;
 	import flash.display.Sprite;
 	import flash.geom.Rectangle;
 	import flash.text.TextField;
+	import org.flowplayer.model.PlayerEvent;
 	
 	import org.flowplayer.model.ClipEvent;
 	import org.flowplayer.model.Plugin;
@@ -27,6 +29,10 @@ package com.kenshisoft.captions.plugins.flowplayer
 		private var config:Config;
 		private var captionsContainer:Sprite = new Sprite();
 		private var captions:Captions;
+		
+		private var sh:Shape;
+		private var sp:Sprite;
+		private var tf:TextField;
 		
 		public function FLPlugin()
 		{
@@ -70,7 +76,41 @@ package com.kenshisoft.captions.plugins.flowplayer
 			this.player.playlist.onSeek(onSeek);
 			this.player.playlist.onResized(onResized);
 			
+			
+			sh = new Shape();
+			sh.graphics.lineStyle(1, 0, 0.6);
+			sh.graphics.beginFill(0x222222, 0.6);
+			sh.graphics.moveTo(5, 5);
+			sh.graphics.curveTo(0, 10, 10, 10);
+			
+			sp = new Sprite();
+			sp.addChild(sh);
+			
+			tf = new TextField();
+			tf.text = "widget";
+			tf.textColor = 0xFFFFFF;
+			this.player.onLoad(onMouseOver);
+			this.player.onMouseOver(onMouseOver);
+			this.player.onMouseOut(onMouseOut);
+			
 			model.dispatchOnLoad();
+		}
+		
+		private function onMouseOver(event:PlayerEvent):void
+		{
+			addChild(sp);
+		}
+		
+		private function onMouseOut(event:PlayerEvent):void
+		{
+			try 
+			{
+				removeChild(sp);
+			}
+			catch (err:Error)
+			{
+				
+			}
 		}
 		
 		private function onMetaData(event:ClipEvent):void
