@@ -1,5 +1,5 @@
 ﻿//
-// Copyright 2011-2012 Jamal Edey
+// Copyright 2011-2013 Jamal Edey
 // 
 // This file is part of as3captionslib.
 // 
@@ -366,12 +366,14 @@ package com.kenshisoft.captions
 					break;
 				}
 			}
+			
+			flushDisplay();
 		}
 		
 		/**
 		 * Removes all captions currently in the caption display container.
 		 */
-		public function flushDisplay():void
+		private function flushDisplay():void
 		{
 			_captionsOnDisplay = new Vector.<ASSCaption>;
 			

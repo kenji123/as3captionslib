@@ -1,5 +1,5 @@
 //
-// Copyright 2011-2012 Jamal Edey
+// Copyright 2011-2013 Jamal Edey
 // 
 // This file is part of as3captionslib.
 // 
@@ -32,6 +32,8 @@ package com.kenshisoft.captions
 	public class FakeNetStream extends NetStream
 	{
 		private var _time:Number;
+		private var _streamProvider:Object;
+		private var _useStreamProvider:Boolean;
 		
 		/**
 		 * Creates a FakeNetStream object.
@@ -49,7 +51,10 @@ package com.kenshisoft.captions
 		 */
 		override public function get time():Number
 		{
-			return _time;
+			if (_useStreamProvider)
+				return _streamProvider.time;
+			else
+				return _time;
 		}
 		
 		/**
@@ -58,6 +63,22 @@ package com.kenshisoft.captions
 		public function set time(value:Number):void
 		{
 			_time = value;
+		}
+		
+		/**
+		 * 
+		 */
+		public function set streamProvider(value:Object):void
+		{
+			_streamProvider = value;
+		}
+		
+		/**
+		 * 
+		 */
+		public function set useStreamProvider(value:Boolean):void
+		{
+			_useStreamProvider = value;
 		}
 	}
 }

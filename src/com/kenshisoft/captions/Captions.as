@@ -1,5 +1,5 @@
 ﻿//
-// Copyright 2011-2012 Jamal Edey
+// Copyright 2011-2013 Jamal Edey
 // 
 // This file is part of as3captionslib.
 // 
@@ -110,6 +110,11 @@ package com.kenshisoft.captions
 			this.animated = animated;
 		}
 		
+		private function onFontsRegistered(event:Object):void
+		{
+			fontsRegisteredSignal.dispatch(event);
+		}
+		
 		private function onCaptionsLoaded(event:Object):void
 		{
 			_rawCaptions = event.toString();
@@ -167,11 +172,6 @@ package com.kenshisoft.captions
 			fontLoader.load(font);
 		}
 		
-		private function onFontsRegistered(event:Object):void
-		{
-			fontsRegisteredSignal.dispatch(event);
-		}
-		
 		/**
 		 * Loads the captions of an external subtitle resource.
 		 * 
@@ -187,6 +187,15 @@ package com.kenshisoft.captions
 			subtitleLoader.load(url);
 		}
 		
+		public function unloadCaptions():void
+		{
+			flush( -1, false);
+			
+			_rawCaptions = null;
+			_parsedCaptions = null;
+			_captionsTimeLine = null;
+		}
+		
 		/**
 		 * Flushes the pre-rendered captions buffer and captions currently on display. 
 		 * If the time parameter > -1, then the buffer head is set to that time. 
@@ -195,7 +204,7 @@ package com.kenshisoft.captions
 		 * 
 		 * @param	time	The time in seconds to set the captions buffer head.
 		 */
-		public function flush(time:Number = -1):void
+		public function flush(time:Number = -1, resume:Boolean = true):void
 		{
 			if (_captionsTimeLine != null)
 			{
@@ -203,9 +212,9 @@ package com.kenshisoft.captions
 					_captionsTimeLine.pause();
 				
 				_captionsTimeLine.flushBuffer(time);
-				_captionsTimeLine.flushDisplay();
+				//_captionsTimeLine.flushDisplay();
 				
-				if (enabled)
+				if (enabled && resume)
 					_captionsTimeLine.start();
 			}
 		}
@@ -222,11 +231,12 @@ package com.kenshisoft.captions
 			if (_captionsTimeLine != null && !enabled)
 			{
 				_captionsTimeLine.pause();
-				_captionsTimeLine.flushDisplay();
+				_captionsTimeLine.flushBuffer();
+				//_captionsTimeLine.flushDisplay();
 			}
 			else if (_captionsTimeLine != null && enabled)
 			{
-				_captionsTimeLine.flushBuffer();
+				//_captionsTimeLine.flushBuffer();
 				_captionsTimeLine.resume();
 			}
 		}

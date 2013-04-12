@@ -1,5 +1,5 @@
 ﻿//
-// Copyright 2011-2012 Jamal Edey
+// Copyright 2011-2013 Jamal Edey
 // 
 // This file is part of as3captionslib.
 // 

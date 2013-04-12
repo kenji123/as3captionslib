@@ -1,10 +1,11 @@
 package com.kenshisoft.captions.plugins.flowplayer
 {
-	import flash.display.Shape;
+	import flash.display.DisplayObject;
+	import flash.display.DisplayObjectContainer;
 	import flash.display.Sprite;
 	import flash.geom.Rectangle;
 	import flash.text.TextField;
-	import org.flowplayer.model.PlayerEvent;
+	import org.flowplayer.model.Clip;
 	
 	import org.flowplayer.model.ClipEvent;
 	import org.flowplayer.model.Plugin;
@@ -14,6 +15,7 @@ package com.kenshisoft.captions.plugins.flowplayer
 	import com.adobe.serialization.json.JSON;
 	
 	import com.kenshisoft.captions.Captions;
+	import com.kenshisoft.captions.config.CaptionConfig;
 	import com.kenshisoft.captions.config.Config;
 	import com.kenshisoft.captions.enums.SubtitleFormat;
 	
@@ -27,18 +29,15 @@ package com.kenshisoft.captions.plugins.flowplayer
 		private var model:PluginModel;
 		
 		private var config:Config;
+		private var currentSubtitle:CaptionConfig;
 		private var captionsContainer:Sprite = new Sprite();
 		private var captions:Captions;
-		
-		private var sh:Shape;
-		private var sp:Sprite;
-		private var tf:TextField;
 		
 		public function FLPlugin()
 		{
 			super();
 			
-			captionsContainer.addChild(new TextField()); // why doesn't flowplayer like empty display objects?
+			captionsContainer.addChild(new TextField()); // quickfix. not sure why it needs this to work
 			addChild(captionsContainer);
 		}
 		
@@ -66,6 +65,17 @@ package com.kenshisoft.captions.plugins.flowplayer
 			}
 			
 			this.config = new Config(args);
+			
+			currentSubtitle = config.getDefaultCaption();
+			
+			initCaptions();
+		}
+		
+		private function initCaptions():void
+		{
+			captions = new Captions(config.captionsEnabled, config.captionsAnimated);
+			captions.setContainer(captionsContainer);
+			captions.fontsRegisteredSignal.add(onFontsRegistered);
 		}
 		
 		public function onLoad(player:Flowplayer):void
@@ -73,113 +83,85 @@ package com.kenshisoft.captions.plugins.flowplayer
 			this.player = player;
 			
 			this.player.playlist.onMetaData(onMetaData);
-			this.player.playlist.onSeek(onSeek);
 			this.player.playlist.onResized(onResized);
-			
-			
-			sh = new Shape();
-			sh.graphics.lineStyle(1, 0, 0.6);
-			sh.graphics.beginFill(0x222222, 0.6);
-			sh.graphics.moveTo(5, 5);
-			sh.graphics.curveTo(0, 10, 10, 10);
-			
-			sp = new Sprite();
-			sp.addChild(sh);
-			
-			tf = new TextField();
-			tf.text = "widget";
-			tf.textColor = 0xFFFFFF;
-			this.player.onLoad(onMouseOver);
-			this.player.onMouseOver(onMouseOver);
-			this.player.onMouseOut(onMouseOut);
+			this.player.playlist.onStart(onStart);
+			this.player.playlist.onSeek(onSeek);
 			
 			model.dispatchOnLoad();
 		}
 		
-		private function onMouseOver(event:PlayerEvent):void
-		{
-			addChild(sp);
-		}
-		
-		private function onMouseOut(event:PlayerEvent):void
-		{
-			try 
-			{
-				removeChild(sp);
-			}
-			catch (err:Error)
-			{
-				
-			}
-		}
-		
 		private function onMetaData(event:ClipEvent):void
 		{
-			if (player.streamProvider.netStream)
-				initCaptions();
+			captions.setStream(player.streamProvider.netStream);
 		}
 		
-		private function initCaptions():void
+		public function onResized(event:ClipEvent):void
 		{
-			captions = new Captions(true, config.animateCaptions);
-			captions.setContainer(captionsContainer);
-			captions.setStream(player.streamProvider.netStream);
-			captions.setVideoRect(new Rectangle(0, 0, player.currentClip.width, player.currentClip.height));
+			if (player.currentClip.getContent().parent)
+			{
+				var currentClip:DisplayObjectContainer = player.currentClip.getContent().parent;
+				captions.setVideoRect(new Rectangle(currentClip.x, currentClip.y, currentClip.width, currentClip.height));
+				captions.flush();
+				captionsContainer.addChild(new TextField()); // quickfix. not sure why it needs this to work
+			}
+        }
+		
+		private function onStart(event:ClipEvent):void
+		{
+			var currentClip:DisplayObjectContainer = player.currentClip.getContent().parent;
+			captions.setVideoRect(new Rectangle(currentClip.x, currentClip.y, currentClip.width, currentClip.height));
 			
 			loadFonts();
 		}
 		
 		private function loadFonts():void
 		{
-			if (config.fonts.length < 1)
+			if (currentSubtitle.fonts.length < 1)
 			{
-				onFontsRegistered(null);
+				loadCaptions();
 				return;
 			}
 			
-			captions.fontsRegisteredSignal.add(onFontsRegistered);
-			captions.loadFontSwf(config.fonts[0]);
-		}
-		
-		private function onFontsRegistered(event:Object):void
-		{
-			for (var i:int; i < config.fonts.length; i++)
+			for (var k:int = 0, l:int = currentSubtitle.fonts.length; k < l; k++)
 			{
-				if (config.fonts[i].url == event.url)
-					config.fonts[i].registered = true;
-			}
-			
-			for (var j:int; j < config.fonts.length; j++)
-			{
-				if (!config.fonts[j].registered)
+				if (!currentSubtitle.fonts[k].registered)
 				{
-					captions.loadFontSwf(config.fonts[j]);
+					captions.loadFontSwf(currentSubtitle.fonts[k]);
 					return;
 				}
 			}
 			
-			captions.loadCaptions(SubtitleFormat.ASS, config.getDefaultCaption().url);
+			loadCaptions();
+		}
+		
+		private function onFontsRegistered(event:Object):void
+		{
+			for (var i:int = 0, j:int = currentSubtitle.fonts.length; i < j; i++)
+			{
+				if (currentSubtitle.fonts[i].url == event.url)
+					currentSubtitle.fonts[i].registered = true;
+			}
+			
+			for (var k:int = 0, l:int = currentSubtitle.fonts.length; k < l; k++)
+			{
+				if (!currentSubtitle.fonts[k].registered)
+				{
+					captions.loadFontSwf(currentSubtitle.fonts[k]);
+					return;
+				}
+			}
+			
+			loadCaptions();
+		}
+		
+		private function loadCaptions():void
+		{
+			captions.loadCaptions(currentSubtitle.format, currentSubtitle.url);
 		}
 		
 		private function onSeek(event:ClipEvent):void
 		{
-			if (captions)
-				captions.flush((player.streamProvider.netStream.time > 0 ? player.streamProvider.netStream.time : 0));
-		}
-		
-		public function onResized(event:ClipEvent):void
-		{
-            resizeCaptionsToStage();
-        }
-		
-		private function resizeCaptionsToStage():void
-		{
-			if (captions)
-			{
-				captions.setVideoRect(new Rectangle(0, 0, player.currentClip.width, player.currentClip.height));
-				captions.flush();
-				captionsContainer.addChild(new TextField());
-			}
+			captions.flush((player.streamProvider.netStream.time > 0 ? player.streamProvider.netStream.time : 0));
 		}
 	}
 }

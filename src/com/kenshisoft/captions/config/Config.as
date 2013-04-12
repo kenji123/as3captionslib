@@ -1,5 +1,5 @@
 //
-// Copyright 2011-2012 Jamal Edey
+// Copyright 2011-2013 Jamal Edey
 // 
 // This file is part of as3captionslib.
 // 
@@ -25,17 +25,17 @@ package com.kenshisoft.captions.config
 	 * <listing version="3.0">
 	 * captions:Array
 	 * 		url:String
-	 * 		format:String
+	 * 		format:SubtitleFormat
 	 * 		name:String
 	 * 		language:String
 	 * 		defaultCaption:Boolean
-	 * fonts:Array
-	 * 		url:String
-	 * 		swfClass:String
-	 * 		fontClasses:Array
-	 * 			className:String
-	 * 			fontFamily:String
-	 * 			aliases:Array
+	 * 		fonts:Array
+	 * 			url:String
+	 * 			swfClass:String
+	 * 			fontClasses:Array
+	 * 				className:String
+	 * 				fontFamily:String
+	 * 				aliases:Array
 	 * animateCaptions:Boolean
 	 * </listing>
 	 * 
@@ -50,8 +50,8 @@ package com.kenshisoft.captions.config
 		public var parameters:Object;
 		
 		private var _captions:Vector.<CaptionConfig> = new Vector.<CaptionConfig>;
-		private var _fonts:Vector.<FontConfig> = new Vector.<FontConfig>;
-		private var _animateCaptions:Boolean;
+		private var _captionsEnabled:Boolean;
+		private var _captionsAnimated:Boolean;
 		
 		/**
 		 * Creates a Config class.
@@ -66,9 +66,8 @@ package com.kenshisoft.captions.config
 			
 			for (var c:String in parameters.captions)
 				_captions.push(new CaptionConfig(parameters.captions[c]));
-			for (var f:String in parameters.fonts)
-				_fonts.push(new FontConfig(parameters.fonts[f]));
-			_animateCaptions = parameters.animateCaptions;
+			_captionsEnabled = parameters.captionsEnabled;
+			_captionsAnimated = parameters.captionsAnimated;
 		}
 		
 		/**
@@ -80,19 +79,19 @@ package com.kenshisoft.captions.config
 		}
 		
 		/**
-		 * Collection of FontConfig objects of the configured fonts.
+		 * Indicates whether the captions will be enabled.
 		 */
-		public function get fonts():Vector.<FontConfig>
+		public function get captionsEnabled():Boolean
 		{
-			return _fonts;
+			return _captionsEnabled;
 		}
 		
 		/**
 		 * Indicates whether the captions will be animated.
 		 */
-		public function get animateCaptions():Boolean
+		public function get captionsAnimated():Boolean
 		{
-			return _animateCaptions;
+			return _captionsAnimated;
 		}
 		
 		/**

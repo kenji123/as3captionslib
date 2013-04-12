@@ -1,5 +1,5 @@
 //
-// Copyright 2011-2012 Jamal Edey
+// Copyright 2011-2013 Jamal Edey
 // 
 // This file is part of as3captionslib.
 // 
@@ -19,6 +19,8 @@
 
 package com.kenshisoft.captions.config
 {
+	import com.kenshisoft.captions.enums.SubtitleFormat;
+	
 	/**
 	 * The CaptionConfig class represents the details of a subtitle resource.
 	 * 
@@ -33,10 +35,11 @@ package com.kenshisoft.captions.config
 		public var properties:Object;
 		
 		private var _url:String;
-		private var _format:String;
+		private var _format:SubtitleFormat;
 		private var _name:String;
 		private var _language:String;
 		private var _defaultCaption:Boolean;
+		private var _fonts:Vector.<FontConfig> = new Vector.<FontConfig>;
 		
 		/**
 		 * Creates a CaptionConfig class.
@@ -50,10 +53,16 @@ package com.kenshisoft.captions.config
 			this.properties = properties;
 			
 			_url = properties.url;
-			_format = properties.format;
+			switch (String(properties.format).toUpperCase())
+			{
+				case SubtitleFormat.ASS.format:
+					_format = SubtitleFormat.ASS; break;
+			}
 			_name = properties.name;
 			_language = properties.language;
-			_defaultCaption = properties.defaultCaption;
+			_defaultCaption = properties.defaultCaption != typeof Boolean ? (properties.defaultCaption > 0 ? true : false) : properties.defaultCaption;
+			for (var f:String in properties.fonts)
+				_fonts.push(new FontConfig(properties.fonts[f]));
 		}
 		
 		/**
@@ -68,7 +77,7 @@ package com.kenshisoft.captions.config
 		 * The format of the subtitle. 
 		 * This value should match the string representation of the equivalent SubtitleFormat.
 		 */
-		public function get format():String
+		public function get format():SubtitleFormat
 		{
 			return _format;
 		}
@@ -95,6 +104,14 @@ package com.kenshisoft.captions.config
 		public function get defaultCaption():Boolean
 		{
 			return _defaultCaption;
+		}
+		
+		/**
+		 * Collection of FontConfig objects of the configured fonts.
+		 */
+		public function get fonts():Vector.<FontConfig>
+		{
+			return _fonts;
 		}
 	}
 }
