@@ -19,8 +19,6 @@
 
 package com.kenshisoft.captions.misc
 {
-	import flash.net.registerClassAlias;
-	
 	/**
 	 * ...
 	 * @author Jamal Edey
@@ -65,13 +63,17 @@ package com.kenshisoft.captions.misc
 			_height = value;
 		}
 		
-		public function copy(rect:MarginRectangle = null):MarginRectangle
+		public function copy():MarginRectangle
 		{
-			if (rect == null) rect = this;
+			var newMR:MarginRectangle = new MarginRectangle();
+			newMR.left = left;
+			newMR.right = right;
+			newMR.top = top;
+			newMR.bottom = bottom;
+			newMR.width = _width;
+			newMR.height = _height;
 			
-			registerClassAlias("com.kenshisoft.captions.misc.MarginRectangle", MarginRectangle);
-			
-			return MarginRectangle(Util.copy(rect));
+			return newMR;
 		}
 	}
 }

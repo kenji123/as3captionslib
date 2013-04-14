@@ -24,14 +24,14 @@ package com.kenshisoft.captions.misc
 	
 	public class Util
 	{
-		public static function copy(obj:Object):Object 
+		/*public static function copy(obj:Object):Object 
 		{
 			var bytes:ByteArray = new ByteArray();
 			bytes.writeObject(obj);
 			bytes.position = 0;
 			
 			return bytes.readObject();
-		}
+		}*/
 		
 		public static function toSeconds(str:String):Number
 		{

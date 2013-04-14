@@ -20,7 +20,6 @@
 package com.kenshisoft.captions.models.ass
 {
 	import fl.motion.Color;
-	import flash.net.registerClassAlias;
 	
 	import com.kenshisoft.captions.misc.MarginRectangle;
 	import com.kenshisoft.captions.misc.Util;
@@ -354,15 +353,44 @@ package com.kenshisoft.captions.models.ass
             _gaussianBlur = value;
 		}
 		
-		public function copy(style:ASSStyle = null):ASSStyle
+		public function copy():ASSStyle
 		{
-			if (style == null) style = this;
+			var newStyle:ASSStyle = new ASSStyle();
+			newStyle.name = _name;
+			newStyle.fontName = _fontName;
+			newStyle.fontEmbed = _fontEmbed;
+			newStyle.fontSize = _fontSize;
+			newStyle.orgFontSize = orgFontSize;
 			
-			registerClassAlias("com.kenshisoft.captions.models.ass.ASSStyle", ASSStyle);
-			registerClassAlias("fl.motion.Color", Color);
-			registerClassAlias("com.kenshisoft.captions.misc.MarginRectangle", MarginRectangle);
+			newStyle.colours = new Vector.<Color>;
+			for (var i:int; i < _colours.length; i++)
+				newStyle.colours.push(Util.toColor(Util.toHexColour(_colours[i].color)));
 			
-			return ASSStyle(Util.copy(style));
+			newStyle.fontWeight = _fontWeight;
+			newStyle.italic = _italic;
+			newStyle.underline = _underline;
+			newStyle.strikeOut = _strikeOut;
+			newStyle.fontScaleX = _fontScaleX;
+			newStyle.fontScaleY = _fontScaleY
+			newStyle.fontSpacing = _fontSpacing;
+			newStyle.fontAngleZ = _fontAngleZ;
+			newStyle.borderStyle = _borderStyle;
+			newStyle.outlineWidthX = _outlineWidthX;
+			newStyle.outlineWidthY = _outlineWidthY;
+			newStyle.shadowDepthX = _shadowDepthX;
+			newStyle.shadowDepthY = _shadowDepthY;
+			newStyle.alignment = _alignment;
+			newStyle.marginRect = _marginRect.copy();
+			newStyle.charSet = _charSet;
+			newStyle.relativeTo = _relativeTo;
+			newStyle.fontAngleX = _fontAngleX;
+			newStyle.fontAngleY = _fontAngleY;
+			newStyle.fontShiftX = _fontShiftX;
+			newStyle.fontShiftY = _fontShiftY;
+			newStyle.blur = _blur;
+			newStyle.gaussianBlur = _gaussianBlur;
+			
+			return newStyle;
 		}
 	}
 }

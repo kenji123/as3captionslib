@@ -19,8 +19,6 @@
 
 package com.kenshisoft.captions.models.ass
 {
-	import flash.net.registerClassAlias;
-	
 	import com.kenshisoft.captions.misc.MarginRectangle;
 	import com.kenshisoft.captions.misc.Util;
 	
@@ -166,14 +164,23 @@ package com.kenshisoft.captions.models.ass
             _duration = value;
 		}
 		
-		public function copy(event:ASSEvent = null):ASSEvent
+		public function copy():ASSEvent
 		{
-			if (event == null) event = this;
+			var newEvent:ASSEvent = new ASSEvent();
+			newEvent.layer = _layer;
+			newEvent.start = _start;
+			newEvent.end = _end;
+			newEvent.style = _style;
+			newEvent.actor = _actor;
+			newEvent.marginRect = _marginRect.copy();
+			newEvent.effect = _effect;
+			newEvent.text = _text;
+			newEvent.id = _id;
+			newEvent.startSeconds = _startSeconds;
+			newEvent.endSeconds = _endSeconds;
+			newEvent.duration = _duration;
 			
-			registerClassAlias("com.kenshisoft.captions.models.ass.ASSEvent", ASSEvent);
-			registerClassAlias("com.kenshisoft.captions.misc.MarginRectangle", MarginRectangle);
-			
-			return ASSEvent(Util.copy(event));
+			return newEvent;
 		}
 	}
 }

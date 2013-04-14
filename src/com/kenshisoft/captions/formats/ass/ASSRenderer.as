@@ -109,404 +109,390 @@ package com.kenshisoft.captions.formats.ass
 				var tag:String = tagsParsed[i][0];
 				var tagOptions:Vector.<String> = tagsParsed[i].slice(1);
 				
-				if (tag == "1c" || tag == "2c" || tag == "3c" || tag == "4c")
+				switch (tag)
 				{
-					j = int(tag.charAt(0)) - 1;
-					
-					if (tagOptions[0].length <= 0) { style.colours[j] = orgStyle.colours[j]; continue; }
-					
-					d = Util.toColor(tagOptions[0]).color;
-					s = style.colours[j].color;
-					
-					style.colours[j].color = Color.interpolateColor(s, d, calculateAnimation(1, 0, isAnimated, options));
-				}
-				
-				if (tag == "1a" || tag == "2a" || tag == "3a" || tag == "4a")
-				{
-					j = int(tag.charAt(0)) - 1;
-					
-					if (tagOptions[0].length <= 0) { style.colours[j].alphaOffset = orgStyle.colours[j].alphaOffset; continue; }
-					
-					d = Util.toDecimalColour("0x" + tagOptions[0])[0];
-					style.colours[j].alphaOffset = int(calculateAnimation(d, style.colours[j].alphaOffset, isAnimated, options));
-				}
-				
-				if (tag == "alpha")
-				{
-					d = Util.toDecimalColour(tagOptions[0])[0];
-					for (j = 0; j < 4; j++)
-						style.colours[j].alphaOffset = tagOptions[0].length > 0 ? calculateAnimation(d, style.colours[j].alphaOffset, isAnimated, options) : orgStyle.colours[j].alphaOffset;
-				}
-				
-				if (tag == "an")
-				{
-					d = Number(tagOptions[0]);
-					if (caption.alignment < 0) caption.alignment = (d > 0 && d < 10) ? d : orgStyle.alignment;
-				}
-				
-				if (tag == "a")
-				{
-					d = Number(tagOptions[0]);
-					if (caption.alignment < 0) caption.alignment = (d > 0 && d < 12) ? ((((d-1)&3)+1)+((d&4)?6:0)+((d&8)?3:0)) : orgStyle.alignment;
-				}
-				
-				if (tag == "blur")
-				{
-					if (tagOptions[0].length <= 0) { style.gaussianBlur = orgStyle.gaussianBlur; continue; }
-					
-					n = calculateAnimation(Number(tagOptions[0]), style.gaussianBlur, isAnimated, options);
-					style.gaussianBlur = n < 0 ? 0 : n;
-				}
-				
-				if (tag == "bord")
-				{
-					if (tagOptions[0].length <= 0)
-					{
-						style.outlineWidthX = orgStyle.outlineWidthY;
-						style.outlineWidthX = orgStyle.outlineWidthY;
+					case "1c":
+					case "2c":
+					case "3c":
+					case "4c":
+						j = int(tag.charAt(0)) - 1;
 						
-						continue;
-					}
-					
-					d = Number(tagOptions[0]);
-					
-					n = calculateAnimation(d, style.outlineWidthX, isAnimated, options);
-					style.outlineWidthX = n < 0 ? 0 : n;
-					
-					n = calculateAnimation(d, style.outlineWidthY, isAnimated, options);
-					style.outlineWidthY = n < 0 ? 0 : n;
-				}
-				
-				if (tag == "be")
-					style.blur = tagOptions[0].length > 0 ? calculateAnimation(Number(tagOptions[0]), style.blur, isAnimated, options) : orgStyle.blur;
-				
-				if (tag == "b")
-				{
-					d = Number(tagOptions[0]);
-					style.fontWeight = tagOptions[0].length > 0 ? (d == 0 ? "normal" : d == 1 ? "bold" : d >= 100 ? "bold" : orgStyle.fontWeight) : orgStyle.fontWeight;
-				}
-				
-				if (tag == "clip" || tag == "iclip") //TODO: write render code
-				{
-					//TODO: style modifying code
-				}
-				
-				if (tag == "c")
-				{
-					if (tagOptions[0].length <= 0) { style.colours[0] = orgStyle.colours[0]; continue; }
-					
-					d = Util.toColor(tagOptions[0]).color;
-					s = style.colours[0].color;
-					
-					style.colours[0].color = Color.interpolateColor(s, d, calculateAnimation(1, 0, isAnimated, options));
-				}
-				
-				if (tag == "fade" || tag == "fad")
-				{
-					if (!options.animate) continue;
-					
-					if(tagOptions.length == 7 && !caption.effects.FADE) // {\fade(a1=param[0], a2=param[1], a3=param[2], t1=t[0], t2=t[1], t3=t[2], t4=t[3])}
-					{
-						e = new ASSEffect(SubtitleEffect.FADE);
+						if (tagOptions[0].length <= 0) { style.colours[j] = orgStyle.colours[j]; continue; }
 						
-						for(j = 0; j < 3; j++)
-							e.param[i] = tagOptions[j];
-						for(j = 0; j < 4; j++)
-							e.t[j] = tagOptions[3+j];
+						d = Util.toColor(tagOptions[0]).color;
+						s = style.colours[j].color;
 						
-						caption.effects.FADE = e;
-						caption.effects.COUNT += 1;
-					}
-					else if(tagOptions.length == 2 && !caption.effects.FADE) // {\fad(t1=t[1], t2=t[2])}
-					{
-						e = new ASSEffect(SubtitleEffect.FADE);
+						style.colours[j].color = Color.interpolateColor(s, d, calculateAnimation(1, 0, isAnimated, options));
 						
-						e.param[0] = e.param[2] = 0xff;
-						e.param[1] = 0x00;
-						for(j = 1; j < 3; j++) 
-							e.t[j] = tagOptions[j-1];
-						e.t[0] = e.t[3] = -1; // will be substituted with "start" and "end"
+						break;
+					case "1a":
+					case "2a":
+					case "3a":
+					case "4a":
+						j = int(tag.charAt(0)) - 1;
 						
-						caption.effects.FADE = e;
-						caption.effects.COUNT += 1;
-					}
-				}
-				
-				if (tag == "fe") //TODO: write render code
-					style.charSet = tagOptions[0].length > 0 ? int(tagOptions[0]) : orgStyle.charSet;
-				
-				if (tag == "fn")
-				{
-					style.fontName = parser.getFontNameByAlias(tagOptions[0].length > 0 ? tagOptions[0] : orgStyle.fontName, options.fontInfo);
-					parser.setTrueFontHeight(style);
-				}
-				
-				if (tag == "frx")
-					style.fontAngleX = tagOptions[0].length > 0 ? calculateAnimation(Number(tagOptions[0]), style.fontAngleX, isAnimated, options) : orgStyle.fontAngleX;
-				
-				if (tag == "fry")
-					style.fontAngleY = tagOptions[0].length > 0 ? calculateAnimation(Number(tagOptions[0]), style.fontAngleY, isAnimated, options) : orgStyle.fontAngleY;
-				
-				if (tag == "frz" || tag == "fr")
-					style.fontAngleZ = tagOptions[0].length > 0 ? calculateAnimation(Number(tagOptions[0]), style.fontAngleZ, isAnimated, options) : orgStyle.fontAngleZ;
-				
-				if (tag == "fax")
-					style.fontShiftX = caption.fax = tagOptions[0].length > 0 ? calculateAnimation(Number(tagOptions[0]), style.fontShiftX, isAnimated, options) : orgStyle.fontShiftX;
-				
-				if (tag == "fay")
-					style.fontShiftY = caption.fay = tagOptions[0].length > 0 ? calculateAnimation(Number(tagOptions[0]), style.fontShiftY, isAnimated, options) : orgStyle.fontShiftY;
-				
-				if (tag == "fscx")
-				{
-					if (tagOptions[0].length <= 0) { style.fontScaleX = orgStyle.fontScaleX; continue; }
-					
-					n = calculateAnimation(Number(tagOptions[0]), style.fontScaleX, isAnimated, options);
-					style.fontScaleX = n < 0 ? 0 : n;
-				}
-				
-				if (tag == "fscy")
-				{
-					if (tagOptions[0].length <= 0) { style.fontScaleY = orgStyle.fontScaleY; continue; }
-					
-					n = calculateAnimation(Number(tagOptions[0]), style.fontScaleY, isAnimated, options);
-					style.fontScaleY = n < 0 ? 0 : n;
-				}
-				
-				if (tag == "fsc")
-				{
-					style.fontScaleX = orgStyle.fontScaleX;
-					style.fontScaleY = orgStyle.fontScaleY;
-				}
-				
-				if (tag == "fsp")
-				{
-					if (tagOptions[0].length <= 0) { style.fontSpacing = orgStyle.fontSpacing; continue; }
-					
-					n = calculateAnimation(Number(tagOptions[0]), style.fontSpacing, isAnimated, options);
-					style.fontSpacing = n < 0 ? 0 : n;
-				}
-				
-				if (tag == "fs")
-				{
-					if (tagOptions[0].length <= 0) { style.fontSize = orgStyle.fontSize; style.orgFontSize = orgStyle.orgFontSize; continue; }
-					
-					d = Number(tagOptions[0]);
-					
-					if (tagOptions[0].charAt(0) == '-' || tagOptions[0].charAt(0) == '+')
-					{
-						n = calculateAnimation(style.orgFontSize + ((style.orgFontSize * d) / 10), style.orgFontSize, isAnimated, options);
-						style.orgFontSize = n > 0 ? n : orgStyle.orgFontSize;
-						parser.setTrueFontHeight(style);
-					}
-					else
-					{
-						n = calculateAnimation(d, style.orgFontSize, isAnimated, options);
-						style.orgFontSize = n > 0 ? n : orgStyle.orgFontSize;
-						parser.setTrueFontHeight(style);
-					}
-				}
-				
-				if (tag == "i")
-				{
-					d = Number(tagOptions[0]);
-					style.italic = tagOptions[0].length > 0 ? (d == 0 ? "normal" : d == 1 ? "italic" : orgStyle.italic) : orgStyle.italic;
-				}
-				
-				if (tag == "kt") //TODO: write render code
-				{
-					options.kStart = tagOptions[0].length > 0 ? Number(tagOptions[0]) * 10 : 0;
-					options.kEnd = options.kStart;
-				}
-				
-				if (tag == "kf" || tag == "K") //TODO: write render code
-				{
-					options.kType = 1;
-					options.kStart = options.kEnd;
-					options.kEnd += tagOptions[0].length > 0 ? Number(tagOptions[0]) * 10 : 1000;
-				}
-				
-				if (tag == "ko") //TODO: write render code
-				{
-					options.kType = 2;
-					options.kStart = options.kEnd;
-					options.kEnd += tagOptions[0].length > 0 ? Number(tagOptions[0]) * 10 : 1000;
-				}
-				
-				if (tag == "k") //TODO: write render code
-				{
-					options.kType = 0;
-					options.kStart = options.kEnd;
-					options.kEnd += tagOptions[0].length > 0 ? Number(tagOptions[0]) * 10 : 1000;
-				}
-				
-				if (tag == "move") // {\move(x1=param[0], y1=param[1], x2=param[2], y2=param[3][, t1=t[0], t2=t[1]])}
-				{
-					if((tagOptions.length == 4 || tagOptions.length == 6) && !caption.effects.MOVE)
-					{
-						e = new ASSEffect(SubtitleEffect.MOVE);
+						if (tagOptions[0].length <= 0) { style.colours[j].alphaOffset = orgStyle.colours[j].alphaOffset; continue; }
 						
-						e.param[0] = int(caption.scaleX * (options.animate ? int(tagOptions[0]) : int(tagOptions[2])));
-						e.param[1] = int(caption.scaleY * (options.animate ? int(tagOptions[1]) : int(tagOptions[3])));
-						e.param[2] = int(caption.scaleX * int(tagOptions[2]));
-						e.param[3] = int(caption.scaleY * int(tagOptions[3]));
+						d = Util.toDecimalColour("0x" + tagOptions[0])[0];
+						style.colours[j].alphaOffset = int(calculateAnimation(d, style.colours[j].alphaOffset, isAnimated, options));
 						
-						e.t[0] = e.t[1] = -1;
+						break;
+					case "alpha":
+						d = Util.toDecimalColour(tagOptions[0])[0];
+						for (j = 0; j < 4; j++)
+							style.colours[j].alphaOffset = tagOptions[0].length > 0 ? calculateAnimation(d, style.colours[j].alphaOffset, isAnimated, options) : orgStyle.colours[j].alphaOffset;
+							
+						break;
+					case "an":
+						d = Number(tagOptions[0]);
+						if (caption.alignment < 0) caption.alignment = (d > 0 && d < 10) ? d : orgStyle.alignment;
 						
-						if(tagOptions.length == 6)
+						break;
+					case "a":
+						d = Number(tagOptions[0]);
+						if (caption.alignment < 0) caption.alignment = (d > 0 && d < 12) ? ((((d - 1) & 3) + 1) + ((d & 4)?6:0) + ((d & 8)?3:0)) : orgStyle.alignment;
+						
+						break;
+					case "blur":
+						if (tagOptions[0].length <= 0) { style.gaussianBlur = orgStyle.gaussianBlur; continue; }
+						
+						n = calculateAnimation(Number(tagOptions[0]), style.gaussianBlur, isAnimated, options);
+						style.gaussianBlur = n < 0 ? 0 : n;
+						
+						break;
+					case "bord":
+						if (tagOptions[0].length <= 0)
 						{
-							for(j = 0; j < 2; j++)
-								e.t[j] = tagOptions[4+j];
+							style.outlineWidthX = orgStyle.outlineWidthY;
+							style.outlineWidthX = orgStyle.outlineWidthY;
+							
+							continue;
 						}
 						
-						caption.effects.MOVE = e;
-						if (options.animate) caption.effects.COUNT += 1;
-					}
-				}
-				
-				if (tag == "org") // {\org(x=param[0], y=param[1])}
-				{
-					if(tagOptions.length == 2 && !caption.effects.ORG)
-					{
-						e = new ASSEffect(SubtitleEffect.ORG);
+						d = Number(tagOptions[0]);
 						
-						e.param[0] = int(caption.scaleX * int(tagOptions[0]));
-						e.param[1] = int(caption.scaleY * int(tagOptions[1]));
+						n = calculateAnimation(d, style.outlineWidthX, isAnimated, options);
+						style.outlineWidthX = n < 0 ? 0 : n;
 						
-						caption.effects.ORG = e;
-						if (options.animate) caption.effects.COUNT += 1;
-					}
-				}
-				
-				if (tag == "pbo") //TODO: write render code
-					options.polygonBaselineOffset = Number(tagOptions[0]);
-				
-				if (tag == "pos")
-				{
-					if(tagOptions.length == 2 && !caption.effects.MOVE)
-					{
-						e = new ASSEffect(SubtitleEffect.MOVE);
+						n = calculateAnimation(d, style.outlineWidthY, isAnimated, options);
+						style.outlineWidthY = n < 0 ? 0 : n;
 						
-						e.param[0] = e.param[2] = int(caption.scaleX * int(tagOptions[0]));
-						e.param[1] = e.param[3] = int(caption.scaleY * int(tagOptions[1]));
-						e.t[0] = e.t[1] = 0;
+						break;
+					case "be":
+						style.blur = tagOptions[0].length > 0 ? calculateAnimation(Number(tagOptions[0]), style.blur, isAnimated, options) : orgStyle.blur;
 						
-						caption.effects.MOVE = e;
-					}
-				}
-				
-				if (tag == "p") //TODO: write render code
-				{
-					n = Number(tagOptions[0]);
-					options.nPolygon = n <= 0 ? 0 : n;
-				}
-				
-				if (tag == "q")
-				{
-					d = Number(tagOptions[0]);
-					caption.wrapStyle = tagOptions[0].length > 0 && (0 <= d && d <= 3) ? d : caption.orgWrapStyle;
-				}
-				
-				if (tag == "r")
-				{
-					var newStyle:ASSStyle;
-					if (tagOptions[0].length > 0) newStyle = parser.getStyle(tagOptions[0], styles).copy();
-					style = (newStyle != null) ? newStyle : orgStyle.copy();
-				}
-				
-				if (tag == "shad")
-				{
-					if (tagOptions[0].length <= 0)
-					{
-						style.shadowDepthX = orgStyle.shadowDepthX;
-						style.shadowDepthY = orgStyle.shadowDepthY;
+						break;
+					case "b":
+						d = Number(tagOptions[0]);
+						style.fontWeight = tagOptions[0].length > 0 ? (d == 0 ? "normal" : d == 1 ? "bold" : d >= 100 ? "bold" : orgStyle.fontWeight) : orgStyle.fontWeight;
 						
-						continue;
-					}
-					
-					d = Number(tagOptions[0]);
-					
-					n = calculateAnimation(d, style.shadowDepthX, isAnimated, options);
-					style.shadowDepthX = n < 0 ? 0 : n;
-					
-					n = calculateAnimation(d, style.shadowDepthY, isAnimated, options);
-					style.shadowDepthY = n < 0 ? 0 : n;
-				}
-				
-				if (tag == "s")
-				{
-					d = Number(tagOptions[0]);
-					style.strikeOut = tagOptions[0].length > 0 ? (d == 0 ? false : d == 1 ? true : orgStyle.strikeOut) : orgStyle.strikeOut;
-				}
-				
-				if (tag == "t") // \t([<t1>,<t2>,][<accel>,]<style modifiers>)
-				{
-					var p:*;
-					
-					options.animStart = options.animEnd = 0;
-					options.animAccel = 1;
-					
-					if(tagOptions.length == 1)
-					{
-						p = tagOptions[0];
-					}
-					else if(tagOptions.length == 2)
-					{
-						options.animAccel = Number(tagOptions[0]);
-						p = tagOptions[1];
-					}
-					else if(tagOptions.length == 3)
-					{
-						options.animStart = int(tagOptions[0]);
-						options.animEnd = int(tagOptions[1]);
-						p = tagOptions[2];
-					}
-					else if(tagOptions.length == 4)
-					{
-						options.animStart = int(tagOptions[0]); 
-						options.animEnd = int(tagOptions[1]);
-						options.animAccel = Number(tagOptions[2]);
-						p = tagOptions[3];
-					}
-					
-					style = styleModifier(caption, parser.parseTag(p), options.animate, style, orgStyle, styles, options);
-					
-					caption.isAnimated = options.animate;
-				}
-				
-				if (tag == "u")
-				{
-					d = Number(tagOptions[0]);
-					style.underline = tagOptions[0].length > 0 ? (d == 0 ? "none" : d == 1 ? "underline" : orgStyle.underline) : orgStyle.underline;
-				}
-				
-				if (tag == "xbord")
-				{
-					if (tagOptions[0].length <= 0) { style.outlineWidthX = orgStyle.outlineWidthX; continue; }
-					
-					n = calculateAnimation(Number(tagOptions[0]), style.outlineWidthX, isAnimated, options);
-					style.outlineWidthX = n < 0 ? 0 : n;
-				}
-				
-				if (tag == "xshad")
-				{
-					if (tagOptions[0].length <= 0) { style.shadowDepthX = orgStyle.shadowDepthX; continue; }
-					
-					style.shadowDepthX = calculateAnimation(Number(tagOptions[0]), style.shadowDepthX, isAnimated, options);
-				}
-				
-				if (tag == "ybord")
-				{
-					if (tagOptions[0].length <= 0) { style.outlineWidthY = orgStyle.outlineWidthY; continue; }
-					
-					n = calculateAnimation(Number(tagOptions[0]), style.outlineWidthY, isAnimated, options);
-					style.outlineWidthY = n < 0 ? 0 : n;
-				}
-				
-				if (tag == "yshad")
-				{
-					if (tagOptions[0].length <= 0) { style.shadowDepthY = orgStyle.shadowDepthY; continue; }
-					
-					style.shadowDepthY = calculateAnimation(Number(tagOptions[0]), style.shadowDepthY, isAnimated, options);
+						break;
+					case "clip":
+					case "iclip": //TODO: write render code
+						//TODO: style modifying code
+						
+						break;
+					case "c":
+						if (tagOptions[0].length <= 0) { style.colours[0] = orgStyle.colours[0]; continue; }
+						
+						d = Util.toColor(tagOptions[0]).color;
+						s = style.colours[0].color;
+						
+						style.colours[0].color = Color.interpolateColor(s, d, calculateAnimation(1, 0, isAnimated, options));
+						
+						break;
+					case "fade":
+					case "fad":
+						if (!options.animate) continue;
+						
+						if(tagOptions.length == 7 && !caption.effects.FADE) // {\fade(a1=param[0], a2=param[1], a3=param[2], t1=t[0], t2=t[1], t3=t[2], t4=t[3])}
+						{
+							e = new ASSEffect(SubtitleEffect.FADE);
+							
+							for(j = 0; j < 3; j++)
+								e.param[i] = tagOptions[j];
+							for(j = 0; j < 4; j++)
+								e.t[j] = tagOptions[3+j];
+							
+							caption.effects.FADE = e;
+							caption.effects.COUNT += 1;
+						}
+						else if(tagOptions.length == 2 && !caption.effects.FADE) // {\fad(t1=t[1], t2=t[2])}
+						{
+							e = new ASSEffect(SubtitleEffect.FADE);
+							
+							e.param[0] = e.param[2] = 0xff;
+							e.param[1] = 0x00;
+							for(j = 1; j < 3; j++) 
+								e.t[j] = tagOptions[j-1];
+							e.t[0] = e.t[3] = -1; // will be substituted with "start" and "end"
+							
+							caption.effects.FADE = e;
+							caption.effects.COUNT += 1;
+						}
+						
+						break;
+					case "fe": //TODO: write render code
+						style.charSet = tagOptions[0].length > 0 ? int(tagOptions[0]) : orgStyle.charSet;
+						
+						break;
+					case "fn":
+						style.fontName = parser.getFontNameByAlias(tagOptions[0].length > 0 ? tagOptions[0] : orgStyle.fontName, options.fontInfo);
+						parser.setTrueFontHeight(style);
+						
+						break;
+					case "frx":
+						style.fontAngleX = tagOptions[0].length > 0 ? calculateAnimation(Number(tagOptions[0]), style.fontAngleX, isAnimated, options) : orgStyle.fontAngleX;
+						
+						break;
+					case "fry":
+						style.fontAngleY = tagOptions[0].length > 0 ? calculateAnimation(Number(tagOptions[0]), style.fontAngleY, isAnimated, options) : orgStyle.fontAngleY;
+						
+						break;
+					case "frz":
+					case "fr":
+						style.fontAngleZ = tagOptions[0].length > 0 ? calculateAnimation(Number(tagOptions[0]), style.fontAngleZ, isAnimated, options) : orgStyle.fontAngleZ;
+						
+						break;
+					case "fax":
+						style.fontShiftX = caption.fax = tagOptions[0].length > 0 ? calculateAnimation(Number(tagOptions[0]), style.fontShiftX, isAnimated, options) : orgStyle.fontShiftX;
+						
+						break;
+					case "fay":
+						style.fontShiftY = caption.fay = tagOptions[0].length > 0 ? calculateAnimation(Number(tagOptions[0]), style.fontShiftY, isAnimated, options) : orgStyle.fontShiftY;
+						
+						break;
+					case "fscx":
+						if (tagOptions[0].length <= 0) { style.fontScaleX = orgStyle.fontScaleX; continue; }
+						
+						n = calculateAnimation(Number(tagOptions[0]), style.fontScaleX, isAnimated, options);
+						style.fontScaleX = n < 0 ? 0 : n;
+						
+						break;
+					case "fscy":
+						if (tagOptions[0].length <= 0) { style.fontScaleY = orgStyle.fontScaleY; continue; }
+						
+						n = calculateAnimation(Number(tagOptions[0]), style.fontScaleY, isAnimated, options);
+						style.fontScaleY = n < 0 ? 0 : n;
+						
+						break;
+					case "fsc":
+						style.fontScaleX = orgStyle.fontScaleX;
+						style.fontScaleY = orgStyle.fontScaleY;
+						
+						break;
+					case "fsp":
+						if (tagOptions[0].length <= 0) { style.fontSpacing = orgStyle.fontSpacing; continue; }
+						
+						n = calculateAnimation(Number(tagOptions[0]), style.fontSpacing, isAnimated, options);
+						style.fontSpacing = n < 0 ? 0 : n;
+						
+						break;
+					case "fs":
+						if (tagOptions[0].length <= 0) { style.fontSize = orgStyle.fontSize; style.orgFontSize = orgStyle.orgFontSize; continue; }
+						
+						d = Number(tagOptions[0]);
+						
+						if (tagOptions[0].charAt(0) == '-' || tagOptions[0].charAt(0) == '+')
+						{
+							n = calculateAnimation(style.orgFontSize + ((style.orgFontSize * d) / 10), style.orgFontSize, isAnimated, options);
+							style.orgFontSize = n > 0 ? n : orgStyle.orgFontSize;
+							parser.setTrueFontHeight(style);
+						}
+						else
+						{
+							n = calculateAnimation(d, style.orgFontSize, isAnimated, options);
+							style.orgFontSize = n > 0 ? n : orgStyle.orgFontSize;
+							parser.setTrueFontHeight(style);
+						}
+						
+						break;
+					case "i":
+						d = Number(tagOptions[0]);
+						style.italic = tagOptions[0].length > 0 ? (d == 0 ? "normal" : d == 1 ? "italic" : orgStyle.italic) : orgStyle.italic;
+						
+						break;
+					case "kt": //TODO: write render code
+						options.kStart = tagOptions[0].length > 0 ? Number(tagOptions[0]) * 10 : 0;
+						options.kEnd = options.kStart;
+						
+						break;
+					case "kf":
+					case "K": //TODO: write render code
+						options.kType = 1;
+						options.kStart = options.kEnd;
+						options.kEnd += tagOptions[0].length > 0 ? Number(tagOptions[0]) * 10 : 1000;
+						
+						break;
+					case "ko": //TODO: write render code
+						options.kType = 2;
+						options.kStart = options.kEnd;
+						options.kEnd += tagOptions[0].length > 0 ? Number(tagOptions[0]) * 10 : 1000;
+						
+						break;
+					case "k": //TODO: write render code
+						options.kType = 0;
+						options.kStart = options.kEnd;
+						options.kEnd += tagOptions[0].length > 0 ? Number(tagOptions[0]) * 10 : 1000;
+						
+						break;
+					case "move": // {\move(x1=param[0], y1=param[1], x2=param[2], y2=param[3][, t1=t[0], t2=t[1]])}
+						if((tagOptions.length == 4 || tagOptions.length == 6) && !caption.effects.MOVE)
+						{
+							e = new ASSEffect(SubtitleEffect.MOVE);
+							
+							e.param[0] = int(caption.scaleX * (options.animate ? int(tagOptions[0]) : int(tagOptions[2])));
+							e.param[1] = int(caption.scaleY * (options.animate ? int(tagOptions[1]) : int(tagOptions[3])));
+							e.param[2] = int(caption.scaleX * int(tagOptions[2]));
+							e.param[3] = int(caption.scaleY * int(tagOptions[3]));
+							
+							e.t[0] = e.t[1] = -1;
+							
+							if(tagOptions.length == 6)
+							{
+								for(j = 0; j < 2; j++)
+									e.t[j] = tagOptions[4+j];
+							}
+							
+							caption.effects.MOVE = e;
+							if (options.animate) caption.effects.COUNT += 1;
+						}
+						
+						break;
+					case "org": // {\org(x=param[0], y=param[1])}
+						if(tagOptions.length == 2 && !caption.effects.ORG)
+						{
+							e = new ASSEffect(SubtitleEffect.ORG);
+							
+							e.param[0] = int(caption.scaleX * int(tagOptions[0]));
+							e.param[1] = int(caption.scaleY * int(tagOptions[1]));
+							
+							caption.effects.ORG = e;
+							if (options.animate) caption.effects.COUNT += 1;
+						}
+						
+						break;
+					case "pbo": //TODO: write render code
+						options.polygonBaselineOffset = Number(tagOptions[0]);
+						
+						break;
+					case "pos":
+						if(tagOptions.length == 2 && !caption.effects.MOVE)
+						{
+							e = new ASSEffect(SubtitleEffect.MOVE);
+							
+							e.param[0] = e.param[2] = int(caption.scaleX * int(tagOptions[0]));
+							e.param[1] = e.param[3] = int(caption.scaleY * int(tagOptions[1]));
+							e.t[0] = e.t[1] = 0;
+							
+							caption.effects.MOVE = e;
+						}
+						
+						break;
+					case "p": //TODO: write render code
+						n = Number(tagOptions[0]);
+						options.nPolygon = n <= 0 ? 0 : n;
+						
+						break;
+					case "q":
+						d = Number(tagOptions[0]);
+						caption.wrapStyle = tagOptions[0].length > 0 && (0 <= d && d <= 3) ? d : caption.orgWrapStyle;
+						
+						break;
+					case "r":
+						var newStyle:ASSStyle;
+						if (tagOptions[0].length > 0) newStyle = parser.getStyle(tagOptions[0], styles).copy();
+						style = (newStyle != null) ? newStyle : orgStyle.copy();
+						
+						break;
+					case "shad":
+						if (tagOptions[0].length <= 0)
+						{
+							style.shadowDepthX = orgStyle.shadowDepthX;
+							style.shadowDepthY = orgStyle.shadowDepthY;
+							
+							continue;
+						}
+						
+						d = Number(tagOptions[0]);
+						
+						n = calculateAnimation(d, style.shadowDepthX, isAnimated, options);
+						style.shadowDepthX = n < 0 ? 0 : n;
+						
+						n = calculateAnimation(d, style.shadowDepthY, isAnimated, options);
+						style.shadowDepthY = n < 0 ? 0 : n;
+						
+						break;
+					case "s":
+						d = Number(tagOptions[0]);
+						style.strikeOut = tagOptions[0].length > 0 ? (d == 0 ? false : d == 1 ? true : orgStyle.strikeOut) : orgStyle.strikeOut;
+						
+						break;
+					case "t": // \t([<t1>,<t2>,][<accel>,]<style modifiers>)
+						var p:*;
+						
+						options.animStart = options.animEnd = 0;
+						options.animAccel = 1;
+						
+						if(tagOptions.length == 1)
+						{
+							p = tagOptions[0];
+						}
+						else if(tagOptions.length == 2)
+						{
+							options.animAccel = Number(tagOptions[0]);
+							p = tagOptions[1];
+						}
+						else if(tagOptions.length == 3)
+						{
+							options.animStart = int(tagOptions[0]);
+							options.animEnd = int(tagOptions[1]);
+							p = tagOptions[2];
+						}
+						else if(tagOptions.length == 4)
+						{
+							options.animStart = int(tagOptions[0]); 
+							options.animEnd = int(tagOptions[1]);
+							options.animAccel = Number(tagOptions[2]);
+							p = tagOptions[3];
+						}
+						
+						style = styleModifier(caption, parser.parseTag(p), options.animate, style, orgStyle, styles, options);
+						
+						caption.isAnimated = options.animate;
+						
+						break;
+					case "u":
+						d = Number(tagOptions[0]);
+						style.underline = tagOptions[0].length > 0 ? (d == 0 ? "none" : d == 1 ? "underline" : orgStyle.underline) : orgStyle.underline;
+						
+						break;
+					case "xbord":
+						if (tagOptions[0].length <= 0) { style.outlineWidthX = orgStyle.outlineWidthX; continue; }
+						
+						n = calculateAnimation(Number(tagOptions[0]), style.outlineWidthX, isAnimated, options);
+						style.outlineWidthX = n < 0 ? 0 : n;
+						
+						break;
+					case "xshad":
+						if (tagOptions[0].length <= 0) { style.shadowDepthX = orgStyle.shadowDepthX; continue; }
+						
+						style.shadowDepthX = calculateAnimation(Number(tagOptions[0]), style.shadowDepthX, isAnimated, options);
+						
+						break;
+					case "ybord":
+						if (tagOptions[0].length <= 0) { style.outlineWidthY = orgStyle.outlineWidthY; continue; }
+						
+						n = calculateAnimation(Number(tagOptions[0]), style.outlineWidthY, isAnimated, options);
+						style.outlineWidthY = n < 0 ? 0 : n;
+						
+						break;
+					case "yshad":
+						if (tagOptions[0].length <= 0) { style.shadowDepthY = orgStyle.shadowDepthY; continue; }
+						
+						style.shadowDepthY = calculateAnimation(Number(tagOptions[0]), style.shadowDepthY, isAnimated, options);
+						
+						break;
 				}
 			}
 			
@@ -1113,7 +1099,8 @@ package com.kenshisoft.captions.formats.ass
 					var outlineShadow:TextLine = bodyOnly ? null : renderText(word.text, word.style, false, false, true);
 					
 					// apply strikeout/underline hack
-					strikeOutUnderlineHack(word.ascent, word.style, body, outline, bodyShadow, outlineShadow);
+					if (style.strikeOut || style.underline == "underline")
+						strikeOutUnderlineHack(word.ascent, word.style, body, outline, bodyShadow, outlineShadow);
 					
 					body.transform.matrix3D = new Matrix3D();
 					if (!bodyOnly)

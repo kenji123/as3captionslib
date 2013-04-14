@@ -76,7 +76,6 @@ package com.kenshisoft.captions
 		private var _captionsEnabled:Boolean = false;
 		private var _bufferTimer:Timer;
 		private var _timeLineTimer:Timer;
-		private var _stageTimer:Timer;
 		private var _currentTime:Number = 0;
 		private var _lastBufferIndex:int = 0;
 		
@@ -117,9 +116,6 @@ package com.kenshisoft.captions
 			
 			_timeLineTimer = new Timer(20);
 			_timeLineTimer.addEventListener(TimerEvent.TIMER, timeLine);
-			
-			_stageTimer = new Timer(20);
-			//_stageTimer.addEventListener(TimerEvent.TIMER, stage);
 		}
 		
 		/**
@@ -133,7 +129,7 @@ package com.kenshisoft.captions
 			
 			for (var i:int = _lastBufferIndex; i < captions.events.length; i++)
 			{
-				if (_currentTime >= captions.events[i].startSeconds && ((captions.events[i].startSeconds - _currentTime) < BUFFER_LENGTH))
+				if (/*_currentTime >= captions.events[i].startSeconds &&*/ ((captions.events[i].startSeconds - _currentTime) < BUFFER_LENGTH))
 				{
 					_captionsBuffer.push(renderer.render(captions, captions.events[i], _videoRect, _container, _captionsOnDisplay, fontClasses, captions.events[i].startSeconds, animated));
 					
@@ -148,11 +144,10 @@ package com.kenshisoft.captions
 		
 		private function timeLine(event:TimerEvent):void
 		{
-			_timeLineTimer.stop();
-			
 			_currentTime = _stream.time - sync;
 			
 			var caption:ASSCaption;
+			var removedCaption:Boolean = false;
 			
 			for (var j:int; j < _captionsOnDisplay.length; j++)
 			{
@@ -168,7 +163,7 @@ package com.kenshisoft.captions
 					
 					renderer.remove(caption, _container);
 					
-					var newCaption:ASSCaption = renderer.render(captions, caption.event.copy(), _videoRect, _container, _captionsOnDisplay, fontClasses, _stream.time, animated);
+					var newCaption:ASSCaption = renderer.render(captions, caption.event, _videoRect, _container, _captionsOnDisplay, fontClasses, _stream.time, animated);
 					
 					renderer.add(newCaption, _captionsOnDisplay, _container);
 					
@@ -181,15 +176,15 @@ package com.kenshisoft.captions
 				{
 					caption = _captionsOnDisplay.splice(j, 1)[0];
 					
-					caption.renderSprite.addEventListener(Event.REMOVED_FROM_STAGE, onRemoved2);
-					
 					renderer.remove(caption, _container);
 					
 					captionRemoveSignal.dispatch(caption);
 					
-					return;
+					removedCaption = true;
 				}
 			}
+			
+			if (removedCaption) return;
 			
 			for (var i:int; i < _captionsBuffer.length; i++)
 			{
@@ -197,119 +192,12 @@ package com.kenshisoft.captions
 				{
 					caption = _captionsBuffer.splice(i, 1)[0];
 					
-					caption.renderSprite.addEventListener(Event.ADDED_TO_STAGE, onAdded2);
-					
 					renderer.add(caption, _captionsOnDisplay, _container);
 					
 					_captionsOnDisplay.push(caption);
 					
 					captionDisplaySignal.dispatch(caption);
-					
-					return;
 				}
-			}
-			
-			_timeLineTimer.start();
-		}
-		
-		private function onRemoved2(event:Event):void
-		{
-			if (event) event.target.removeEventListener(Event.REMOVED_FROM_STAGE, onRemoved);
-			
-			_timeLineTimer.start();
-		}
-		
-		private function onAdded2(event:Event):void
-		{
-			if (event) event.target.removeEventListener(Event.ADDED_TO_STAGE, onAdded);
-			
-			_timeLineTimer.start();
-		}
-		
-		private function stage(event:TimerEvent):void
-		{
-			_stageTimer.stop();
-			
-			//_container.alpha = 0;
-			
-			removeCaptions();
-		}
-		
-		private function removeCaptions():void
-		{
-			if (format == SubtitleFormat.ASS)
-			{
-				var caption:ASSCaption;
-				
-				if (_captionsToRemove.length > 0)
-				{
-					//caption = ASSCaption(_captionsToRemove.splice(0, 1)[0]);
-					
-					caption.renderSprite.addEventListener(Event.EXIT_FRAME, onRemoved);
-					
-					//ASSRenderer.remove(caption, _container);
-					
-					captionRemoveSignal.dispatch(caption);
-				}
-				else
-				{
-					onRemoved(null);
-				}
-			}
-		}
-		
-		private function addCaptions():void
-		{
-			if (format == SubtitleFormat.ASS)
-			{
-				var caption:ASSCaption;
-				
-				if (_captionsToAdd.length > 0)
-				{
-					//caption = ASSCaption(_captionsToAdd.splice(0, 1)[0]);
-					
-					caption.renderSprite.addEventListener(Event.ENTER_FRAME, onAdded);
-					
-					//ASSRenderer.add(caption, _captionsOnDisplay, _container);
-					
-					_captionsOnDisplay.push(caption);
-					
-					captionDisplaySignal.dispatch(caption);
-				}
-				else
-				{
-					onAdded(null);
-				}
-			}
-		}
-		
-		private function onRemoved(event:Event):void
-		{
-			if (event) event.target.removeEventListener(Event.EXIT_FRAME, onRemoved);
-			
-			if (_captionsToRemove.length > 0)
-			{
-				removeCaptions();
-			}
-			else
-			{
-				addCaptions();
-			}
-		}
-		
-		private function onAdded(event:Event):void
-		{
-			if (event) event.target.removeEventListener(Event.ENTER_FRAME, onAdded);
-			
-			if (_captionsToAdd.length > 0)
-			{
-				addCaptions();
-			}
-			else
-			{
-				_container.alpha = 1;
-				
-				_stageTimer.start();
 			}
 		}
 		
@@ -322,7 +210,6 @@ package com.kenshisoft.captions
 			
 			_bufferTimer.start();
 			_timeLineTimer.start();
-			//_stageTimer.start();
 		}
 		
 		/**
@@ -334,7 +221,6 @@ package com.kenshisoft.captions
 			
 			_bufferTimer.stop();
 			_timeLineTimer.stop();
-			_stageTimer.stop();
 		}
 		
 		/**
