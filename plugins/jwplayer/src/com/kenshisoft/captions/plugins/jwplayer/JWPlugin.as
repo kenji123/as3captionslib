@@ -12,6 +12,7 @@ package com.kenshisoft.captions.plugins.jwplayer
 	
 	import com.kenshisoft.captions.Captions;
 	import com.kenshisoft.captions.FakeNetStream;
+	import com.kenshisoft.captions.config.CaptionConfig;
 	import com.kenshisoft.captions.config.Config;
 	import com.kenshisoft.captions.enums.SubtitleFormat;
 	
@@ -26,6 +27,7 @@ package com.kenshisoft.captions.plugins.jwplayer
 		private var player:IPlayer;
 		
 		private var config:Config;
+		private var currentSubtitle:CaptionConfig;
 		private var captionsContainer:Sprite = new Sprite();
 		private var fakeStream:FakeNetStream = new FakeNetStream();
 		private var captions:Captions;
@@ -53,6 +55,8 @@ package com.kenshisoft.captions.plugins.jwplayer
 			
 			this.config = new Config(args);
 			
+			currentSubtitle = config.getDefaultCaption();
+			
 			initCaptions();
 			
 			player.addEventListener(MediaEvent.JWPLAYER_MEDIA_TIME, onMediaTime);
@@ -66,49 +70,11 @@ package com.kenshisoft.captions.plugins.jwplayer
 		
 		public function resize(width:Number, height:Number):void
 		{
-			resizeCaptionsToStage();
-		}
-		
-		private function initCaptions():void
-		{
-			captions = new Captions(true, config.animateCaptions);
-			captions.setContainer(captionsContainer);
-			captions.setStream(fakeStream);
-			captions.setVideoRect(new Rectangle(0, 0, player.controls.display.width, player.controls.display.height));
-			
-			loadFonts();
-		}
-		
-		private function loadFonts():void
-		{
-			if (config.fonts.length < 1)
+			if (captions)
 			{
-				onFontsRegistered(null);
-				return;
+				captions.setVideoRect(new Rectangle(0, 0, player.controls.display.width, player.controls.display.height));
+				captions.flush();
 			}
-			
-			captions.fontsRegisteredSignal.add(onFontsRegistered);
-			captions.loadFontSwf(config.fonts[0]);
-		}
-		
-		private function onFontsRegistered(event:Object):void
-		{
-			for (var i:int; i < config.fonts.length; i++)
-			{
-				if (config.fonts[i].url == event.url)
-					config.fonts[i].registered = true;
-			}
-			
-			for (var j:int; j < config.fonts.length; j++)
-			{
-				if (!config.fonts[j].registered)
-				{
-					captions.loadFontSwf(config.fonts[j]);
-					return;
-				}
-			}
-			
-			captions.loadCaptions(SubtitleFormat.ASS, config.getDefaultCaption().url);
 		}
 		
 		private function onMediaTime(event:MediaEvent):void
@@ -122,13 +88,59 @@ package com.kenshisoft.captions.plugins.jwplayer
 				captions.flush((event.offset > 0 ? event.offset : 0));
 		}
 		
-		private function resizeCaptionsToStage():void
+		private function initCaptions():void
 		{
-			if (captions)
+			captions = new Captions(true, config.captionsAnimated);
+			captions.setContainer(captionsContainer);
+			captions.setStream(fakeStream);
+			captions.setVideoRect(new Rectangle(0, 0, player.controls.display.width, player.controls.display.height));
+			
+			loadFonts();
+		}
+		
+		private function loadFonts():void
+		{
+			if (currentSubtitle.fonts.length < 1)
 			{
-				captions.setVideoRect(new Rectangle(0, 0, player.controls.display.width, player.controls.display.height));
-				captions.flush();
+				loadCaptions();
+				return;
 			}
+			
+			for (var k:int = 0, l:int = currentSubtitle.fonts.length; k < l; k++)
+			{
+				if (!currentSubtitle.fonts[k].registered)
+				{
+					captions.loadFontSwf(currentSubtitle.fonts[k]);
+					return;
+				}
+			}
+			
+			loadCaptions();
+		}
+		
+		private function onFontsRegistered(event:Object):void
+		{
+			for (var i:int = 0, j:int = currentSubtitle.fonts.length; i < j; i++)
+			{
+				if (currentSubtitle.fonts[i].url == event.url)
+					currentSubtitle.fonts[i].registered = true;
+			}
+			
+			for (var k:int = 0, l:int = currentSubtitle.fonts.length; k < l; k++)
+			{
+				if (!currentSubtitle.fonts[k].registered)
+				{
+					captions.loadFontSwf(currentSubtitle.fonts[k]);
+					return;
+				}
+			}
+			
+			loadCaptions();
+		}
+		
+		private function loadCaptions():void
+		{
+			captions.loadCaptions(currentSubtitle.format, currentSubtitle.url);
 		}
 	}
 }
