@@ -33,7 +33,7 @@ package com.kenshisoft.captions.models.ass
 		private var _effect:String = "";
 		private var _text:String = "";
 		
-		// makes things easier when dealing with ass events
+		// makes things easier when dealing with events
 		private var _id:int;
 		private var _startSeconds:Number;
 		private var _endSeconds:Number;

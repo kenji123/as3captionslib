@@ -31,7 +31,7 @@ package com.kenshisoft.captions.models.ass
 		private var _fontEmbed:Boolean = false; // whether or not to use embedded fonts
 		private var _fontSize:Number = 18;
 		private var _orgFontSize:Number = 18;
-		private var _colours:Vector.<Color> = new Vector.<Color>;
+		private var _colours:Vector.<Color> = new Vector.<Color>; // primary, secondary, outline, back
 		private var _fontWeight:String = "bold";
 		private var _italic:String = "normal";
 		private var _underline:String = "none";
