@@ -19,6 +19,9 @@
 
 package com.kenshisoft.captions.formats.ass
 {
+	import com.kenshisoft.captions.formats.ICaption;
+	import com.kenshisoft.captions.models.IEvent;
+	import com.kenshisoft.captions.models.ISubtitle;
 	import fl.motion.Color;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
@@ -29,6 +32,7 @@ package com.kenshisoft.captions.formats.ass
 	import flash.filters.BlurFilter;
 	import flash.filters.DropShadowFilter;
 	import flash.filters.GlowFilter;
+	import flash.geom.ColorTransform;
 	import flash.geom.Matrix;
 	import flash.geom.Matrix3D;
 	import flash.geom.PerspectiveProjection;
@@ -48,6 +52,8 @@ package com.kenshisoft.captions.formats.ass
 	import com.kenshisoft.captions.FontClass;
 	import com.kenshisoft.captions.SubtitleWord;
 	import com.kenshisoft.captions.enums.SubtitleEffect;
+	import com.kenshisoft.captions.formats.IParser;
+	import com.kenshisoft.captions.formats.IRenderer;
 	import com.kenshisoft.captions.formats.ass.ASSCaption;
 	import com.kenshisoft.captions.loaders.FontLoader;
 	import com.kenshisoft.captions.misc.MarginRectangle;
@@ -56,21 +62,20 @@ package com.kenshisoft.captions.formats.ass
 	import com.kenshisoft.captions.models.ass.ASSEvent;
 	import com.kenshisoft.captions.models.ass.ASSStyle;
 	import com.kenshisoft.captions.models.ass.ASSSubtitle;
-	import com.kenshisoft.captions.parsers.ASSParser;
 	
 	/**
 	 * ...
 	 * @author ...
 	 */
-	public class ASSRenderer
+	public class ASSRenderer implements IRenderer
 	{
-		public var parser:ASSParser;
+		private var _parser:ASSParser;
 		
 		public function ASSRenderer()
 		{
 			super();
 			
-			parser = new ASSParser();
+			_parser = new ASSParser();
 		}
 		
 		private function calculateAnimation(dst:Number, src:Number, isAnimated:Boolean, options:Object):Number
@@ -133,15 +138,15 @@ package com.kenshisoft.captions.formats.ass
 						
 						if (tagOptions[0].length <= 0) { style.colours[j].alphaOffset = orgStyle.colours[j].alphaOffset; continue; }
 						
-						d = Util.toDecimalColour("0x" + tagOptions[0])[0];
+						d = uint("0x" + tagOptions[0]);
 						style.colours[j].alphaOffset = int(calculateAnimation(d, style.colours[j].alphaOffset, isAnimated, options));
 						
 						break;
 					case "alpha":
-						d = Util.toDecimalColour(tagOptions[0])[0];
+						d = uint("0x" + tagOptions[0]);
 						for (j = 0; j < 4; j++)
-							style.colours[j].alphaOffset = tagOptions[0].length > 0 ? calculateAnimation(d, style.colours[j].alphaOffset, isAnimated, options) : orgStyle.colours[j].alphaOffset;
-							
+							style.colours[j].alphaOffset = tagOptions[0].length > 0 ? int(calculateAnimation(d, style.colours[j].alphaOffset, isAnimated, options)) : orgStyle.colours[j].alphaOffset;
+						
 						break;
 					case "an":
 						d = Number(tagOptions[0]);
@@ -237,8 +242,8 @@ package com.kenshisoft.captions.formats.ass
 						
 						break;
 					case "fn":
-						style.fontName = parser.getFontNameByAlias(tagOptions[0].length > 0 ? tagOptions[0] : orgStyle.fontName, options.fontInfo);
-						parser.setTrueFontHeight(style);
+						style.fontName = _parser.getFontNameByAlias(tagOptions[0].length > 0 ? tagOptions[0] : orgStyle.fontName, options.fontInfo);
+						_parser.setTrueFontHeight(style);
 						
 						break;
 					case "frx":
@@ -297,13 +302,13 @@ package com.kenshisoft.captions.formats.ass
 						{
 							n = calculateAnimation(style.orgFontSize + ((style.orgFontSize * d) / 10), style.orgFontSize, isAnimated, options);
 							style.orgFontSize = n > 0 ? n : orgStyle.orgFontSize;
-							parser.setTrueFontHeight(style);
+							_parser.setTrueFontHeight(style);
 						}
 						else
 						{
 							n = calculateAnimation(d, style.orgFontSize, isAnimated, options);
 							style.orgFontSize = n > 0 ? n : orgStyle.orgFontSize;
-							parser.setTrueFontHeight(style);
+							_parser.setTrueFontHeight(style);
 						}
 						
 						break;
@@ -401,7 +406,7 @@ package com.kenshisoft.captions.formats.ass
 						break;
 					case "r":
 						var newStyle:ASSStyle;
-						if (tagOptions[0].length > 0) newStyle = parser.getStyle(tagOptions[0], styles).copy();
+						if (tagOptions[0].length > 0) newStyle = _parser.getStyle(tagOptions[0], styles).copy();
 						style = (newStyle != null) ? newStyle : orgStyle.copy();
 						
 						break;
@@ -457,7 +462,7 @@ package com.kenshisoft.captions.formats.ass
 							p = tagOptions[3];
 						}
 						
-						style = styleModifier(caption, parser.parseTag(p), options.animate, style, orgStyle, styles, options);
+						style = styleModifier(caption, _parser.parseTag(p), options.animate, style, orgStyle, styles, options);
 						
 						caption.isAnimated = options.animate;
 						
@@ -950,10 +955,13 @@ package com.kenshisoft.captions.formats.ass
 			return matrix3d;
 		}
 		
-		public function render(subtitle:ASSSubtitle, event:ASSEvent, videoRect:Rectangle, container:DisplayObjectContainer, captionsOnDisplay:Vector.<ASSCaption>, fontClasses:Vector.<FontClass>, time:Number = -1, animate:Boolean = true):ASSCaption
+		public function render(subtitle_:ISubtitle, event_:IEvent, videoRect:Rectangle, container:DisplayObjectContainer, captionsOnDisplay:Vector.<ICaption>, fontClasses:Vector.<FontClass>, time:Number = -1, animate:Boolean = true):ICaption
 		{
-			var style:ASSStyle = parser.getStyle(event.style, subtitle.styles).copy();
-			var orgStyle:ASSStyle = parser.getStyle(event.style, subtitle.styles);
+			var subtitle:ASSSubtitle = ASSSubtitle(subtitle_);
+			var event:ASSEvent = ASSEvent(event_);
+			
+			var style:ASSStyle = _parser.getStyle(event.style, subtitle.styles).copy();
+			var orgStyle:ASSStyle = _parser.getStyle(event.style, subtitle.styles);
 			
 			var caption:ASSCaption = new ASSCaption(subtitle.wrapStyle, style.alignment, event);
 			if (!caption) return null;
@@ -975,7 +983,7 @@ package com.kenshisoft.captions.formats.ass
 			options.nPolygon = 0;
 			options.polygonBaselineOffset = 0;
 			
-			if (animate) parser.parseEffect(caption, event.effect);
+			if (animate) _parser.parseEffect(caption, event.effect);
 			
 			var str:String = event.text;
 			
@@ -985,7 +993,7 @@ package com.kenshisoft.captions.formats.ass
 				
 				if(str.charAt(0) == '{' && (i = str.indexOf('}')) > 0)
 				{
-					style = styleModifier(caption, parser.parseTag(str.substr(1, i-1)), false, style, orgStyle, subtitle.styles, options);
+					style = styleModifier(caption, _parser.parseTag(str.substr(1, i-1)), false, style, orgStyle, subtitle.styles, options);
 					
 					str = str.substr(i+1);
 				}
@@ -1003,9 +1011,9 @@ package com.kenshisoft.captions.formats.ass
 				tmp.shadowDepthY *= subtitle.scaledBorderAndShadow ? caption.scaleY : 1;
 				
 				if (options.nPolygon > 0)
-					parser.parsePolygon(caption, str.substr(0, i), tmp);
+					_parser.parsePolygon(caption, str.substr(0, i), tmp);
 				else
-					parser.parseString(caption, str.substr(0, i), tmp, this);
+					_parser.parseString(caption, str.substr(0, i), tmp, this);
 				
 				str = str.substr(i);
 			}
@@ -1257,6 +1265,11 @@ package com.kenshisoft.captions.formats.ass
 		{
 			try { container.removeChild(caption.renderSprite); } catch (error:Error) { }
 			//try { container.removeChild(caption.bitmap); } catch (error:Error) { }
+		}
+		
+		public function get parser():IParser
+		{
+			return _parser;
 		}
 	}
 }

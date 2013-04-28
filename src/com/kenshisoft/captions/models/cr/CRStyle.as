@@ -34,7 +34,7 @@ package com.kenshisoft.captions.models.cr
 		private var _name:String;
 		private var _font_name:String;
 		private var _font_size:Number;
-		private var _colours:Vector.<Colors> = new Vector.<Colors>; // primary, secondary, outline, back
+		private var _colours:Vector.<Color> = new Vector.<Color>; // primary, secondary, outline, back
 		private var _bold:int;
 		private var _italic:int;
 		private var _underline:int;

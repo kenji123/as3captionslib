@@ -28,17 +28,17 @@ package com.kenshisoft.captions.enums
 	public class SubtitleFormat
 	{
 		/**
-		 * Indicates that this is a Advanced Substation Alpha subtitle.
+		 * Indicates that the associated subtitle is an Advanced Substation Alpha subtitle.
 		 */
 		public static const ASS:SubtitleFormat = new SubtitleFormat("ASS");
 		/**
-		 * Indicates that this is a SubRip Text subtitle.
+		 * Indicates that the associated subtitle is a CrunchyRoll subtitle.
+		 */
+		public static const CR:SubtitleFormat = new SubtitleFormat("CR");
+		/**
+		 * Indicates that the associated subtitle is a SubRip Text subtitle.
 		 */
 		public static const SRT:SubtitleFormat = new SubtitleFormat("SRT");
-		/**
-		 * Indicates that this is a Synchronized Accessible Media Interchange subtitle.
-		 */
-		public static const SAMI:SubtitleFormat = new SubtitleFormat("SAMI");
 		
 		/**
 		 * Format of the subtitle.

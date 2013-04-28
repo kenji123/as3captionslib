@@ -45,61 +45,29 @@ package com.kenshisoft.captions.misc
 			return time.length < 4 ? -1 : ((((time[0]*60 + time[1])*60) + time[2]) + (time[3]/100));
 		}
 		
-		public static function toColor(hexColour:String):Color
+		public static function toColor(hexColor:String):Color
         {
-			if (hexColour.indexOf("0x") >= 0)
-				hexColour = hexColour.substr(hexColour.indexOf("0x"));
+			if (hexColor.indexOf("0x") >= 0)
+				hexColor = hexColor.substr(hexColor.indexOf("0x"));
 			
-			while(hexColour.length < 8)
-				hexColour = "0" + hexColour;
+			while(hexColor.length < 8)
+				hexColor = "0" + hexColor;
 			
             var hexRegExp:RegExp = new RegExp("([0-9a-fA-F][0-9a-fA-F])([0-9a-fA-F][0-9a-fA-F])([0-9a-fA-F][0-9a-fA-F])([0-9a-fA-F][0-9a-fA-F])", "i");
-            var hexMatch:Object = hexRegExp.exec(hexColour);
+            var hexMatch:Object = hexRegExp.exec(hexColor);
 			
             return hexMatch == null ? new Color() : new Color(1, 1, 1, 1, int("0x" + hexMatch[4]), int("0x" + hexMatch[3]), int("0x" + hexMatch[2]), int("0x" + hexMatch[1]));
         }
 		
-		public static function toDecimalColour(hexColour:String):Array
+		public static function toHexColor(color:Color):String
 		{
-			var bytes:Array = [];
-			while (hexColour.length > 2)
-			{
-				var byte:String = hexColour.substr(-2);
-				hexColour = hexColour.substr(0, hexColour.length-2);
-				bytes.splice(0, 0, int("0x" + byte));
-			}
+			var abgr:uint = color.alphaOffset << 24 | color.blueOffset << 16 | color.greenOffset << 8 | color.redOffset;
+			var hexColor:String = abgr.toString(16).toUpperCase();
 			
-			return bytes;
-		}
-		
-		public static function toHexColour(decimalColour:*):String
-		{
-			var hexColour:String = "";
+			while(hexColor.length < 8)
+				hexColor = "0" + hexColor;
 			
-			if (decimalColour is String || decimalColour is Number || decimalColour is uint || decimalColour is int)
-			{
-				hexColour = (1*decimalColour).toString(16).toUpperCase();
-			}
-			else if (decimalColour is Color)
-			{
-				hexColour += decimalColour.redOffset.toString(16).toUpperCase();
-				hexColour += decimalColour.greenOffset.toString(16).toUpperCase();
-				hexColour += decimalColour.blueOffset.toString(16).toUpperCase();
-				hexColour += decimalColour.alphaOffset.toString(16).toUpperCase();
-			}
-			else if (decimalColour is Array)
-			{
-				var dcl:int = decimalColour.length;
-				for (var i:int = 0; i < dcl; i++)
-					decimalColour[i] = decimalColour[i].toString(16).toUpperCase();
-				
-				hexColour = decimalColour.join();
-			}
-			
-			while(hexColour.length < 8)
-				hexColour = "0" + hexColour;
-			
-			return "0x" + hexColour;
+			return "0x" + hexColor;
 		}
 		
 		public static function trim(str:String):String
@@ -108,7 +76,7 @@ package com.kenshisoft.captions.misc
 			return str.replace(/^\s+|\s+$/g, '');
 		}
 		
-		public static function trimLeft(str:String):String
+		/*public static function trimLeft(str:String):String
 		{
 			if (str == null) return '';
 			return str.replace(/^\s+/, '');
@@ -118,6 +86,6 @@ package com.kenshisoft.captions.misc
 		{
 			if (str == null) return '';
 			return str.replace(/\s+$/, '');
-		}
+		}*/
 	}
 }

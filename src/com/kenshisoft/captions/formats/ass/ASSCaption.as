@@ -19,6 +19,7 @@
 
 package com.kenshisoft.captions.formats.ass
 {
+	import com.kenshisoft.captions.formats.ICaption;
 	import flash.display.Bitmap;
 	import flash.display.Sprite;
 	import flash.geom.Point;
@@ -35,7 +36,7 @@ package com.kenshisoft.captions.formats.ass
 	 * ...
 	 * @author ...
 	 */
-	public class ASSCaption
+	public class ASSCaption implements ICaption
 	{
 		public var wrapStyle:int;
 		public var alignment:int;
@@ -246,6 +247,12 @@ package com.kenshisoft.captions.formats.ass
 			
 			//TODO: testing
 			_rect.height += line.pixelHeight + (last ? 0 : line.pixelLeading);
+			
+			if (last)
+			{
+				_rect.width = Math.ceil(_rect.width);
+				_rect.height = Math.ceil(_rect.height);
+			}
 			
 			_lines.push(line);
 		}

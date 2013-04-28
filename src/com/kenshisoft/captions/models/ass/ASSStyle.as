@@ -364,7 +364,7 @@ package com.kenshisoft.captions.models.ass
 			
 			newStyle.colours = new Vector.<Color>;
 			for (var i:int; i < _colours.length; i++)
-				newStyle.colours.push(Util.toColor(Util.toHexColour(_colours[i].color)));
+				newStyle.colours.push(Util.toColor(Util.toHexColor(_colours[i])));
 			
 			newStyle.fontWeight = _fontWeight;
 			newStyle.italic = _italic;

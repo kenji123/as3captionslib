@@ -43,7 +43,7 @@ package com.kenshisoft.captions.loaders
 		* Dispatched when a subtitle resource is loaded. 
 		* Returns the loaded subtitle resource as a string.
 		*/
-		public var subtitleLoadedSignal:Signal = new Signal(Object);
+		public var subtitleLoadedSignal:Signal = new Signal(String);
 		
 		/**
 		 * Creates a SubtitleLoder object.
@@ -77,7 +77,7 @@ package com.kenshisoft.captions.loaders
 		{
             //trace("SubtitleLoader onDownloadComplete: " + _urlLoader.data);
 			
-			subtitleLoadedSignal.dispatch(_urlLoader.data);
+			subtitleLoadedSignal.dispatch(_urlLoader.data.toString());
         }
 		
 		private function onHttpStatus(event:HTTPStatusEvent):void

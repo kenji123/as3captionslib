@@ -21,8 +21,9 @@ package com.kenshisoft.captions.models.ass
 {
 	import com.kenshisoft.captions.misc.MarginRectangle;
 	import com.kenshisoft.captions.misc.Util;
+	import com.kenshisoft.captions.models.IEvent;
 	
-	public class ASSEvent
+	public class ASSEvent implements IEvent
 	{
 		private var _layer:int = 0;
 		private var _start:String = "00:00:00.00"; // stored as parsed. use startSeconds for numeric converted value

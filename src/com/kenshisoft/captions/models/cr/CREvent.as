@@ -20,12 +20,13 @@
 package com.kenshisoft.captions.models.cr 
 {
 	import com.kenshisoft.captions.misc.MarginRectangle;
+	import com.kenshisoft.captions.models.IEvent;
 	
 	/**
 	 * ...
 	 * @author 
 	 */
-	public class CREvent
+	public class CREvent implements IEvent
 	{
 		private var _id:int;
 		private var _start:String;
@@ -44,6 +45,16 @@ package com.kenshisoft.captions.models.cr
 		public function CREvent()
 		{
 			super();
+		}
+		
+		public function get id():int
+        {
+            return _id;
+		}
+		
+       	public function set id(value:int):void
+        {
+            _id = value;
 		}
 		
 		public function get start():String
@@ -114,6 +125,36 @@ package com.kenshisoft.captions.models.cr
         public function set text(value:String):void
 		{
             _text = value;
+		}
+		
+		public function get startSeconds():Number
+        {
+            return _startSeconds;
+		}
+		
+       	public function set startSeconds(value:Number):void
+        {
+            _startSeconds = value;
+		}
+		
+		public function get endSeconds():Number
+        {
+            return _endSeconds;
+		}
+		
+       	public function set endSeconds(value:Number):void
+        {
+            _endSeconds = value;
+		}
+		
+		public function get duration():Number
+        {
+            return _duration;
+		}
+		
+       	public function set duration(value:Number):void
+        {
+            _duration = value;
 		}
 	}
 }

@@ -50,7 +50,7 @@ package com.kenshisoft.captions.loaders
 		* Dispatched when a font(s) is registered. 
 		* Returns the associated FontConfig object.
 		*/
-		public var fontsRegisteredSignal:Signal = new Signal(Object);
+		public var fontsRegisteredSignal:Signal = new Signal(FontConfig);
 		
 		/**
 		 * Creates a FontLoader object.

@@ -19,12 +19,17 @@
 
 package com.kenshisoft.captions.models.cr 
 {
+	import com.kenshisoft.captions.enums.SubtitleFormat;
+	import com.kenshisoft.captions.models.ISubtitle;
+	
 	/**
 	 * ...
 	 * @author 
 	 */
-	public class CRSubtitleScript
+	public class CRSubtitleScript implements ISubtitle
 	{
+		private static const FORMAT:SubtitleFormat = SubtitleFormat.CR;
+		
 		private var _id:int;
 		private var _title:String;
 		private var _play_res_x:int;
@@ -35,6 +40,8 @@ package com.kenshisoft.captions.models.cr
 		private var _progress_string:String;
 		private var _status_string:String;
 		private var _wrap_style:int;
+		private var _styles:Vector.<CRStyle> = new Vector.<CRStyle>;
+    	private var _events:Vector.<CREvent> = new Vector.<CREvent>;
 		
 		public function CRSubtitleScript()
 		{
@@ -139,6 +146,31 @@ package com.kenshisoft.captions.models.cr
        	public function set wrap_style(value:int):void
         {
             _wrap_style = value;
+		}
+		
+		public function get styles():Vector.<CRStyle>
+        {
+            return _styles;
+		}
+		
+       	public function set styles(value:Vector.<CRStyle>):void
+        {
+            _styles = value;
+		}
+		
+		public function get events():Vector.<CREvent>
+        {
+            return _events;
+		}
+		
+       	public function set events(value:Vector.<CREvent>):void
+        {
+            _events = value;
+		}
+		
+		public function get format():SubtitleFormat
+        {
+            return FORMAT;
 		}
 	}
 }

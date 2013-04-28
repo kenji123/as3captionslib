@@ -17,7 +17,7 @@
 // along with as3captionslib.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-package com.kenshisoft.captions.parsers
+package com.kenshisoft.captions.formats.ass
 {
 	import fl.motion.Color;
 	import flash.text.FontType;
@@ -31,6 +31,7 @@ package com.kenshisoft.captions.parsers
 	
 	import com.kenshisoft.captions.FontClass;
 	import com.kenshisoft.captions.SubtitleWord;
+	import com.kenshisoft.captions.formats.IParser;
 	import com.kenshisoft.captions.formats.ass.ASSCaption;
 	import com.kenshisoft.captions.formats.ass.ASSEffect;
 	import com.kenshisoft.captions.formats.ass.ASSRenderer;
@@ -39,18 +40,19 @@ package com.kenshisoft.captions.parsers
 	import com.kenshisoft.captions.misc.MarginRectangle;
 	import com.kenshisoft.captions.misc.Size;
 	import com.kenshisoft.captions.misc.Util;
+	import com.kenshisoft.captions.models.ISubtitle;
 	import com.kenshisoft.captions.models.ass.ASSEvent;
 	import com.kenshisoft.captions.models.ass.ASSStyle;
 	import com.kenshisoft.captions.models.ass.ASSSubtitle;
 	
-	public class ASSParser
+	public class ASSParser implements IParser
 	{
 		public function ASSParser()
 		{
 			super();
 		}
 		
-		public function parse(subtitleStr:String, fontClasses:Vector.<FontClass>):ASSSubtitle
+		public function parse(subtitleStr:String, fontClasses:Vector.<FontClass>):ISubtitle
 		{
 			// comment, picture, sound, movie, and command events are ignored
 			var styleV5RegExp:RegExp = /(.*),(.*),(\d*),&H(.{0,8}?),&H(.{0,8}?),&H(.{0,8}?),&H(.{0,8}?),(-?\d),(-?\d),(-?\d),(-?\d),(\d*),(\d*),(\d*\.?\d*?),(\d*\.?\d*?),(\d*),(\d*\.?\d*?),(\d*\.?\d*?),(\d*),(\d*),(\d*),(\d*),(\d*)/im;
@@ -307,7 +309,7 @@ package com.kenshisoft.captions.parsers
 				}
 				else if (tag.indexOf("alpha") == 0)
 				{
-					tagParams.push("alpha", tag.substr(5, (tag.length - 1) - 5));
+					tagParams.push("alpha", tag.substr(7, (tag.length - 1) - 7));
 				}
 				else if (tag.indexOf("an") == 0)
 				{
@@ -609,7 +611,7 @@ package com.kenshisoft.captions.parsers
 				{
 					style.fontSize = trueSize;
 					return;
-				}	
+				}
 			}
 		}
 	}

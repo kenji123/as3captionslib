@@ -19,10 +19,12 @@
 
 package com.kenshisoft.captions.models.ass
 {
+	import com.kenshisoft.captions.enums.SubtitleFormat;
 	import com.kenshisoft.captions.enums.SubtitleMode;
 	import com.kenshisoft.captions.misc.Size;
+	import com.kenshisoft.captions.models.ISubtitle;
 	
-	public class ASSSubtitle
+	public class ASSSubtitle implements ISubtitle
 	{
 		public static const SCRIPT_HEADER:String = ( <![CDATA[
 											[Script Info]
@@ -47,6 +49,8 @@ package com.kenshisoft.captions.models.ass
 											[Events]
                                     		Format: Layer, Start, End, Style, Actor, MarginL, MarginR, MarginV, Effect, Text
 										]]> ).toString();
+		
+		private static const FORMAT:SubtitleFormat = SubtitleFormat.ASS;
 		
 		private var _mode:SubtitleMode = SubtitleMode.TIME;
 		private var _screenSize:Size = new Size();
@@ -263,6 +267,11 @@ package com.kenshisoft.captions.models.ass
        	public function set timer(value:Number):void
         {
             _timer = value;
+		}
+		
+		public function get format():SubtitleFormat
+        {
+            return FORMAT;
 		}
 	}
 }

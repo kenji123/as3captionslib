@@ -19,6 +19,11 @@
 
 package com.kenshisoft.captions
 {
+	import com.kenshisoft.captions.formats.ass.ASSRenderer;
+	import com.kenshisoft.captions.formats.ass.ASSTimeLine;
+	import com.kenshisoft.captions.formats.cr.CRRenderer;
+	import com.kenshisoft.captions.formats.cr.CRTimeLine;
+	import com.kenshisoft.captions.formats.ICaption;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.DisplayObjectContainer;
@@ -28,14 +33,15 @@ package com.kenshisoft.captions
 	import org.osflash.signals.Signal;
 	
 	import com.kenshisoft.captions.config.FontConfig;
+	import com.kenshisoft.captions.formats.IParser;
+	import com.kenshisoft.captions.formats.IRenderer;
 	import com.kenshisoft.captions.formats.ass.ASSCaption;
-	import com.kenshisoft.captions.formats.ass.ASSRenderer;
 	import com.kenshisoft.captions.enums.SubtitleFormat;
 	import com.kenshisoft.captions.loaders.FontLoader;
 	import com.kenshisoft.captions.loaders.SubtitleLoader;
 	import com.kenshisoft.captions.misc.Size;
+	import com.kenshisoft.captions.models.ISubtitle;
 	import com.kenshisoft.captions.models.ass.ASSSubtitle;
-	import com.kenshisoft.captions.parsers.ASSParser;
 	
 	/**
 	 * The Captions class provides the functionaltiy of displaying formated text based captions.
@@ -64,15 +70,15 @@ package com.kenshisoft.captions
 		private var _captionsFormat:SubtitleFormat;
 		private var _fontClasses:Vector.<FontClass> = new Vector.<FontClass>;
 		private var _rawCaptions:String;
-		private var _renderer:ASSRenderer = new ASSRenderer();
-		private var _parsedCaptions:ASSSubtitle;
-		private var _captionsTimeLine:CaptionsTimeLine;
+		private var _renderer:IRenderer;
+		private var _parsedCaptions:ISubtitle;
+		private var _captionsTimeLine:ICaptionsTimeLine;
 		
 		/**
 		* Dispatched when a font(s) is registered. 
 		* Returns the associated FontConfig object.
 		*/
-		public var fontsRegisteredSignal:Signal = new Signal(Object);
+		public var fontsRegisteredSignal:Signal = new Signal(FontConfig);
 		
 		/**
 		* Dispatched when a subtitle resource is loaded. 
@@ -81,20 +87,20 @@ package com.kenshisoft.captions
 		public var captionsLoadedSignal:Signal = new Signal(String);
 		/**
 		* Dispatched when a subtitle resource is parsed and is available as an object. 
-		* Returns the SubtitleFormat and the parsed captions object.
+		* Returns the parsed captions object.
 		*/
-		public var captionsParsedSignal:Signal = new Signal(SubtitleFormat, Object);
+		public var captionsParsedSignal:Signal = new Signal(ISubtitle);
 		
 		/**
 		* Dispatched when a caption has been addded to the associated captions display object container. 
 		* Returns the ASSCaption object displayed.
 		*/
-		public var captionDisplayedSignal:Signal = new Signal(ASSCaption);
+		public var captionDisplayedSignal:Signal = new Signal(ICaption);
 		/**
 		* Dispatched when a caption has been removed from the associated captions display object container. 
 		* Returns the ASSCaption object removed.
 		*/
-		public var captionRemovedSignal:Signal = new Signal(ASSCaption);
+		public var captionRemovedSignal:Signal = new Signal(ICaption);
 		
 		/**
 		 * Creates a Captions object.
@@ -110,14 +116,14 @@ package com.kenshisoft.captions
 			this.animated = animated;
 		}
 		
-		private function onFontsRegistered(event:Object):void
+		private function onFontsRegistered(event:FontConfig):void
 		{
 			fontsRegisteredSignal.dispatch(event);
 		}
 		
-		private function onCaptionsLoaded(event:Object):void
+		private function onCaptionsLoaded(event:String):void
 		{
-			_rawCaptions = event.toString();
+			_rawCaptions = event;
 			
 			captionsLoadedSignal.dispatch(_rawCaptions);
 			
@@ -126,17 +132,36 @@ package com.kenshisoft.captions
 		
 		private function parseCaptions():void
 		{
-			if(_captionsFormat == SubtitleFormat.ASS)
-				_parsedCaptions = _renderer.parser.parse(rawCaptions, _fontClasses);
+			switch (_captionsFormat)
+			{
+				case SubtitleFormat.ASS:
+					_renderer = new ASSRenderer();
+					_parsedCaptions = _renderer.parser.parse(rawCaptions, _fontClasses);
+					break;
+				case SubtitleFormat.CR:
+					_renderer = new CRRenderer();
+					_parsedCaptions = _renderer.parser.parse(rawCaptions, _fontClasses);
+					break;
+			}
 			
-			captionsParsedSignal.dispatch(_captionsFormat, _parsedCaptions);
+			captionsParsedSignal.dispatch(_parsedCaptions);
 			
 			initializeCaptionsTimeLine();
 		}
 		
 		private function initializeCaptionsTimeLine():void
 		{
-			_captionsTimeLine = new CaptionsTimeLine(_captionsFormat, _parsedCaptions, _fontClasses, animated, _renderer);
+			switch (_captionsFormat)
+			{
+				case SubtitleFormat.ASS:
+					_captionsTimeLine = new ASSTimeLine(_parsedCaptions, _fontClasses, _renderer, animated);
+					break;
+				case SubtitleFormat.CR:
+					_captionsTimeLine = new CRTimeLine(_parsedCaptions, _fontClasses, _renderer, animated);
+					break;
+			}
+			
+			//_captionsTimeLine = new CaptionsTimeLine(_captionsFormat, _parsedCaptions, _fontClasses, animated, _renderer);
 			_captionsTimeLine.setContainer(_container);
 			_captionsTimeLine.setStream(_stream);
 			_captionsTimeLine.setVideoRect(_videoRect);
@@ -147,12 +172,12 @@ package com.kenshisoft.captions
 				_captionsTimeLine.start();
 		}
 		
-		private function onDisplayCaption(event:ASSCaption):void
+		private function onDisplayCaption(event:ICaption):void
 		{
 			captionDisplayedSignal.dispatch(event);
 		}
 		
-		private function onRemoveCaption(event:ASSCaption):void
+		private function onRemoveCaption(event:ICaption):void
 		{
 			captionRemovedSignal.dispatch(event);
 		}
@@ -256,6 +281,14 @@ package com.kenshisoft.captions
 			flush();
 		}
 		
+		public function setTimeShift(timeShift:Number):void
+		{
+			if (_captionsTimeLine != null)
+				_captionsTimeLine.timeShift = timeShift;
+			
+			//trace(secs);
+		}
+		
 		/**
 		 * Sets the container within which the captions will be children of.
 		 * 
@@ -319,17 +352,9 @@ package com.kenshisoft.captions
 		/**
 		 * The captions object of the parsed subtitle resource.
 		 */
-		public function get parsedCaptions():ASSSubtitle
+		public function get parsedCaptions():ISubtitle
 		{
 			return _parsedCaptions;
-		}
-		
-		public function setSync(secs:Number):void
-		{
-			if (_captionsTimeLine != null)
-				_captionsTimeLine.sync = secs;
-			
-			//trace(secs);
 		}
 	}
 }

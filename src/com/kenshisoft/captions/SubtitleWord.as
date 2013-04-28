@@ -71,15 +71,15 @@ package com.kenshisoft.captions
 			_descent = _textLine.descent;
 			_leading = (_ascent + _descent) * 0.2;
 			
-			if (_isLineBreak)
-				return;
+			/*if (_isLineBreak)
+				return;*/
 			
 			_pixelWidth = style.fontScaleX / 100 * textWidth + style.fontSpacing;
 			
 			//TODO: testing
-			pixelHeight = style.fontScaleY / 100 * (_ascent + _descent);
+			pixelHeight = style.fontScaleY / 100 * (_isLineBreak ? _descent * 1.5 : (_ascent + _descent));
 			pixelLeading = style.fontScaleY / 100 * _leading;
-		 
+			
 			_width = int((style.fontScaleX / 100 * textWidth + 4/*1*/) >> 3); // word wrap mahou
 		}
 		
