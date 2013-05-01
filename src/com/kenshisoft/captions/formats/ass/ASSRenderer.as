@@ -993,7 +993,7 @@ package com.kenshisoft.captions.formats.ass
 			return matrix3d;
 		}
 		
-		public function render(subtitle_:ISubtitle, event_:IEvent, videoRect:Rectangle, container:DisplayObjectContainer, captionsOnDisplay:Vector.<ICaption>, fontClasses:Vector.<FontClass>, time:Number = -1, animate:Boolean = true):ICaption
+		public function render(subtitle_:ISubtitle, event_:IEvent, videoRect:Rectangle, container:DisplayObjectContainer, fontClasses:Vector.<FontClass>, time:Number = -1, animate:Boolean = true):ICaption
 		{
 			var subtitle:ASSSubtitle = ASSSubtitle(subtitle_);
 			var event:ASSEvent = ASSEvent(event_);
@@ -1187,7 +1187,7 @@ package com.kenshisoft.captions.formats.ass
 					if (word.style.fontAngleX != 0 || word.style.fontAngleY != 0 || word.style.fontAngleZ != 0)
 					{
 						// now let's get some perspective
-						body.transform.perspectiveProjection =  getTransformPerspective(caption.transformPoint);
+						body.transform.perspectiveProjection = getTransformPerspective(caption.transformPoint);
 						if (!bodyOnly)
 							outline.transform.perspectiveProjection = bodyShadow.transform.perspectiveProjection = outlineShadow.transform.perspectiveProjection = body.transform.perspectiveProjection;
 						
@@ -1275,8 +1275,11 @@ package com.kenshisoft.captions.formats.ass
 			return caption;
 		}
 		
-		public function add(caption:ASSCaption, captionsOnDisplay:Vector.<ASSCaption>, container:DisplayObjectContainer):void
+		public function add(caption_:ICaption, captionsOnDisplay_:Vector.<ICaption>, container:DisplayObjectContainer):void
 		{
+			var caption:ASSCaption = ASSCaption(caption_);
+			var captionsOnDisplay:Vector.<ASSCaption> = Vector.<ASSCaption>(captionsOnDisplay_);
+			
 			if (!caption.effects.MOVE && !caption.effects.ORG && !caption.effects.BANNER && !caption.effects.SCROLL && !caption.isAnimated)
 				handleCollisions(caption, caption.renderSprite, captionsOnDisplay, container);
 			
@@ -1299,7 +1302,7 @@ package com.kenshisoft.captions.formats.ass
 			//try { insertAt == -1 ? container.addChild(caption.bitmap) : container.addChildAt(caption.bitmap, insertAt); } catch (error:Error) { }
 		}
 		
-		public function remove(caption:ASSCaption, container:DisplayObjectContainer):void
+		public function remove(caption:ICaption, container:DisplayObjectContainer):void
 		{
 			try { container.removeChild(caption.renderSprite); } catch (error:Error) { }
 			//try { container.removeChild(caption.bitmap); } catch (error:Error) { }

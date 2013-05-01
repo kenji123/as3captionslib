@@ -57,6 +57,10 @@ package com.kenshisoft.captions.config
 			{
 				case SubtitleFormat.ASS.format:
 					_format = SubtitleFormat.ASS; break;
+				case SubtitleFormat.CR.format:
+					_format = SubtitleFormat.CR; break;
+				case SubtitleFormat.SRT.format:
+					_format = SubtitleFormat.SRT; break;
 			}
 			_name = properties.name;
 			_language = properties.language;

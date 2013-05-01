@@ -69,13 +69,7 @@ package com.kenshisoft.captions
 		 * Whether captions are animated.
 		 */
 		private var _animated:Boolean;
-		public function get animated():Boolean { return _animated; };
-		public function set animated(value:Boolean):void { _animated = value; };
-		
 		private var _timeShift:Number = 0;
-		public function get timeShift():Number { return _timeShift; };
-		public function set timeShift(value:Number):void { _timeShift = value; };
-		
 		private var _container:DisplayObjectContainer;
 		private var _stream:NetStream;
 		private var _videoRect:Rectangle;
@@ -279,6 +273,26 @@ package com.kenshisoft.captions
 					_container.removeChildAt(0);
 				} while (_container.numChildren > 0);
 			} catch (error:Error) { }
+		}
+		
+		public function get animated():Boolean
+		{
+			return _animated;
+		}
+		
+		public function set animated(value:Boolean):void
+		{
+			_animated = value;
+		}
+		
+		public function get timeShift():Number
+		{
+			return _timeShift;
+		}
+		
+		public function set timeShift(value:Number):void
+		{
+			_timeShift = value;
 		}
 		
 		/**

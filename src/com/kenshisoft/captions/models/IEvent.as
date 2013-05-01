@@ -1,6 +1,5 @@
 package com.kenshisoft.captions.models
 {
-	
 	/**
 	 * ...
 	 * @author 

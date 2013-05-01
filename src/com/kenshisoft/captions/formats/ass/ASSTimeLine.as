@@ -98,7 +98,7 @@ package com.kenshisoft.captions.formats.ass
 			{
 				if ((captions.events[i].startSeconds - _currentTime) < BUFFER_LENGTH)
 				{
-					_captionsBuffer.push(renderer.render(captions, captions.events[i], _videoRect, _container, Vector.<ICaption>(_captionsOnDisplay), fontClasses, captions.events[i].startSeconds, animated));
+					_captionsBuffer.push(renderer.render(captions, captions.events[i], _videoRect, _container, fontClasses, captions.events[i].startSeconds, animated));
 					
 					_lastBufferIndex++;
 				}
@@ -124,9 +124,9 @@ package com.kenshisoft.captions.formats.ass
 					
 					renderer.remove(caption, _container);
 					
-					var newCaption:ASSCaption = ASSCaption(renderer.render(captions, caption.event, _videoRect, _container, Vector.<ICaption>(_captionsOnDisplay), fontClasses, _stream.time, animated));
+					var newCaption:ASSCaption = ASSCaption(renderer.render(captions, caption.event, _videoRect, _container, fontClasses, _stream.time, animated));
 					
-					renderer.add(newCaption, _captionsOnDisplay, _container);
+					renderer.add(newCaption, Vector.<ICaption>(_captionsOnDisplay), _container);
 					
 					_captionsOnDisplay.push(newCaption);
 					
@@ -153,7 +153,7 @@ package com.kenshisoft.captions.formats.ass
 				{
 					caption = _captionsBuffer.splice(i, 1)[0];
 					
-					renderer.add(caption, _captionsOnDisplay, _container);
+					renderer.add(caption, Vector.<ICaption>(_captionsOnDisplay), _container);
 					
 					_captionsOnDisplay.push(caption);
 					
@@ -187,7 +187,7 @@ package com.kenshisoft.captions.formats.ass
 		{
 			_captionsBuffer = new Vector.<ASSCaption>;
 			
-			time = (time > -1 ? time : _stream.time);
+			time = (time > -1 ? time : _stream.time - BUFFER_LENGTH);
 			
 			for (var i:int; i < captions.events.length; i++)
 			{

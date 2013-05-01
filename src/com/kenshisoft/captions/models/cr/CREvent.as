@@ -37,7 +37,6 @@ package com.kenshisoft.captions.models.cr
 		private var _effect:String;
 		private var _text:String;
 		
-		// makes things easier when dealing with events
 		private var _startSeconds:Number;
 		private var _endSeconds:Number;
 		private var _duration:Number;

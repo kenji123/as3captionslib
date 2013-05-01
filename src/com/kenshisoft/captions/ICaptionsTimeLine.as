@@ -13,12 +13,6 @@ package com.kenshisoft.captions
 	 */
 	public interface ICaptionsTimeLine
 	{
-		function get animated():Boolean;
-		function set animated(value:Boolean):void;
-		
-		function get timeShift():Number;
-		function set timeShift(value:Number):void;
-		
 		function get captionDisplaySignal():Signal;
 		function get captionRemoveSignal():Signal;
 		
@@ -26,6 +20,11 @@ package com.kenshisoft.captions
 		function pause():void;
 		function resume():void;
 		function flushBuffer(time:Number = -1):void;
+		
+		function get animated():Boolean;
+		function set animated(value:Boolean):void;
+		function get timeShift():Number;
+		function set timeShift(value:Number):void;
 		
 		function setContainer(container:DisplayObjectContainer):void;
 		function setStream(stream:NetStream):void;

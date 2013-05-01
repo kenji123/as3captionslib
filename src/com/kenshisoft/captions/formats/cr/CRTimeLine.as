@@ -75,7 +75,7 @@ package com.kenshisoft.captions.formats.cr
 			{
 				if ((captions.events[i].startSeconds - _currentTime) < BUFFER_LENGTH)
 				{
-					_captionsBuffer.push(renderer.render(captions, captions.events[i], _videoRect, _container, Vector.<ICaption>(_captionsOnDisplay), fontClasses, captions.events[i].startSeconds, animated));
+					_captionsBuffer.push(renderer.render(captions, captions.events[i], _videoRect, _container, fontClasses, captions.events[i].startSeconds, animated));
 					
 					_lastBufferIndex++;
 				}
@@ -88,7 +88,40 @@ package com.kenshisoft.captions.formats.cr
 		
 		private function timeLine(event:TimerEvent):void
 		{
+			_currentTime = _stream.time - _timeShift;
 			
+			var caption:CRCaption;
+			var removedCaption:Boolean = false;
+			
+			for (var j:int; j < _captionsOnDisplay.length; j++)
+			{
+				if (_currentTime < _captionsOnDisplay[j].event.startSeconds || _currentTime >= _captionsOnDisplay[j].event.endSeconds)
+				{
+					caption = _captionsOnDisplay.splice(j, 1)[0];
+					
+					renderer.remove(caption, _container);
+					
+					captionRemoveSignal.dispatch(caption);
+					
+					removedCaption = true;
+				}
+			}
+			
+			if (removedCaption) return;
+			
+			for (var i:int; i < _captionsBuffer.length; i++)
+			{
+				if (_currentTime >= _captionsBuffer[i].event.startSeconds && _currentTime < _captionsBuffer[i].event.endSeconds)
+				{
+					caption = _captionsBuffer.splice(i, 1)[0];
+					
+					renderer.add(caption, Vector.<ICaption>(_captionsOnDisplay), _container);
+					
+					_captionsOnDisplay.push(caption);
+					
+					captionDisplaySignal.dispatch(caption);
+				}
+			}
 		}
 		
 		public function start():void
@@ -116,7 +149,7 @@ package com.kenshisoft.captions.formats.cr
 		{
 			_captionsBuffer = new Vector.<CRCaption>;
 			
-			time = (time > -1 ? time : _stream.time);
+			time = (time > -1 ? time : _stream.time - BUFFER_LENGTH);
 			
 			for (var i:int; i < captions.events.length; i++)
 			{
