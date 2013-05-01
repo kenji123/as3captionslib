@@ -50,7 +50,6 @@
   </includeLibraries>
   <!-- SWC Libraries -->
   <libraryPaths>
-    <element path="C:\Program Files (x86)\Adobe\Adobe Flash CS5\Common\Configuration\ActionScript 3.0\libs\flash.swc" />
     <element path="lib\as3-signals-v0.8.swc" />
     <element path="lib\as3corelib.swc" />
   </libraryPaths>

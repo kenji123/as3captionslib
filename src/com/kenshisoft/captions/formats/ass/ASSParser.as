@@ -19,7 +19,7 @@
 
 package com.kenshisoft.captions.formats.ass
 {
-	import fl.motion.Color;
+	//import fl.motion.Color;
 	import flash.text.FontType;
 	import flash.text.TextField;
 	import flash.text.TextFormat;
@@ -141,7 +141,9 @@ package com.kenshisoft.captions.formats.ass
 						style.fontName = getFontNameByAlias(String(styleMatch[index++]).replace(/^@/, ''), fontClasses);
 						//style.fontSize = Number(styleMatch[index++]);
 						style.fontSize = style.orgFontSize = Number(styleMatch[index++]);
-						style.colours = new Vector.<Color>; style.colours.push(Util.toColor(styleMatch[index++]), Util.toColor(styleMatch[index++]), Util.toColor(styleMatch[index++]), Util.toColor(styleMatch[index++]));
+						//style.colours = new Vector.<Color>; style.colours.push(Util.toColor(styleMatch[index++]), Util.toColor(styleMatch[index++]), Util.toColor(styleMatch[index++]), Util.toColor(styleMatch[index++]));
+						style.colours = new Vector.<uint>; style.colours.push("0x" + styleMatch[index++], "0x" + styleMatch[index++], "0x" + styleMatch[index++], "0x" + styleMatch[index++]);
+						//style.colours = new Vector.<uint>; style.colours.push(Util.invertColor(uint("0x" + styleMatch[index++])), Util.invertColor(uint("0x" + styleMatch[index++])), Util.invertColor(uint("0x" + styleMatch[index++])), Util.invertColor(uint("0x" + styleMatch[index++])));
 						style.fontWeight = int(styleMatch[index++]) < 0 ? "bold" : "normal";
 						style.italic = int(styleMatch[index++]) < 0 ? "italic" : "normal";
 						if (subtitle.styleVersion >= 5) style.underline = int(styleMatch[index++]) < 0 ? "underline" : "none";
@@ -158,13 +160,16 @@ package com.kenshisoft.captions.formats.ass
 						if (subtitle.styleVersion >= 6) style.marginRect.bottom = int(styleMatch[index++]);
 						if (subtitle.styleVersion <= 4)
 						{
-							style.colours[2] = new Color(1, 1, 1, 1, style.colours[3].redOffset, style.colours[3].greenOffset, style.colours[3].blueOffset, style.colours[3].alphaOffset);
+							//style.colours[2] = new Color(1, 1, 1, 1, style.colours[3].redOffset, style.colours[3].greenOffset, style.colours[3].blueOffset, style.colours[3].alphaOffset);
+							style.colours[2] = style.colours[3];
 							
 							var alpha:int = int(styleMatch[index]) < 0xff ? int(styleMatch[index]) : 0xff; index++; alpha = alpha > 0 ? alpha : 0;
 							for (var j:int; j < 3; j++)
-								style.colours[j].alphaOffset = alpha;
+								style.colours[j] = alpha << 24 | Util.removeAlpha(style.colours[j]);
+								//style.colours[j].alphaOffset = alpha;
 							
-							style.colours[3].alphaOffset = 0x80;
+							//style.colours[3].alphaOffset = 0x80;
+							style.colours[3] = 0x80 << 24 | Util.removeAlpha(style.colours[3]);
 						}
 						style.charSet = int(styleMatch[index++]);
 						if (subtitle.styleVersion >= 6) style.relativeTo = int(styleMatch[index++]);
@@ -301,15 +306,15 @@ package com.kenshisoft.captions.formats.ass
 				
 				if (tag.indexOf("1c") == 0 || tag.indexOf("2c") == 0 || tag.indexOf("3c") == 0 || tag.indexOf("4c") == 0)
 				{
-					tagParams.push(tag.substr(0, 2), tag.substr(4, (tag.length - 1) - 4));
+					tagParams.push(tag.substr(0, 2), "0x" + tag.substr(4, (tag.length - 1) - 4));
 				}
 				else if (tag.indexOf("1a") == 0 || tag.indexOf("2a") == 0 || tag.indexOf("3a") == 0 || tag.indexOf("4a") == 0)
 				{
-					tagParams.push(tag.substr(0, 2), tag.substr(4, (tag.length - 1) - 4));
+					tagParams.push(tag.substr(0, 2), "0x" + tag.substr(4, (tag.length - 1) - 4));
 				}
 				else if (tag.indexOf("alpha") == 0)
 				{
-					tagParams.push("alpha", tag.substr(7, (tag.length - 1) - 7));
+					tagParams.push("alpha", "0x" + tag.substr(7, (tag.length - 1) - 7));
 				}
 				else if (tag.indexOf("an") == 0)
 				{
@@ -341,7 +346,7 @@ package com.kenshisoft.captions.formats.ass
 				}
 				else if (tag.indexOf("c") == 0)
 				{
-					tagParams.push("c", tag.substr(3, (tag.length - 1) - 3));
+					tagParams.push("c", "0x" + tag.substr(3, (tag.length - 1) - 3));
 				}
 				else if (tag.indexOf("fade") == 0 || tag.indexOf("fad") == 0)
 				{

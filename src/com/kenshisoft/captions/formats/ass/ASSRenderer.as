@@ -22,7 +22,7 @@ package com.kenshisoft.captions.formats.ass
 	import com.kenshisoft.captions.formats.ICaption;
 	import com.kenshisoft.captions.models.IEvent;
 	import com.kenshisoft.captions.models.ISubtitle;
-	import fl.motion.Color;
+	//import fl.motion.Color;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.DisplayObjectContainer;
@@ -124,10 +124,17 @@ package com.kenshisoft.captions.formats.ass
 						
 						if (tagOptions[0].length <= 0) { style.colours[j] = orgStyle.colours[j]; continue; }
 						
-						d = Util.toColor(tagOptions[0]).color;
-						s = style.colours[j].color;
+						d = uint(tagOptions[0]);
+						/*s = Util.toHexColor(style.colours[j], false);
 						
-						style.colours[j].color = Color.interpolateColor(s, d, calculateAnimation(1, 0, isAnimated, options));
+						style.colours[j] = Util.toColor((int(calculateAnimation(d & 0xff, s & 0xff, isAnimated, options)) & 0xff
+							| int(calculateAnimation(d & 0xff00, s & 0xff00, isAnimated, options)) & 0xff00
+							| int(calculateAnimation(d & 0xff0000, s & 0xff0000, isAnimated, options)) & 0xff0000).toString(16));*/
+						s = style.colours[j];
+						
+						style.colours[j] = int(calculateAnimation(d & 0x00ff, s & 0x00ff, isAnimated, options)) & 0x00ff
+							| int(calculateAnimation(d & 0x00ff00, s & 0x00ff00, isAnimated, options)) & 0x00ff00
+							| int(calculateAnimation(d & 0x00ff0000, s & 0x00ff0000, isAnimated, options)) & 0x00ff0000;
 						
 						break;
 					case "1a":
@@ -136,16 +143,18 @@ package com.kenshisoft.captions.formats.ass
 					case "4a":
 						j = int(tag.charAt(0)) - 1;
 						
-						if (tagOptions[0].length <= 0) { style.colours[j].alphaOffset = orgStyle.colours[j].alphaOffset; continue; }
+						//if (tagOptions[0].length <= 0) { style.colours[j].alphaOffset = orgStyle.colours[j].alphaOffset; continue; }
+						if (tagOptions[0].length <= 0) { style.colours[j] = (orgStyle.colours[j] >> 24) << 24 | Util.removeAlpha(orgStyle.colours[j]); continue; }
 						
-						d = uint("0x" + tagOptions[0]);
-						style.colours[j].alphaOffset = int(calculateAnimation(d, style.colours[j].alphaOffset, isAnimated, options));
+						//d = tagOptions[0];
+						//style.colours[j].alphaOffset = int(calculateAnimation(d, style.colours[j].alphaOffset, isAnimated, options));
+						style.colours[j] = int(calculateAnimation(uint(tagOptions[0]) << 24 | Util.removeAlpha(style.colours[j]), style.colours[j], isAnimated, options));
 						
 						break;
 					case "alpha":
-						d = uint("0x" + tagOptions[0]);
 						for (j = 0; j < 4; j++)
-							style.colours[j].alphaOffset = tagOptions[0].length > 0 ? int(calculateAnimation(d, style.colours[j].alphaOffset, isAnimated, options)) : orgStyle.colours[j].alphaOffset;
+							style.colours[j] = tagOptions[0].length > 0 ? int(calculateAnimation(uint(tagOptions[0]) << 24 | Util.removeAlpha(style.colours[j]), style.colours[j], isAnimated, options)) : (orgStyle.colours[j] >> 24) << 24 | Util.removeAlpha(orgStyle.colours[j]);
+							//style.colours[j].alphaOffset = tagOptions[0].length > 0 ? int(calculateAnimation(d, style.colours[j].alphaOffset, isAnimated, options)) : orgStyle.colours[j].alphaOffset;
 						
 						break;
 					case "an":
@@ -200,10 +209,17 @@ package com.kenshisoft.captions.formats.ass
 					case "c":
 						if (tagOptions[0].length <= 0) { style.colours[0] = orgStyle.colours[0]; continue; }
 						
-						d = Util.toColor(tagOptions[0]).color;
-						s = style.colours[0].color;
+						d = uint(tagOptions[0]);
+						/*s = Util.toHexColor(style.colours[0], false);
 						
-						style.colours[0].color = Color.interpolateColor(s, d, calculateAnimation(1, 0, isAnimated, options));
+						style.colours[j] = Util.toColor((int(calculateAnimation(d & 0xff, s & 0xff, isAnimated, options)) & 0xff
+							| int(calculateAnimation(d & 0xff00, s & 0xff00, isAnimated, options)) & 0xff00
+							| int(calculateAnimation(d & 0xff0000, s & 0xff0000, isAnimated, options)) & 0xff0000).toString(16));*/
+						s = style.colours[0];
+						
+						style.colours[j] = int(calculateAnimation(d & 0x00ff, s & 0x00ff, isAnimated, options)) & 0x00ff
+							| int(calculateAnimation(d & 0x00ff00, s & 0x00ff00, isAnimated, options)) & 0x00ff00
+							| int(calculateAnimation(d & 0x00ff0000, s & 0x00ff0000, isAnimated, options)) & 0x00ff0000;
 						
 						break;
 					case "fade":
@@ -720,30 +736,38 @@ package com.kenshisoft.captions.formats.ass
 			elementFormat.textRotation = TextRotation.ROTATE_0;
 			if (!outline && !bodyShadow && !outlineShadow)
 			{
-				elementFormat.color = style.colours[0].color;
-				elementFormat.alpha = 1 - (style.colours[0].alphaOffset / 255);
+				/*elementFormat.color = style.colours[0].color;
+				elementFormat.alpha = 1 - (style.colours[0].alphaOffset / 255);*/
+				elementFormat.color = Util.invertColor(style.colours[0]);
+				elementFormat.alpha = 1 - (uint(style.colours[0] >> 24) / 255);
 			}
 			else if (outline)
 			{
-				elementFormat.color = style.colours[2].color;
+				//elementFormat.color = style.colours[2].color;
+				elementFormat.color = Util.invertColor(style.colours[2]);
 				if ((style.outlineWidthX + style.outlineWidthY) > 0)
-					elementFormat.alpha = 1 - (style.colours[2].alphaOffset / 255);
+					elementFormat.alpha = 1 - (uint(style.colours[2] >> 24) / 255);
+					//elementFormat.alpha = 1 - (style.colours[2].alphaOffset / 255);
 				else
 					elementFormat.alpha = 0;
 			}
 			else if (bodyShadow)
 			{
-				elementFormat.color = style.colours[3].color;
+				//elementFormat.color = style.colours[3].color;
+				elementFormat.color = Util.invertColor(style.colours[3]);
 				if (style.shadowDepthX != 0 || style.shadowDepthY != 0)
-					elementFormat.alpha = 1 - (style.colours[0].alphaOffset / 255);
+					elementFormat.alpha = 1 - (uint(style.colours[0] >> 24) / 255);
+					//elementFormat.alpha = 1 - (style.colours[0].alphaOffset / 255);
 				else
 					elementFormat.alpha = 0;
 			}
 			else if (outlineShadow)
 			{
-				elementFormat.color = style.colours[3].color;
+				//elementFormat.color = style.colours[3].color;
+				elementFormat.color = Util.invertColor(style.colours[3]);
 				if ((style.outlineWidthX + style.outlineWidthY) > 0 && (style.shadowDepthX != 0 || style.shadowDepthY != 0))
-					elementFormat.alpha = 1 - (style.colours[2].alphaOffset / 255);
+					elementFormat.alpha = 1 - (uint(style.colours[2] >> 24) / 255);
+					//elementFormat.alpha = 1 - (style.colours[2].alphaOffset / 255);
 				else
 					elementFormat.alpha = 0;
 			}
@@ -778,8 +802,10 @@ package com.kenshisoft.captions.formats.ass
 			outlineColour.blurX = style.outlineWidthX + bl;
 			outlineColour.blurY = style.outlineWidthY + bl;
 			outlineColour.distance = 0;
-			outlineColour.color = style.colours[2].color;
-			outlineColour.alpha = (1 - (style.colours[2].alphaOffset / 255));
+			/*outlineColour.color = style.colours[2].color;
+			outlineColour.alpha = (1 - (style.colours[2].alphaOffset / 255));*/
+			outlineColour.color = Util.invertColor(style.colours[2]);
+			outlineColour.alpha = (1 - (uint(style.colours[2] >> 24) / 255));
 			outlineColour.knockout = true;
 			
 			var gBlur:BlurFilter = new BlurFilter(style.gaussianBlur, style.gaussianBlur, BitmapFilterQuality.HIGH);
@@ -797,8 +823,10 @@ package com.kenshisoft.captions.formats.ass
 			shadowColour.strength = 20;
 			shadowColour.blurX = shadowColour.blurY = 0;
 			shadowColour.distance = 0;
-			shadowColour.color = style.colours[3].color;
-			shadowColour.alpha = (1 - (style.colours[3].alphaOffset / 255));
+			/*shadowColour.color = style.colours[3].color;
+			shadowColour.alpha = (1 - (style.colours[3].alphaOffset / 255));*/
+			shadowColour.color = Util.invertColor(style.colours[3]);
+			shadowColour.alpha = (1 - (uint(style.colours[3] >> 24) / 255));
 			shadowColour.hideObject = true;
 			
 			var gBlur:BlurFilter = new BlurFilter(style.gaussianBlur, style.gaussianBlur, BitmapFilterQuality.HIGH);
@@ -815,8 +843,10 @@ package com.kenshisoft.captions.formats.ass
 			outlineColour.blurX = style.outlineWidthX;
 			outlineColour.blurY = style.outlineWidthY;
 			outlineColour.distance = 0;
-			outlineColour.color = style.colours[3].color;
-			outlineColour.alpha = (1 - (style.colours[3].alphaOffset / 255));
+			/*outlineColour.color = style.colours[3].color;
+			outlineColour.alpha = (1 - (style.colours[3].alphaOffset / 255));*/
+			outlineColour.color = Util.invertColor(style.colours[3]);
+			outlineColour.alpha = (1 - (uint(style.colours[3] >> 24) / 255));
 			outlineColour.knockout = true;
 			
 			var gBlur:BlurFilter = new BlurFilter(style.gaussianBlur, style.gaussianBlur, BitmapFilterQuality.HIGH);
@@ -878,30 +908,38 @@ package com.kenshisoft.captions.formats.ass
 			
 			if (!outline && !bodyShadow && !outlineShadow)
 			{
-				color = style.colours[0].color;
-				alpha = 1 - (style.colours[0].alphaOffset / 255);
+				//color = style.colours[0].color;
+				//alpha = 1 - (style.colours[0].alphaOffset / 255);
+				color = Util.invertColor(style.colours[0]);
+				alpha = 1 - (uint(style.colours[0] >> 24) / 255);
 			}
 			else if (outline)
 			{
-				color = style.colours[2].color;
+				//color = style.colours[2].color;
+				color = Util.invertColor(style.colours[2]);
 				if ((style.outlineWidthX + style.outlineWidthY) > 0)
-					alpha = 1 - (style.colours[2].alphaOffset / 255);
+					alpha = 1 - (uint(style.colours[2] >> 24) / 255);
+					//alpha = 1 - (style.colours[2].alphaOffset / 255);
 				else
 					alpha = 0;
 			}
 			else if (bodyShadow)
 			{
-				color = style.colours[3].color;
+				//color = style.colours[3].color;
+				color = Util.invertColor(style.colours[3]);
 				if ((style.outlineWidthX + style.outlineWidthY) > 0)
-					alpha = 1 - (style.colours[0].alphaOffset / 255);
+					alpha = 1 - (uint(style.colours[0] >> 24) / 255);
+					//alpha = 1 - (style.colours[0].alphaOffset / 255);
 				else
 					alpha = 0;
 			}
 			else if (outlineShadow)
 			{
-				color = style.colours[3].color;
+				//color = style.colours[3].color;
+				color = Util.invertColor(style.colours[3]);
 				if ((style.outlineWidthX + style.outlineWidthY) > 0 && (style.shadowDepthX != 0 || style.shadowDepthY != 0))
-					alpha = 1 - (style.colours[2].alphaOffset / 255);
+					alpha = 1 - (uint(style.colours[2] >> 24) / 255);
+					//alpha = 1 - (style.colours[2].alphaOffset / 255);
 				else
 					alpha = 0;
 			}

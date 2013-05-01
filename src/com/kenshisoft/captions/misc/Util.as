@@ -19,7 +19,7 @@
 
 package com.kenshisoft.captions.misc
 {
-	import fl.motion.Color;
+	//import fl.motion.Color;
 	import flash.utils.ByteArray;
 	
 	public class Util
@@ -45,7 +45,7 @@ package com.kenshisoft.captions.misc
 			return time.length < 4 ? -1 : ((((time[0]*60 + time[1])*60) + time[2]) + (time[3]/100));
 		}
 		
-		public static function toColor(hexColor:String):Color
+		/*public static function toColor(hexColor:String):Color
         {
 			if (hexColor.indexOf("0x") >= 0)
 				hexColor = hexColor.substr(hexColor.indexOf("0x"));
@@ -59,15 +59,58 @@ package com.kenshisoft.captions.misc
             return hexMatch == null ? new Color() : new Color(1, 1, 1, 1, int("0x" + hexMatch[4]), int("0x" + hexMatch[3]), int("0x" + hexMatch[2]), int("0x" + hexMatch[1]));
         }
 		
-		public static function toHexColor(color:Color):String
+		public static function toHexColor(color:Color, alpha:Boolean = true):String
 		{
-			var abgr:uint = color.alphaOffset << 24 | color.blueOffset << 16 | color.greenOffset << 8 | color.redOffset;
+			var abgr:uint = (alpha ? color.alphaOffset << 24 : 0) | color.blueOffset << 16 | color.greenOffset << 8 | color.redOffset;
 			var hexColor:String = abgr.toString(16).toUpperCase();
+			
+			while(hexColor.length < (alpha ? 8 : 6))
+				hexColor = "0" + hexColor;
+			
+			return "0x" + hexColor;
+		}*/
+		
+		public static function toHexColor2(color:uint, alpha:Boolean = true):String
+		{
+			var hexColor:String = color.toString(16).toUpperCase();
+			
+			while(hexColor.length < (alpha ? 8 : 6))
+				hexColor = "0" + hexColor;
+			
+			return "0x" + hexColor;
+		}
+		
+		public static function invertColor(color:uint, alpha:Boolean = true):uint
+		{
+			var hexColor:String = color.toString(16).toUpperCase();
+			
+			while(hexColor.length < (alpha ? 8 : 6))
+				hexColor = "0" + hexColor;
+			
+			if (!alpha && hexColor.length > 6)
+				while(hexColor.length > 6)
+					hexColor = hexColor.substr(1);
+			
+			var argb:uint = 0;
+			
+			if (alpha)
+				argb = uint("0x" + hexColor.substring(0, 2) + hexColor.substring(6, 8) + hexColor.substring(4, 6) + hexColor.substring(2, 4));
+			else
+				argb = uint("0x" + hexColor.substring(4, 6) + hexColor.substring(2, 4) + hexColor.substring(0, 2));
+			
+			return argb;
+		}
+		
+		public static function removeAlpha(color:uint):uint
+		{
+			var hexColor:String = color.toString(16).toUpperCase();
 			
 			while(hexColor.length < 8)
 				hexColor = "0" + hexColor;
 			
-			return "0x" + hexColor;
+			hexColor = hexColor.substr(2);
+			
+			return uint("0x" + hexColor);
 		}
 		
 		public static function trim(str:String):String
