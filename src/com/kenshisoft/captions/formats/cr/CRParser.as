@@ -84,5 +84,16 @@ package com.kenshisoft.captions.formats.cr
 			
 			return subtitle;
 		}
+		
+		public function getStyle(name:String, styles:Vector.<CRStyle>):CRStyle
+		{
+			for (var i:int; i < styles.length; i++)
+			{
+				if(styles[i].name == name)
+					return styles[i];
+			}
+			
+			return new CRStyle();
+		}
 	}
 }

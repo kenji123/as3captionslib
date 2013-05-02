@@ -24,6 +24,8 @@ package com.kenshisoft.captions
 	import com.kenshisoft.captions.formats.cr.CRRenderer;
 	import com.kenshisoft.captions.formats.cr.CRTimeLine;
 	import com.kenshisoft.captions.formats.ICaption;
+	import com.kenshisoft.captions.formats.srt.SRTRenderer;
+	import com.kenshisoft.captions.formats.srt.SRTTimeLine;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.DisplayObjectContainer;
@@ -142,6 +144,10 @@ package com.kenshisoft.captions
 					_renderer = new CRRenderer();
 					_parsedCaptions = _renderer.parser.parse(rawCaptions, _fontClasses);
 					break;
+				case SubtitleFormat.SRT:
+					_renderer = new SRTRenderer();
+					_parsedCaptions = _renderer.parser.parse(rawCaptions, _fontClasses);
+					break;
 			}
 			
 			captionsParsedSignal.dispatch(_parsedCaptions);
@@ -158,6 +164,9 @@ package com.kenshisoft.captions
 					break;
 				case SubtitleFormat.CR:
 					_captionsTimeLine = new CRTimeLine(_parsedCaptions, _fontClasses, _renderer, animated);
+					break;
+				case SubtitleFormat.SRT:
+					_captionsTimeLine = new SRTTimeLine(_parsedCaptions, _fontClasses, _renderer, animated);
 					break;
 			}
 			

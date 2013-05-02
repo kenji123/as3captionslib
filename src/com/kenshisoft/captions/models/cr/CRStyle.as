@@ -31,14 +31,14 @@ package com.kenshisoft.captions.models.cr
 	public class CRStyle
 	{
 		private var _id:int;
-		private var _name:String;
-		private var _font_name:String;
-		private var _font_size:Number;
+		private var _name:String = "Default";
+		private var _font_name:String = "Arial";
+		private var _font_size:Number = 20;
 		//private var _colours:Vector.<Color> = new Vector.<Color>; // primary, secondary, outline, back
 		private var _colours:Vector.<uint> = new Vector.<uint>; // primary, secondary, outline, back
-		private var _bold:int;
-		private var _italic:int;
-		private var _underline:int;
+		private var _bold:int = 0;
+		private var _italic:int = 0;
+		private var _underline:int = 0;
 		private var _strikeout:int;
 		private var _scale_x:Number;
 		private var _scale_y:Number;
@@ -56,6 +56,7 @@ package com.kenshisoft.captions.models.cr
 			super();
 			
 			//_colours.push(Util.toColor("0x00ffffff"), Util.toColor("0x0000ffff"), Util.toColor("0x00000000"), Util.toColor("0x80000000"));
+			_colours.push(0x00ffffff, 0x00000000, 0x00000000, 0x00000000);
 		}
 		
 		public function get id():int

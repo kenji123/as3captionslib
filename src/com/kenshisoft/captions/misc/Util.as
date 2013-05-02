@@ -35,14 +35,17 @@ package com.kenshisoft.captions.misc
 		
 		public static function toSeconds(str:String):Number
 		{
-			// assumes <hours>:<minutes>:<seconds>.<milliseconds> format
-			var time:Array = str.replace(".", ":").split(":");
+			// assumes <hours>:<minutes>:<seconds>[.|,]<milliseconds> format
+			var time:Array = str.replace(/(\.|,)/, ":").split(":");
+			
+			while (time[3].length < 3)
+				time[3] += "0";
 			
 			var tl:int = time.length;
 			for (var i:int = 0; i < tl; i++)
 				time[i] = int(time[i]);
 			
-			return time.length < 4 ? -1 : ((((time[0]*60 + time[1])*60) + time[2]) + (time[3]/100));
+			return time.length < 4 ? -1 : ((((time[0]*60 + time[1])*60) + time[2]) + (time[3]/1000));
 		}
 		
 		/*public static function toColor(hexColor:String):Color
@@ -111,6 +114,11 @@ package com.kenshisoft.captions.misc
 			hexColor = hexColor.substr(2);
 			
 			return uint("0x" + hexColor);
+		}
+		
+		public static function getAlphaMultiplier(color:uint):Number
+		{
+			return 1 - uint(color >> 24) / 255;
 		}
 		
 		public static function trim(str:String):String

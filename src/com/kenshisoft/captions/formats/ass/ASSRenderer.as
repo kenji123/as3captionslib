@@ -739,14 +739,14 @@ package com.kenshisoft.captions.formats.ass
 				/*elementFormat.color = style.colours[0].color;
 				elementFormat.alpha = 1 - (style.colours[0].alphaOffset / 255);*/
 				elementFormat.color = Util.invertColor(style.colours[0]);
-				elementFormat.alpha = 1 - (uint(style.colours[0] >> 24) / 255);
+				elementFormat.alpha = Util.getAlphaMultiplier(style.colours[0]);
 			}
 			else if (outline)
 			{
 				//elementFormat.color = style.colours[2].color;
 				elementFormat.color = Util.invertColor(style.colours[2]);
 				if ((style.outlineWidthX + style.outlineWidthY) > 0)
-					elementFormat.alpha = 1 - (uint(style.colours[2] >> 24) / 255);
+					elementFormat.alpha = Util.getAlphaMultiplier(style.colours[2]);
 					//elementFormat.alpha = 1 - (style.colours[2].alphaOffset / 255);
 				else
 					elementFormat.alpha = 0;
@@ -756,7 +756,7 @@ package com.kenshisoft.captions.formats.ass
 				//elementFormat.color = style.colours[3].color;
 				elementFormat.color = Util.invertColor(style.colours[3]);
 				if (style.shadowDepthX != 0 || style.shadowDepthY != 0)
-					elementFormat.alpha = 1 - (uint(style.colours[0] >> 24) / 255);
+					elementFormat.alpha = Util.getAlphaMultiplier(style.colours[0]);
 					//elementFormat.alpha = 1 - (style.colours[0].alphaOffset / 255);
 				else
 					elementFormat.alpha = 0;
@@ -766,7 +766,7 @@ package com.kenshisoft.captions.formats.ass
 				//elementFormat.color = style.colours[3].color;
 				elementFormat.color = Util.invertColor(style.colours[3]);
 				if ((style.outlineWidthX + style.outlineWidthY) > 0 && (style.shadowDepthX != 0 || style.shadowDepthY != 0))
-					elementFormat.alpha = 1 - (uint(style.colours[2] >> 24) / 255);
+					elementFormat.alpha = Util.getAlphaMultiplier(style.colours[2]);
 					//elementFormat.alpha = 1 - (style.colours[2].alphaOffset / 255);
 				else
 					elementFormat.alpha = 0;
@@ -805,7 +805,7 @@ package com.kenshisoft.captions.formats.ass
 			/*outlineColour.color = style.colours[2].color;
 			outlineColour.alpha = (1 - (style.colours[2].alphaOffset / 255));*/
 			outlineColour.color = Util.invertColor(style.colours[2]);
-			outlineColour.alpha = (1 - (uint(style.colours[2] >> 24) / 255));
+			outlineColour.alpha = Util.getAlphaMultiplier(style.colours[2]);
 			outlineColour.knockout = true;
 			
 			var gBlur:BlurFilter = new BlurFilter(style.gaussianBlur, style.gaussianBlur, BitmapFilterQuality.HIGH);
@@ -826,7 +826,7 @@ package com.kenshisoft.captions.formats.ass
 			/*shadowColour.color = style.colours[3].color;
 			shadowColour.alpha = (1 - (style.colours[3].alphaOffset / 255));*/
 			shadowColour.color = Util.invertColor(style.colours[3]);
-			shadowColour.alpha = (1 - (uint(style.colours[3] >> 24) / 255));
+			shadowColour.alpha = Util.getAlphaMultiplier(style.colours[3]);
 			shadowColour.hideObject = true;
 			
 			var gBlur:BlurFilter = new BlurFilter(style.gaussianBlur, style.gaussianBlur, BitmapFilterQuality.HIGH);
@@ -846,7 +846,7 @@ package com.kenshisoft.captions.formats.ass
 			/*outlineColour.color = style.colours[3].color;
 			outlineColour.alpha = (1 - (style.colours[3].alphaOffset / 255));*/
 			outlineColour.color = Util.invertColor(style.colours[3]);
-			outlineColour.alpha = (1 - (uint(style.colours[3] >> 24) / 255));
+			outlineColour.alpha = Util.getAlphaMultiplier(style.colours[3]);
 			outlineColour.knockout = true;
 			
 			var gBlur:BlurFilter = new BlurFilter(style.gaussianBlur, style.gaussianBlur, BitmapFilterQuality.HIGH);
@@ -911,14 +911,14 @@ package com.kenshisoft.captions.formats.ass
 				//color = style.colours[0].color;
 				//alpha = 1 - (style.colours[0].alphaOffset / 255);
 				color = Util.invertColor(style.colours[0]);
-				alpha = 1 - (uint(style.colours[0] >> 24) / 255);
+				alpha = Util.getAlphaMultiplier(style.colours[0]);
 			}
 			else if (outline)
 			{
 				//color = style.colours[2].color;
 				color = Util.invertColor(style.colours[2]);
 				if ((style.outlineWidthX + style.outlineWidthY) > 0)
-					alpha = 1 - (uint(style.colours[2] >> 24) / 255);
+					alpha = Util.getAlphaMultiplier(style.colours[2]);
 					//alpha = 1 - (style.colours[2].alphaOffset / 255);
 				else
 					alpha = 0;
@@ -928,7 +928,7 @@ package com.kenshisoft.captions.formats.ass
 				//color = style.colours[3].color;
 				color = Util.invertColor(style.colours[3]);
 				if ((style.outlineWidthX + style.outlineWidthY) > 0)
-					alpha = 1 - (uint(style.colours[0] >> 24) / 255);
+					alpha = Util.getAlphaMultiplier(style.colours[0]);
 					//alpha = 1 - (style.colours[0].alphaOffset / 255);
 				else
 					alpha = 0;
@@ -938,7 +938,7 @@ package com.kenshisoft.captions.formats.ass
 				//color = style.colours[3].color;
 				color = Util.invertColor(style.colours[3]);
 				if ((style.outlineWidthX + style.outlineWidthY) > 0 && (style.shadowDepthX != 0 || style.shadowDepthY != 0))
-					alpha = 1 - (uint(style.colours[2] >> 24) / 255);
+					alpha = Util.getAlphaMultiplier(style.colours[2]);
 					//alpha = 1 - (style.colours[2].alphaOffset / 255);
 				else
 					alpha = 0;

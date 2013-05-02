@@ -24,6 +24,36 @@ package com.kenshisoft.captions.models.srt
 			super();
 		}
 		
+		public function get start():String
+        {
+            return _start;
+		}
+		
+       	public function set start(value:String):void
+        {
+            _start = value;
+		}
+		
+    	public function get end():String
+        {
+            return _end;
+		}
+		
+       	public function set end(value:String):void
+        {
+            _end = value;
+		}
+		
+		public function get text():String
+		{
+        	return _text;
+		}
+		
+        public function set text(value:String):void
+		{
+            _text = value;
+		}
+		
 		public function get id():int
         {
             return _id;
