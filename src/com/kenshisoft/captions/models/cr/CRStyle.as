@@ -19,8 +19,6 @@
 
 package com.kenshisoft.captions.models.cr 
 {
-	//import fl.motion.Color;
-	
 	import com.kenshisoft.captions.misc.MarginRectangle;
 	import com.kenshisoft.captions.misc.Util;
 	
@@ -34,7 +32,6 @@ package com.kenshisoft.captions.models.cr
 		private var _name:String = "Default";
 		private var _font_name:String = "Arial";
 		private var _font_size:Number = 20;
-		//private var _colours:Vector.<Color> = new Vector.<Color>; // primary, secondary, outline, back
 		private var _colours:Vector.<uint> = new Vector.<uint>; // primary, secondary, outline, back
 		private var _bold:int = 0;
 		private var _italic:int = 0;
@@ -55,7 +52,6 @@ package com.kenshisoft.captions.models.cr
 		{
 			super();
 			
-			//_colours.push(Util.toColor("0x00ffffff"), Util.toColor("0x0000ffff"), Util.toColor("0x00000000"), Util.toColor("0x80000000"));
 			_colours.push(0x00ffffff, 0x00000000, 0x00000000, 0x00000000);
 		}
 		
@@ -99,13 +95,11 @@ package com.kenshisoft.captions.models.cr
             _font_size = value;
 		}
 		
-		//public function get colours():Vector.<Color>
 		public function get colours():Vector.<uint>
 		{
         	return _colours;
 		}
 		
-        //public function set colours(value:Vector.<Color>):void
 		public function set colours(value:Vector.<uint>):void
 		{
             _colours = value;

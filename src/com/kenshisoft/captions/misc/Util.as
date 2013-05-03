@@ -19,8 +19,7 @@
 
 package com.kenshisoft.captions.misc
 {
-	//import fl.motion.Color;
-	import flash.utils.ByteArray;
+	//import flash.utils.ByteArray;
 	
 	public class Util
 	{
