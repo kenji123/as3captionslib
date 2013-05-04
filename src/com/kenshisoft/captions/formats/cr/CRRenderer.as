@@ -22,6 +22,7 @@ package com.kenshisoft.captions.formats.cr
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
 	import flash.text.TextFormat;
+	import flash.text.TextFormatAlign;
 	
 	/**
 	 * ...
@@ -36,6 +37,28 @@ package com.kenshisoft.captions.formats.cr
 		private var calcHeight:Number;
 		private var calcWidth:Number;
 		
+		public static const BOTTOM:String = TextFormatAlign.END;
+		public static const MIDDLE:String = TextFormatAlign.JUSTIFY;
+		public static const TOP:String = TextFormatAlign.START;
+		public static const LEFT:String = TextFormatAlign.LEFT;
+		public static const CENTER:String = TextFormatAlign.CENTER;
+		public static const RIGHT:String = TextFormatAlign.RIGHT;
+		
+		public static const BOTTOM_LEFT:Array = [1, 1, BOTTOM, LEFT];
+		public static const BOTTOM_CENTER:Array = [2, 2, BOTTOM, CENTER];
+		public static const BOTTOM_RIGHT:Array = [3, 3, BOTTOM, RIGHT];
+        public static const MIDDLE_LEFT:Array = [4, 9, MIDDLE, LEFT];
+        public static const MIDDLE_CENTER:Array = [5, 10, MIDDLE, CENTER];
+		public static const MIDDLE_RIGHT:Array = [6, 11, MIDDLE, RIGHT];
+		public static const TOP_LEFT:Array = [7, 5, TOP, LEFT];
+        public static const TOP_CENTER:Array = [8, 6, TOP, CENTER];
+        public static const TOP_RIGHT:Array = [9, 7, TOP, RIGHT];
+		
+		public static const WRAP1:Array = [0, true, true];
+        public static const WRAP2:Array = [1, true, true];
+        public static const NONE:Array = [2, false, false];
+		public static const WRAP3:Array = [3, true, true];
+        
 		public function CRRenderer()
 		{
 			super();
@@ -43,22 +66,51 @@ package com.kenshisoft.captions.formats.cr
 			_parser = new CRParser();
 		}
 		
+		private function getWrapStyle(subtitle:CRSubtitleScript):Array //TODO: do parse() text, then FIXME
+		{
+			var wrapStyles:Array = [WRAP1, WRAP2, NONE, WRAP3];
+			
+			for (var i:int; i < wrapStyles.length; i++)
+            {
+                if (wrapStyles[i][0] == subtitle.wrap_style)
+                {
+                    return wrapStyles[i];
+                }
+            }
+			
+            return null;
+		}
+		
+		private function getAlignment(style:CRStyle):Array
+		{
+			var alignments:Array = [BOTTOM_LEFT, BOTTOM_CENTER, BOTTOM_RIGHT, MIDDLE_LEFT, MIDDLE_CENTER, MIDDLE_RIGHT, TOP_LEFT, TOP_CENTER, TOP_RIGHT];
+			
+			for (var i:int; i < alignments.length; i++)
+            {
+                if (alignments[i][0] == style.alignment)
+                {
+                    return alignments[i];
+                }
+            }
+			
+            return null;
+		}
+		
 		private function getGlowStrength(styleOutline:Number):Number
 		{
             switch (styleOutline)
             {
 				case 0:
-					return 4;
-				case 1:
-					return 7;
-				case 2:
-					return 14;
-				case 3:
-					return 28;
-				case 4:
-                    return 7;
-				default:
 					return 1;
+				case 1:
+					return 4;
+				case 3:
+					return 14;
+				case 4:
+                    return 28;
+				case 2:
+				default:
+					return 7;
             }
         }
 		
@@ -87,15 +139,17 @@ package com.kenshisoft.captions.formats.cr
 		
 		private function getY(textField:TextField, event:CREvent, style:CRStyle):Number
 		{
-            switch (style.alignment)//unresolved jump//, , getAlignment()._-2J)
+			var t:int = (event.margin.bottom > 0 ? event.margin.bottom : style.margin.bottom) + style.outline;
+			
+            switch (getAlignment(style)[2])
             {
-				/*case _ -3J._ -1q: // top
-					return (((calcHeight - textField.textHeight) / 2));
-                case _-3J._-0P: // middle
-					return (((((calcHeight + staticMultiplier) - textField.textHeight) - _ -t()) - textField.getLineMetrics(0).descent));
-				case _-3J._-10: // bottom*/
+				case TOP:
+					return t - staticMultiplier;
+                case MIDDLE:
+					return (calcHeight - textField.textHeight) / 2;
+				case BOTTOM:
                 default:
-                    return ((event.margin.bottom > 0 ? event.margin.bottom : style.margin.bottom) + style.outline) - staticMultiplier;
+                    return (((calcHeight + staticMultiplier) - textField.textHeight) - t) - textField.getLineMetrics(0).descent;
             }
         }
 		
@@ -104,24 +158,31 @@ package com.kenshisoft.captions.formats.cr
 			var subtitle:CRSubtitleScript = CRSubtitleScript(subtitle_);
 			var event:CREvent = CREvent(event_);
 			
-			var style:CRStyle = _parser.getStyle(event.style, subtitle.styles);
+			var style:CRStyle = _parser.getStyle(event.style, subtitle.styles).copy();
 			
 			var caption:CRCaption = new CRCaption(event);
 			
-			calcHeight = subtitle.play_res_y > 0 ? subtitle.play_res_y : defaultHeight;
-			calcWidth = Math.floor((calcHeight * videoRect.width) / videoRect.height);
-            
+			var scaleX:Number = subtitle.play_res_x > 0 ? (1.0 * videoRect.width / subtitle.play_res_x) : 1.0;
+			var scaleY:Number = subtitle.play_res_y > 0 ? (1.0 * videoRect.height / subtitle.play_res_y) : 1.0;
+			
+			calcHeight = (subtitle.play_res_y > 0 ? subtitle.play_res_y : defaultHeight) * scaleX;
+			calcWidth = (Math.floor((calcHeight * videoRect.width) / videoRect.height));
+			
+			style.font_size *= scaleY;
+			style.outline *= scaleY;
+			style.shadow *= scaleY;
+			
 			var textFormat:TextFormat = new TextFormat();
 			//textFormat.font = getPreferredFont(_ -1g.style.font_name);
 			textFormat.font = style.font_name;
 			textFormat.size = style.font_size;
 			textFormat.color = Util.removeAlpha(style.colours[0]);
-			//textFormat.align = getAlignment()._-1a;
+			textFormat.align = getAlignment(style)[3];
 			textFormat.bold = style.bold;
 			textFormat.italic = style.italic;
 			textFormat.underline = style.underline;
 			textFormat.leftMargin = (event.margin.left > 0 ? event.margin.left : style.margin.left) - style.outline;
-			textFormat.rightMargin =  (event.margin.right > 0 ? event.margin.right : style.margin.right) - style.outline;
+			textFormat.rightMargin = (event.margin.right > 0 ? event.margin.right : style.margin.right) - style.outline;
 			
 			var textField:TextField = new TextField();
 			//var _local5:Object;
@@ -133,7 +194,7 @@ package com.kenshisoft.captions.formats.cr
 			textField.width = calcWidth + (2 * staticMultiplier);
 			textField.x = 0 - staticMultiplier;
 			textField.blendMode = BlendMode.LAYER;
-			//var _local2:_-5j = _-3W();
+			var wrapStyle:Array = getWrapStyle(subtitle);
 			//textField.text = _-0._-1();
             //textField.text = _-0._-8f();
 			textField.text = event.text;

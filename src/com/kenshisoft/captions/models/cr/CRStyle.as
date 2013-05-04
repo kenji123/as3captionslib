@@ -244,5 +244,35 @@ package com.kenshisoft.captions.models.cr
 		{
             _encoding = value;
 		}
+		
+		public function copy():CRStyle
+		{
+			var newStyle:CRStyle = new CRStyle();
+			newStyle.id = _id;
+			newStyle.name = _name;
+			newStyle.font_name = _font_name;
+			newStyle.font_size = _font_size;
+			
+			newStyle.colours = new Vector.<uint>;
+			for (var i:int; i < _colours.length; i++)
+				newStyle.colours.push(_colours[i]);
+			
+			newStyle.bold = _bold;
+			newStyle.italic = _italic;
+			newStyle.underline = _underline;
+			newStyle.strikeout = _strikeout;
+			newStyle.scale_x = _scale_x;
+			newStyle.scale_y = _scale_y;
+			newStyle.spacing = _spacing;
+			newStyle.angle = _angle;
+			newStyle.border_style = _border_style;
+			newStyle.outline = _outline;
+			newStyle.shadow = _shadow;
+			newStyle.alignment = _alignment;
+			newStyle.margin = _margin.copy();
+			newStyle.encoding = _encoding;
+			
+			return newStyle;
+		}
 	}
 }
