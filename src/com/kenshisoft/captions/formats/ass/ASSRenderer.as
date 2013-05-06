@@ -1023,7 +1023,7 @@ package com.kenshisoft.captions.formats.ass
 			
 			if (animate) _parser.parseEffect(caption, event.effect);
 			
-			var str:String = event.text;
+			/*var str:String = event.text;
 			
 			while (str.length > 0)
 			{
@@ -1054,6 +1054,30 @@ package com.kenshisoft.captions.formats.ass
 					_parser.parseString(caption, str.substr(0, i), tmp, this);
 				
 				str = str.substr(i);
+			}*/
+			
+			var styleTextRegExp:RegExp = /\{([^\}]+)\}(.+)|([^\{]+)/g;
+			
+			var match:Object = styleTextRegExp.exec(event.text);
+			
+			while (match != null)
+			{
+				style = styleModifier(caption, _parser.parseTag(match[2] != null ? match[2] : ""), false, style, orgStyle, subtitle.styles, options);
+				
+				var tmp:ASSStyle = style.copy();
+				tmp.fontSize = caption.scaleY * tmp.fontSize;
+				tmp.fontSpacing = caption.scaleX * tmp.fontSpacing;
+				tmp.outlineWidthX *= subtitle.scaledBorderAndShadow ? caption.scaleX : 1;
+				tmp.outlineWidthY *= subtitle.scaledBorderAndShadow ? caption.scaleY : 1;
+				tmp.shadowDepthX *= subtitle.scaledBorderAndShadow ? caption.scaleX : 1;
+				tmp.shadowDepthY *= subtitle.scaledBorderAndShadow ? caption.scaleY : 1;
+				
+				if (options.nPolygon > 0)
+					_parser.parsePolygon(caption, (match[3] != null ? match[3] : ""), tmp);
+				else
+					_parser.parseString(caption, (match[3] != null ? match[3] : ""), tmp, this);
+				
+				match = styleTextRegExp.exec(event.text);
 			}
 			
 			// RTS.cpp: just a "work-around" solution... in most cases nobody will want to use \org together with moving but without rotating the subs

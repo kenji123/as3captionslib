@@ -169,8 +169,6 @@ package com.kenshisoft.captions.formats.cr
 			calcWidth = (Math.floor((calcHeight * videoRect.width) / videoRect.height));
 			
 			style.font_size *= scaleY;
-			style.outline *= scaleY;
-			style.shadow *= scaleY;
 			
 			var textFormat:TextFormat = new TextFormat();
 			//textFormat.font = getPreferredFont(_ -1g.style.font_name);
@@ -192,7 +190,7 @@ package com.kenshisoft.captions.formats.cr
 			textField.defaultTextFormat = textFormat;
 			textField.height = calcHeight;
 			textField.width = calcWidth + (2 * staticMultiplier);
-			textField.x = 0 - staticMultiplier;
+			textField.x = 0 - staticMultiplier + videoRect.x;
 			textField.blendMode = BlendMode.LAYER;
 			var wrapStyle:Array = getWrapStyle(subtitle);
 			//textField.text = _-0._-1();
@@ -217,7 +215,7 @@ package com.kenshisoft.captions.formats.cr
 			//, (_local1.gridFitType = GridFitType.NONE), continue)
 			textField.antiAliasType = AntiAliasType.ADVANCED;
 			
-			textField.y = getY(textField,event, style);
+			textField.y = getY(textField,event, style) + videoRect.y;
             //_-1Q = _-1J(textField);
             //var _local4:DisplayObjectContainer = _-6c(_-2z, _-53, _-5r, _-m);
             //addChild(_local4);
