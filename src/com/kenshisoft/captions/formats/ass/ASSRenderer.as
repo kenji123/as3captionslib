@@ -1056,13 +1056,16 @@ package com.kenshisoft.captions.formats.ass
 				str = str.substr(i);
 			}*/
 			
-			var styleTextRegExp:RegExp = /\{([^\}]+)\}(.+)|([^\{]+)/g;
+			var styleTextRegExp:RegExp = /\{([^\}]+)\}([^\{]*)|(.+)$/g;
 			
 			var match:Object = styleTextRegExp.exec(event.text);
 			
 			while (match != null)
 			{
-				style = styleModifier(caption, _parser.parseTag(match[2] != null ? match[2] : ""), false, style, orgStyle, subtitle.styles, options);
+				var styleStr:String = match[1] ? match[1] : "";
+				var textStr:String = (match[1] == null && match[2] == null) ? match[3] : match[2]; textStr = textStr ? textStr : "";
+				
+				style = styleModifier(caption, _parser.parseTag(styleStr), false, style, orgStyle, subtitle.styles, options);
 				
 				var tmp:ASSStyle = style.copy();
 				tmp.fontSize = caption.scaleY * tmp.fontSize;
@@ -1073,9 +1076,9 @@ package com.kenshisoft.captions.formats.ass
 				tmp.shadowDepthY *= subtitle.scaledBorderAndShadow ? caption.scaleY : 1;
 				
 				if (options.nPolygon > 0)
-					_parser.parsePolygon(caption, (match[3] != null ? match[3] : ""), tmp);
+					_parser.parsePolygon(caption, textStr, tmp);
 				else
-					_parser.parseString(caption, (match[3] != null ? match[3] : ""), tmp, this);
+					_parser.parseString(caption, textStr, tmp, this);
 				
 				match = styleTextRegExp.exec(event.text);
 			}
