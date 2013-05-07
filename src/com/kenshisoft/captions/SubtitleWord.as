@@ -32,6 +32,7 @@ package com.kenshisoft.captions
 	{
 		public var text:String;
 		public var style:ASSStyle;
+		public var styleStr:String;
 		
 		private var _isLineBreak:Boolean = false;
 		private var _isWhiteSpace:Boolean = false;
@@ -51,12 +52,13 @@ package com.kenshisoft.captions
 		public var _kstart:int;
 		public var _kend:int;
 		
-		public function SubtitleWord(text:String, style:ASSStyle, renderer:ASSRenderer)
+		public function SubtitleWord(text:String, style:ASSStyle, renderer:ASSRenderer, styleStr:String)
 		{
 			super();
 			
 			this.text = text;
 			this.style = style;
+			this.styleStr = styleStr;
 			
 			if (text == '\n') _isLineBreak = true;
 			if (text == ' ') _isWhiteSpace = true;
@@ -121,6 +123,11 @@ package com.kenshisoft.captions
 		public function get textLine():TextLine
 		{
 			return _textLine;
+		}
+		
+		public function rerender(renderer:ASSRenderer):void
+		{
+			_textLine = renderer.renderText(text, style);
 		}
 	}
 }

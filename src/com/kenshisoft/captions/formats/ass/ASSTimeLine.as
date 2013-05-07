@@ -124,7 +124,9 @@ package com.kenshisoft.captions.formats.ass
 					
 					renderer.remove(caption, _container);
 					
-					var newCaption:ASSCaption = ASSCaption(renderer.render(captions, caption.event, _videoRect, _container, fontClasses, _stream.time, animated));
+					//var newCaption:ASSCaption = ASSCaption(renderer.render(captions, caption.event, _videoRect, _container, fontClasses, _stream.time, animated));
+					
+					var newCaption:ASSCaption = ASSCaption(renderer.rerender(captions, caption.event, caption, _videoRect, fontClasses, _stream.time, animated));
 					
 					renderer.add(newCaption, Vector.<ICaption>(_captionsOnDisplay), _container);
 					

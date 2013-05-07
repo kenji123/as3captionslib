@@ -993,6 +993,217 @@ package com.kenshisoft.captions.formats.ass
 			return matrix3d;
 		}
 		
+		public function rerender(subtitle_:ISubtitle, event_:IEvent, caption_:ICaption, videoRect:Rectangle, fontClasses:Vector.<FontClass>, time:Number = -1, animate:Boolean = true):ICaption
+		{
+			var subtitle:ASSSubtitle = ASSSubtitle(subtitle_);
+			var event:ASSEvent = ASSEvent(event_);
+			var caption:ASSCaption = ASSCaption(caption_);
+			
+			caption.reset();
+			
+			var style:ASSStyle = _parser.getStyle(event.style, subtitle.styles).copy();
+			var orgStyle:ASSStyle = _parser.getStyle(event.style, subtitle.styles);
+			
+			var options:Object = new Object();
+			options.time = (time - event.startSeconds) * 1000;
+			options.duration = event.duration * 1000;
+			options.fontInfo = fontClasses;
+			options.animate = animate;
+			
+			for (var i:int; i < caption.words.length; i++)
+			{
+				caption.words[i].rerender(this);
+				caption.words[i].style = styleModifier(caption, _parser.parseTag(caption.words[i].styleStr), false, style, orgStyle, subtitle.styles, options);
+			}
+			
+			caption.makeLines(caption.getMarginRect().copy());
+			
+			var renderSprite:Sprite = new Sprite();
+			
+			// apply fax/fay transform (first occurance is absolute, and cannot be turned off using \r)
+			// method 1
+			/*renderSprite.transform.matrix3D = new Matrix3D();
+			var matrix3d:Matrix3D = renderSprite.transform.matrix3D.clone();
+			var rawData:Vector.<Number> = matrix3d.rawData;
+			try
+			{
+				rawData[4] += caption.fax;
+				rawData[1] += caption.fay;
+				matrix3d.rawData = rawData;
+			}
+			catch (error:Error)
+			{
+				// matrix probably doesn't have an identity
+				trace(error.getStackTrace().toString());
+			}
+			renderSprite.transform.matrix3D = matrix3d;*/
+			
+			// method 2
+			var matrix:Matrix = renderSprite.transform.matrix.clone();
+			matrix.c += caption.fax;
+			matrix.b += caption.fay;
+			renderSprite.transform.matrix = matrix;
+			
+			renderSprite.name = caption.event.id.toString();
+			renderSprite.x = caption.getRect().x;
+			renderSprite.y = caption.getRect().y;
+			
+			applyEffects(caption, renderSprite, videoRect, time);
+			
+			// let's get the point
+			if (caption.transformPoint == null)
+				caption.transformPoint = getTransformPoint(caption);
+			
+			var rendered:Vector.<Vector.<TextLine>> = new Vector.<Vector.<TextLine>>;
+			
+			for (var l:int; l < caption.lines.length; l++)
+			{
+				var firstWord:Boolean = true;
+				var lastWordXWidth:Number = 0;
+				
+				// let's render line by line
+				for (var w:int = 0; w < caption.lines[l].words.length; w++)
+				{
+					var word:SubtitleWord = caption.lines[l].words[w];
+					var bodyOnly:Boolean = ((word.isWhiteSpace || word.isLineBreak) && !style.strikeOut && !word.style.underline == "underline")
+					
+					// render
+					var body:TextLine = word.textLine;
+					var outline:TextLine = bodyOnly ? null : renderText(word.text, word.style, true);
+					var bodyShadow:TextLine = bodyOnly ? null : renderText(word.text, word.style, false, true);
+					var outlineShadow:TextLine = bodyOnly ? null : renderText(word.text, word.style, false, false, true);
+					
+					// apply strikeout/underline hack
+					if (style.strikeOut || style.underline == "underline")
+						strikeOutUnderlineHack(word.ascent, word.style, body, outline, bodyShadow, outlineShadow);
+					
+					body.transform.matrix3D = new Matrix3D();
+					if (!bodyOnly)
+					{
+						outline.transform.matrix3D = new Matrix3D();
+						bodyShadow.transform.matrix3D = new Matrix3D();
+						outlineShadow.transform.matrix3D = new Matrix3D();
+					}
+					
+					// apply scaling
+					body.scaleX = word.style.fontScaleX / 100;
+					body.scaleY = word.style.fontScaleY / 100;
+					if (!bodyOnly)
+					{
+						outline.scaleX = bodyShadow.scaleX = outlineShadow.scaleX = word.style.fontScaleX / 100;
+						outline.scaleY = bodyShadow.scaleY = outlineShadow.scaleY = word.style.fontScaleY / 100;
+					}
+					
+					// final alignment on render sprite applying pre-calulated positioning values (getLineRects())
+					lastWordXWidth = firstWord ? caption.getLineRects()[l].x : lastWordXWidth;
+					
+					body.x = lastWordXWidth;
+					body.y = caption.getLineRects()[l].y;
+					if (!bodyOnly)
+					{
+						outline.x = lastWordXWidth;
+						outline.y = caption.getLineRects()[l].y;
+					}
+					
+					// set shadow position relative to word position
+					if (!bodyOnly)
+					{
+						bodyShadow.x = outlineShadow.x = lastWordXWidth + word.style.shadowDepthX;
+						bodyShadow.y = outlineShadow.y = caption.getLineRects()[l].y + word.style.shadowDepthY;
+					}
+					
+					// apply transformations
+					if (word.style.fontAngleX != 0 || word.style.fontAngleY != 0 || word.style.fontAngleZ != 0)
+					{
+						// now let's get some perspective
+						body.transform.perspectiveProjection = getTransformPerspective(caption.transformPoint);
+						if (!bodyOnly)
+							outline.transform.perspectiveProjection = bodyShadow.transform.perspectiveProjection = outlineShadow.transform.perspectiveProjection = body.transform.perspectiveProjection;
+						
+						// Autobots TRANSFORM!
+						body.transform.matrix3D = transform(body.transform.matrix3D.clone(), caption.transformPoint, word.style);
+						if (!bodyOnly)
+						{
+							outline.transform.matrix3D = body.transform.matrix3D.clone();
+							bodyShadow.transform.matrix3D = transform(bodyShadow.transform.matrix3D.clone(), caption.transformPoint, word.style);
+							outlineShadow.transform.matrix3D = bodyShadow.transform.matrix3D.clone();
+						}
+					}
+					
+					// apply italic hack if needed
+					if (word.style.fontEmbed && word.style.italic == "italic")
+					{
+						var doItalicHack:Boolean = false;
+						var fontsFound:Array = FontLoader.getRegisteredFont(style.fontName, true, FontType.EMBEDDED_CFF);
+						
+						for (var f:int = 0; f < fontsFound.length; f++)
+						{
+							if (fontsFound[f].fontStyle != FontStyle.ITALIC || fontsFound[f].fontStyle != FontStyle.BOLD_ITALIC)
+							{
+								doItalicHack = true;
+								break;
+							}
+						}
+						
+						// italic hack when no italic font is available for the embedded font
+						if (doItalicHack)
+						{
+							body.transform.matrix3D = italicHack(body.transform.matrix3D.clone(), word.style);
+							if (!bodyOnly)
+							{
+								outline.transform.matrix3D = body.transform.matrix3D.clone();
+								bodyShadow.transform.matrix3D = italicHack(bodyShadow.transform.matrix3D.clone(), word.style);
+								outlineShadow.transform.matrix3D = bodyShadow.transform.matrix3D.clone();
+							}
+						}
+					}
+					
+					// apply filters
+					body.filters = renderBody(word.style);
+					if (!bodyOnly)
+					{
+						outline.filters = renderOutline(word.style);
+						bodyShadow.filters = renderBodyShadow(word.style);
+						outlineShadow.filters = renderOutlineShadow(word.style);
+					}
+					
+					var renderedWord:Vector.<TextLine> = new Vector.<TextLine>;
+					renderedWord.push(body, outline, bodyShadow, outlineShadow);
+					
+					lastWordXWidth += word.pixelWidth;
+					firstWord = false;
+					
+					rendered.push(renderedWord);
+				}
+			}
+			
+			// shadow
+			for (var so:int; so < rendered.length; so++)
+				rendered[so][3] != null ? renderSprite.addChild(rendered[so][3]) : null;
+			
+			for (var sb:int; sb < rendered.length; sb++)
+				rendered[sb][2] != null ? renderSprite.addChild(rendered[sb][2]) : null;
+			
+			// outline
+			for (var o:int; o < rendered.length; o++)
+				rendered[o][1] != null ? renderSprite.addChild(rendered[o][1]) : null;
+			
+			// body
+			for (var b:int; b < rendered.length; b++)
+				rendered[b][0] != null ? renderSprite.addChild(rendered[b][0]) : null;
+			
+			renderSprite.cacheAsBitmap = true;
+			caption.renderSprite = renderSprite;
+			
+			/*var bitmapData:BitmapData = new BitmapData(container.getChildAt(0).width, container.getChildAt(0).height, true, 0x00FFFFFF);
+			bitmapData.draw(caption.renderSprite, caption.renderSprite.transform.matrix);
+			var bitmap:Bitmap = new Bitmap(bitmapData, "auto", true);
+			bitmap.transform.matrix = caption.renderSprite.transform.matrix;
+			caption.bitmap = bitmap;*/
+			
+			return caption;
+		}
+		
 		public function render(subtitle_:ISubtitle, event_:IEvent, videoRect:Rectangle, container:DisplayObjectContainer, fontClasses:Vector.<FontClass>, time:Number = -1, animate:Boolean = true):ICaption
 		{
 			var subtitle:ASSSubtitle = ASSSubtitle(subtitle_);
@@ -1057,7 +1268,6 @@ package com.kenshisoft.captions.formats.ass
 			}*/
 			
 			var styleTextRegExp:RegExp = /\{([^\}]+)\}([^\{]*)|(.+)$/g;
-			
 			var match:Object = styleTextRegExp.exec(event.text);
 			
 			while (match != null)
@@ -1078,7 +1288,7 @@ package com.kenshisoft.captions.formats.ass
 				if (options.nPolygon > 0)
 					_parser.parsePolygon(caption, textStr, tmp);
 				else
-					_parser.parseString(caption, textStr, tmp, this);
+					_parser.parseString(caption, textStr, tmp, this, styleStr);
 				
 				match = styleTextRegExp.exec(event.text);
 			}

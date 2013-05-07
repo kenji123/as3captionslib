@@ -376,5 +376,12 @@ package com.kenshisoft.captions.formats.ass
 		{
 			_renderSprite = value;
 		}
+		
+		public function reset():void
+		{
+			_lines = new Vector.<SubtitleLine>;
+			_lineRects = new Vector.<Rectangle>;
+			//_effects = new Object();
+		}
 	}
 }
