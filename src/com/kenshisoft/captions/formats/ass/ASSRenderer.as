@@ -22,6 +22,7 @@ package com.kenshisoft.captions.formats.ass
 	import com.kenshisoft.captions.formats.ICaption;
 	import com.kenshisoft.captions.models.IEvent;
 	import com.kenshisoft.captions.models.ISubtitle;
+	import flash.display.DisplayObject;
 	//import fl.motion.Color;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
@@ -993,7 +994,7 @@ package com.kenshisoft.captions.formats.ass
 			return matrix3d;
 		}
 		
-		public function rerender(subtitle_:ISubtitle, event_:IEvent, caption_:ICaption, videoRect:Rectangle, fontClasses:Vector.<FontClass>, time:Number = -1, animate:Boolean = true):ICaption
+		public function rerender(subtitle_:ISubtitle, event_:IEvent, caption_:ICaption, videoRect:Rectangle, container:DisplayObjectContainer, fontClasses:Vector.<FontClass>, captionsOnDisplay_:Vector.<ICaption>, time:Number = -1, animate:Boolean = true):void
 		{
 			var subtitle:ASSSubtitle = ASSSubtitle(subtitle_);
 			var event:ASSEvent = ASSEvent(event_);
@@ -1004,21 +1005,71 @@ package com.kenshisoft.captions.formats.ass
 			var style:ASSStyle = _parser.getStyle(event.style, subtitle.styles).copy();
 			var orgStyle:ASSStyle = _parser.getStyle(event.style, subtitle.styles);
 			
+			//caption.relativeTo = style.relativeTo;
+			
+			//caption.scaleX = subtitle.screenSize.width > 0 ? (1.0 * (style.relativeTo == 1 ? videoRect.width : container.width) / subtitle.screenSize.width) : 1.0;
+			//caption.scaleY = subtitle.screenSize.height > 0 ? (1.0 * (style.relativeTo == 1 ? videoRect.height : container.height) / subtitle.screenSize.height) : 1.0;
+			
 			var options:Object = new Object();
 			options.time = (time - event.startSeconds) * 1000;
 			options.duration = event.duration * 1000;
 			options.fontInfo = fontClasses;
 			options.animate = animate;
 			
+			options.animStart = options.animEnd = 0;
+			options.animAccel = 1;
+			options.kType = options.kStart = options.kEnd = 0;
+			options.nPolygon = 0;
+			options.polygonBaselineOffset = 0;
+			
+			if (animate) _parser.parseEffect(caption, event.effect);
+			
 			for (var i:int; i < caption.words.length; i++)
 			{
-				caption.words[i].rerender(this);
-				caption.words[i].style = styleModifier(caption, _parser.parseTag(caption.words[i].styleStr), false, style, orgStyle, subtitle.styles, options);
+				style = styleModifier(caption, _parser.parseTag(caption.words[i].styleStr), false, style, orgStyle, subtitle.styles, options);
+				
+				var tmp:ASSStyle = style.copy();
+				tmp.fontSize = caption.scaleY * tmp.fontSize;
+				tmp.fontSpacing = caption.scaleX * tmp.fontSpacing;
+				tmp.outlineWidthX *= subtitle.scaledBorderAndShadow ? caption.scaleX : 1;
+				tmp.outlineWidthY *= subtitle.scaledBorderAndShadow ? caption.scaleY : 1;
+				tmp.shadowDepthX *= subtitle.scaledBorderAndShadow ? caption.scaleX : 1;
+				tmp.shadowDepthY *= subtitle.scaledBorderAndShadow ? caption.scaleY : 1;
+				
+				caption.words[i] = new SubtitleWord(caption.words[i].text, tmp, this, caption.words[i].styleStr);
 			}
 			
-			caption.makeLines(caption.getMarginRect().copy());
+			//if(caption.alignment < 0) caption.alignment = (caption.alignment > 0 ? caption.alignment : -caption.alignment);
 			
-			var renderSprite:Sprite = new Sprite();
+			/*var marginRect:MarginRectangle = event.marginRect.copy();
+			if(marginRect.left == 0) marginRect.left = orgStyle.marginRect.left;
+			if(marginRect.top == 0) marginRect.top = orgStyle.marginRect.top;
+			if(marginRect.right == 0) marginRect.right = orgStyle.marginRect.right;
+			if(marginRect.bottom == 0) marginRect.bottom = orgStyle.marginRect.bottom;
+			marginRect.left = caption.scaleX * marginRect.left;
+			marginRect.top = caption.scaleY * marginRect.top;
+			marginRect.right = caption.scaleX * marginRect.right;
+			marginRect.bottom = caption.scaleY * marginRect.bottom;
+			
+			if(caption.relativeTo == 1)
+			{
+				marginRect.left += videoRect.left;
+				marginRect.top += videoRect.top;
+				marginRect.right += container.width - videoRect.right;
+				marginRect.bottom += container.height - videoRect.bottom;
+			}
+			
+			// though only marginRect.width is used/needed once, store both anyway
+			marginRect.width = container.width - (marginRect.left + marginRect.right);
+			marginRect.height = container.height - (marginRect.top + marginRect.bottom);*/
+			
+			//TODO: (clip/iclip)ers
+			//sub->m_clip.SetRect(0, 0, m_size.cx>>3, m_size.cy>>3);
+			
+			caption.makeLines(caption.getMarginRect());
+			
+			//caption.renderSprite.removeChildren(0, caption.renderSprite.numChildren - 1);
+			var renderSprite:Sprite = caption.renderSprite;
 			
 			// apply fax/fay transform (first occurance is absolute, and cannot be turned off using \r)
 			// method 1
@@ -1039,21 +1090,20 @@ package com.kenshisoft.captions.formats.ass
 			renderSprite.transform.matrix3D = matrix3d;*/
 			
 			// method 2
-			var matrix:Matrix = renderSprite.transform.matrix.clone();
+			/*var matrix:Matrix = renderSprite.transform.matrix.clone();
 			matrix.c += caption.fax;
 			matrix.b += caption.fay;
-			renderSprite.transform.matrix = matrix;
+			renderSprite.transform.matrix = matrix;*/
 			
-			renderSprite.name = caption.event.id.toString();
+			//renderSprite.name = caption.event.id.toString();
 			renderSprite.x = caption.getRect().x;
 			renderSprite.y = caption.getRect().y;
 			
 			applyEffects(caption, renderSprite, videoRect, time);
 			
 			// let's get the point
-			if (caption.transformPoint == null)
-				caption.transformPoint = getTransformPoint(caption);
-			
+			//caption.transformPoint = getTransformPoint(caption);
+			//var start = new Date().time;
 			var rendered:Vector.<Vector.<TextLine>> = new Vector.<Vector.<TextLine>>;
 			
 			for (var l:int; l < caption.lines.length; l++)
@@ -1167,6 +1217,10 @@ package com.kenshisoft.captions.formats.ass
 						outlineShadow.filters = renderOutlineShadow(word.style);
 					}
 					
+					body.cacheAsBitmap = true;
+					if (!bodyOnly)
+						outline.cacheAsBitmap = bodyShadow.cacheAsBitmap = outlineShadow.cacheAsBitmap = true;
+					
 					var renderedWord:Vector.<TextLine> = new Vector.<TextLine>;
 					renderedWord.push(body, outline, bodyShadow, outlineShadow);
 					
@@ -1176,35 +1230,47 @@ package com.kenshisoft.captions.formats.ass
 					rendered.push(renderedWord);
 				}
 			}
-			
+			//trace(new Date().time-start);
 			// shadow
-			for (var so:int; so < rendered.length; so++)
-				rendered[so][3] != null ? renderSprite.addChild(rendered[so][3]) : null;
+			for (var so:int, tl:int; so < rendered.length; so++, tl++)
+			{
+				var t:DisplayObject = renderSprite.getChildAt(tl);
+				if (rendered[so][3] != null) t = rendered[so][3];
+			}
 			
-			for (var sb:int; sb < rendered.length; sb++)
-				rendered[sb][2] != null ? renderSprite.addChild(rendered[sb][2]) : null;
+			for (var sb:int; sb < rendered.length; sb++, tl++)
+			{
+				var t:DisplayObject = renderSprite.getChildAt(tl);
+				if (rendered[sb][2] != null) t = rendered[sb][2];
+			}
 			
 			// outline
-			for (var o:int; o < rendered.length; o++)
-				rendered[o][1] != null ? renderSprite.addChild(rendered[o][1]) : null;
+			for (var o:int; o < rendered.length; o++, tl++)
+			{
+				var t:DisplayObject = renderSprite.getChildAt(tl);
+				if (rendered[o][1] != null) t = rendered[o][1];
+			}
 			
 			// body
-			for (var b:int; b < rendered.length; b++)
-				rendered[b][0] != null ? renderSprite.addChild(rendered[b][0]) : null;
+			for (var b:int; b < rendered.length; b++, tl++)
+			{
+				var t:DisplayObject = renderSprite.getChildAt(tl);
+				if (rendered[b][0] != null) t = rendered[b][0];
+			}
 			
 			renderSprite.cacheAsBitmap = true;
-			caption.renderSprite = renderSprite;
+			//caption.renderSprite = renderSprite;
+			
+			//handleCollisions(caption, caption.renderSprite, Vector.<ASSCaption>(captionsOnDisplay_), container);
 			
 			/*var bitmapData:BitmapData = new BitmapData(container.getChildAt(0).width, container.getChildAt(0).height, true, 0x00FFFFFF);
 			bitmapData.draw(caption.renderSprite, caption.renderSprite.transform.matrix);
 			var bitmap:Bitmap = new Bitmap(bitmapData, "auto", true);
 			bitmap.transform.matrix = caption.renderSprite.transform.matrix;
 			caption.bitmap = bitmap;*/
-			
-			return caption;
 		}
 		
-		public function render(subtitle_:ISubtitle, event_:IEvent, videoRect:Rectangle, container:DisplayObjectContainer, fontClasses:Vector.<FontClass>, time:Number = -1, animate:Boolean = true):ICaption
+		public function render(subtitle_:ISubtitle, event_:IEvent, videoRect:Rectangle, container:DisplayObjectContainer, fontClasses:Vector.<FontClass>, rerender:ICaption, time:Number = -1, animate:Boolean = true):ICaption
 		{
 			var subtitle:ASSSubtitle = ASSSubtitle(subtitle_);
 			var event:ASSEvent = ASSEvent(event_);
@@ -1212,13 +1278,18 @@ package com.kenshisoft.captions.formats.ass
 			var style:ASSStyle = _parser.getStyle(event.style, subtitle.styles).copy();
 			var orgStyle:ASSStyle = _parser.getStyle(event.style, subtitle.styles);
 			
-			var caption:ASSCaption = new ASSCaption(subtitle.wrapStyle, style.alignment, event);
+			var caption:ASSCaption = rerender ? ASSCaption(rerender) : new ASSCaption(subtitle.wrapStyle, style.alignment, event);
 			if (!caption) return null;
 			
+			caption.reset();
+			
+			if (!rerender)
+			{
 			caption.relativeTo = style.relativeTo;
 			
 			caption.scaleX = subtitle.screenSize.width > 0 ? (1.0 * (style.relativeTo == 1 ? videoRect.width : container.width) / subtitle.screenSize.width) : 1.0;
 			caption.scaleY = subtitle.screenSize.height > 0 ? (1.0 * (style.relativeTo == 1 ? videoRect.height : container.height) / subtitle.screenSize.height) : 1.0;
+			}
 			
 			var options:Object = new Object();
 			options.time = (time - event.startSeconds) * 1000;
@@ -1270,9 +1341,13 @@ package com.kenshisoft.captions.formats.ass
 			var styleTextRegExp:RegExp = /\{([^\}]+)\}([^\{]*)|(.+)$/g;
 			var match:Object = styleTextRegExp.exec(event.text);
 			
+			var styleStr:String = '';
+			var textStr:String = '';
+			
 			while (match != null)
 			{
-				var styleStr:String = match[1] ? match[1] : "";
+				var tmpStyleStr:String = match[1] ? match[1] : "";
+				if (textStr.length == 0) styleStr += tmpStyleStr; else styleStr = tmpStyleStr;
 				var textStr:String = (match[1] == null && match[2] == null) ? match[3] : match[2]; textStr = textStr ? textStr : "";
 				
 				style = styleModifier(caption, _parser.parseTag(styleStr), false, style, orgStyle, subtitle.styles, options);
@@ -1297,6 +1372,8 @@ package com.kenshisoft.captions.formats.ass
 			/*if (caption.effects.ORG && (caption.effects.MOVE || caption.effects.BANNER || caption.effects.SCROLL))
 				caption.isAnimated = true;*/
 			
+			if (!rerender)
+			{
 			if(caption.alignment < 0) caption.alignment = (caption.alignment > 0 ? caption.alignment : -caption.alignment);
 			
 			var marginRect:MarginRectangle = event.marginRect.copy();
@@ -1320,13 +1397,14 @@ package com.kenshisoft.captions.formats.ass
 			// though only marginRect.width is used/needed once, store both anyway
 			marginRect.width = container.width - (marginRect.left + marginRect.right);
 			marginRect.height = container.height - (marginRect.top + marginRect.bottom);
+			}
 			
 			//TODO: (clip/iclip)ers
 			//sub->m_clip.SetRect(0, 0, m_size.cx>>3, m_size.cy>>3);
 			
-			caption.makeLines(marginRect);
+			caption.makeLines(rerender ? caption.getMarginRect() : marginRect);
 			
-			var renderSprite:Sprite = new Sprite();
+			var renderSprite:Sprite = rerender ? rerender.renderSprite : new Sprite();
 			
 			// apply fax/fay transform (first occurance is absolute, and cannot be turned off using \r)
 			// method 1
@@ -1347,20 +1425,23 @@ package com.kenshisoft.captions.formats.ass
 			renderSprite.transform.matrix3D = matrix3d;*/
 			
 			// method 2
+			if (!rerender)
+			{
 			var matrix:Matrix = renderSprite.transform.matrix.clone();
 			matrix.c += caption.fax;
 			matrix.b += caption.fay;
 			renderSprite.transform.matrix = matrix;
+			}
 			
-			renderSprite.name = caption.event.id.toString();
+			if (!rerender)
+				renderSprite.name = caption.event.id.toString();
 			renderSprite.x = caption.getRect().x;
 			renderSprite.y = caption.getRect().y;
 			
 			applyEffects(caption, renderSprite, videoRect, time);
 			
 			// let's get the point
-			if (caption.transformPoint == null)
-				caption.transformPoint = getTransformPoint(caption);
+			caption.transformPoint = getTransformPoint(caption);
 			
 			var rendered:Vector.<Vector.<TextLine>> = new Vector.<Vector.<TextLine>>;
 			
@@ -1475,6 +1556,10 @@ package com.kenshisoft.captions.formats.ass
 						outlineShadow.filters = renderOutlineShadow(word.style);
 					}
 					
+					body.cacheAsBitmap = true;
+					if (!bodyOnly)
+						outline.cacheAsBitmap = bodyShadow.cacheAsBitmap = outlineShadow.cacheAsBitmap = true;
+					
 					var renderedWord:Vector.<TextLine> = new Vector.<TextLine>;
 					renderedWord.push(body, outline, bodyShadow, outlineShadow);
 					
@@ -1485,6 +1570,37 @@ package com.kenshisoft.captions.formats.ass
 				}
 			}
 			
+			if (rerender)
+			{
+			// shadow
+			for (var so:int, tl:int; so < rendered.length; so++, tl++)
+			{
+				var t:DisplayObject = renderSprite.getChildAt(tl);
+				if (rendered[so][3] != null) t = rendered[so][3];
+			}
+			
+			for (var sb:int; sb < rendered.length; sb++, tl++)
+			{
+				var t:DisplayObject = renderSprite.getChildAt(tl);
+				if (rendered[sb][2] != null) t = rendered[sb][2];
+			}
+			
+			// outline
+			for (var o:int; o < rendered.length; o++, tl++)
+			{
+				var t:DisplayObject = renderSprite.getChildAt(tl);
+				if (rendered[o][1] != null) t = rendered[o][1];
+			}
+			
+			// body
+			for (var b:int; b < rendered.length; b++, tl++)
+			{
+				var t:DisplayObject = renderSprite.getChildAt(tl);
+				if (rendered[b][0] != null) t = rendered[b][0];
+			}
+			}
+			else
+			{
 			// shadow
 			for (var so:int; so < rendered.length; so++)
 				rendered[so][3] != null ? renderSprite.addChild(rendered[so][3]) : null;
@@ -1499,27 +1615,22 @@ package com.kenshisoft.captions.formats.ass
 			// body
 			for (var b:int; b < rendered.length; b++)
 				rendered[b][0] != null ? renderSprite.addChild(rendered[b][0]) : null;
+			}
 			
 			renderSprite.cacheAsBitmap = true;
 			caption.renderSprite = renderSprite;
 			
-			/*var bitmapData:BitmapData = new BitmapData(container.getChildAt(0).width, container.getChildAt(0).height, true, 0x00FFFFFF);
-			bitmapData.draw(caption.renderSprite, caption.renderSprite.transform.matrix);
-			var bitmap:Bitmap = new Bitmap(bitmapData, "auto", true);
-			bitmap.transform.matrix = caption.renderSprite.transform.matrix;
-			caption.bitmap = bitmap;*/
-			
 			return caption;
 		}
 		
-		public function add(caption_:ICaption, captionsOnDisplay_:Vector.<ICaption>, container:DisplayObjectContainer):void
+		public function add(caption_:ICaption, captionsOnDisplay_:Vector.<ICaption>, container:DisplayObjectContainer, rerender:Boolean = false):void
 		{
 			var caption:ASSCaption = ASSCaption(caption_);
 			var captionsOnDisplay:Vector.<ASSCaption> = Vector.<ASSCaption>(captionsOnDisplay_);
 			
 			if (!caption.effects.MOVE && !caption.effects.ORG && !caption.effects.BANNER && !caption.effects.SCROLL && !caption.isAnimated)
 				handleCollisions(caption, caption.renderSprite, captionsOnDisplay, container);
-			
+			if (rerender) return;
 			// let's keep "newer" captions at the front, while paying attention to layers
 			var insertAt:int = -1;
 			
@@ -1536,13 +1647,11 @@ package com.kenshisoft.captions.formats.ass
 			}
 			
 			try { insertAt == -1 ? container.addChild(caption.renderSprite) : container.addChildAt(caption.renderSprite, insertAt); } catch (error:Error) { }
-			//try { insertAt == -1 ? container.addChild(caption.bitmap) : container.addChildAt(caption.bitmap, insertAt); } catch (error:Error) { }
 		}
 		
 		public function remove(caption:ICaption, container:DisplayObjectContainer):void
 		{
 			try { container.removeChild(caption.renderSprite); } catch (error:Error) { }
-			//try { container.removeChild(caption.bitmap); } catch (error:Error) { }
 		}
 		
 		public function get parser():IParser

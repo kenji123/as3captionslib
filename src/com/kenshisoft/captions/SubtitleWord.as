@@ -124,10 +124,5 @@ package com.kenshisoft.captions
 		{
 			return _textLine;
 		}
-		
-		public function rerender(renderer:ASSRenderer):void
-		{
-			_textLine = renderer.renderText(text, style);
-		}
 	}
 }

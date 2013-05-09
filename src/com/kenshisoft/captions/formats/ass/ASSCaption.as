@@ -379,9 +379,13 @@ package com.kenshisoft.captions.formats.ass
 		
 		public function reset():void
 		{
+			_words = new Vector.<SubtitleWord>;
 			_lines = new Vector.<SubtitleLine>;
+			_rect = new Rectangle();
 			_lineRects = new Vector.<Rectangle>;
-			//_effects = new Object();
+			_effects = new Object();
+			
+			_effects.COUNT = 0;
 		}
 	}
 }

@@ -22,6 +22,7 @@ package com.kenshisoft.captions.formats.ass
 	import com.kenshisoft.captions.FontClass;
 	import com.kenshisoft.captions.formats.ICaption;
 	import com.kenshisoft.captions.ICaptionsTimeLine;
+	import com.kenshisoft.captions.models.ass.ASSEvent;
 	import flash.display.DisplayObjectContainer;
 	import flash.display.Sprite;
 	import flash.events.Event;
@@ -83,10 +84,10 @@ package com.kenshisoft.captions.formats.ass
 			
 			_animated = animated;
 			
-			_bufferTimer = new Timer(20);
+			_bufferTimer = new Timer(60);
 			_bufferTimer.addEventListener(TimerEvent.TIMER, buffer);
 			
-			_timeLineTimer = new Timer(20);
+			_timeLineTimer = new Timer(60);
 			_timeLineTimer.addEventListener(TimerEvent.TIMER, timeLine);
 		}
 		
@@ -98,7 +99,7 @@ package com.kenshisoft.captions.formats.ass
 			{
 				if ((captions.events[i].startSeconds - _currentTime) < BUFFER_LENGTH)
 				{
-					_captionsBuffer.push(renderer.render(captions, captions.events[i], _videoRect, _container, fontClasses, captions.events[i].startSeconds, animated));
+					_captionsBuffer.push(renderer.render(captions, captions.events[i], _videoRect, _container, fontClasses, null, captions.events[i].startSeconds, animated));
 					
 					_lastBufferIndex++;
 				}
@@ -122,15 +123,19 @@ package com.kenshisoft.captions.formats.ass
 				{
 					caption = _captionsOnDisplay.splice(j, 1)[0];
 					
-					renderer.remove(caption, _container);
+					//caption = _captionsOnDisplay[j];
 					
-					//var newCaption:ASSCaption = ASSCaption(renderer.render(captions, caption.event, _videoRect, _container, fontClasses, _stream.time, animated));
+					//renderer.remove(caption, _container);
 					
-					var newCaption:ASSCaption = ASSCaption(renderer.rerender(captions, caption.event, caption, _videoRect, fontClasses, _stream.time, animated));
-					
-					renderer.add(newCaption, Vector.<ICaption>(_captionsOnDisplay), _container);
+					//var newCaption:ASSCaption = ASSCaption(renderer.render(captions, caption.event, _videoRect, _container, fontClasses, null, _stream.time, animated));
+					var newCaption:ASSCaption = ASSCaption(renderer.render(captions, caption.event, _videoRect, _container, fontClasses, caption, _stream.time, animated));
+					//var start = new Date().time;
+					//renderer.rerender(captions, caption.event, caption, _videoRect, _container, fontClasses, Vector.<ICaption>(_captionsOnDisplay), _stream.time, animated);
+					//trace(new Date().time-start);
+					renderer.add(caption, Vector.<ICaption>(_captionsOnDisplay), _container, true);
 					
 					_captionsOnDisplay.push(newCaption);
+					//_captionsOnDisplay.push(caption);
 					
 					continue;
 				}

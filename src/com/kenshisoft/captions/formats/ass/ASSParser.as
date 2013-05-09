@@ -493,7 +493,8 @@ package com.kenshisoft.captions.formats.ass
 		
 		public function parseString(caption:ASSCaption, str:String, style:ASSStyle, renderer:ASSRenderer, styleStr:String):void
 		{
-			var start_time:int = getTimer();
+			//var start_time:int = getTimer();
+			//var start:Number = new Date().time;
 			/*str = str.replace(/\\N/g, '\n');
 			str = str.replace(/\\n/g, (caption.wrapStyle < 2 || caption.wrapStyle == 3) ? ' ' : '\n');
 			str = str.replace(/\\h/g, ' ');// '\x00A0');
@@ -545,7 +546,8 @@ package com.kenshisoft.captions.formats.ass
 				if (i != lines.length - 1)
 					caption.words.push(new SubtitleWord('\n', style, renderer, styleStr));
 			}
-			trace("execution time: ", getTimer()-start_time);
+			//trace("execution time: ", getTimer()-start_time);
+			//trace(new Date().time-start);
 		}
 		
 		public function parsePolygon(caption:ASSCaption, str:String, style:ASSStyle):void

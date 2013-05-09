@@ -31,7 +31,7 @@ package com.kenshisoft.captions.formats.srt
 			_parser = new SRTParser();
 		}
 		
-		public function render(subtitle_:ISubtitle, event_:IEvent, videoRect:Rectangle, container:DisplayObjectContainer, fontClasses:Vector.<FontClass>, time:Number = -1, animate:Boolean = true):ICaption
+		public function render(subtitle_:ISubtitle, event_:IEvent, videoRect:Rectangle, container:DisplayObjectContainer, fontClasses:Vector.<FontClass>, rerender:ICaption, time:Number = -1, animate:Boolean = true):ICaption
 		{
 			var subtitle:SRTSubtitle = SRTSubtitle(subtitle_);
 			var event:SRTEvent = SRTEvent(event_);
