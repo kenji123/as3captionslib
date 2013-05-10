@@ -4,7 +4,7 @@
   <output>
     <movie outputType="Application" />
     <movie input="" />
-    <movie path="bin\as3captionslib.swf" />
+    <movie path="..\..\..\..\QSPlayer\QSPlayer\bin\as3captionslibworker.swf" />
     <movie fps="30" />
     <movie width="800" />
     <movie height="600" />
@@ -51,7 +51,6 @@
   <!-- SWC Libraries -->
   <libraryPaths>
     <element path="lib\as3-signals-v0.8.swc" />
-    <element path="lib\as3corelib.swc" />
   </libraryPaths>
   <!-- External Libraries -->
   <externalLibraryPaths>
@@ -71,11 +70,11 @@
   </library>
   <!-- Class files to compile (other referenced classes will automatically be included) -->
   <compileTargets>
-    <compile path="src\com\kenshisoft\captions\Captions.as" />
+    <compile path="src\com\kenshisoft\captions\CaptionsWorker.as" />
   </compileTargets>
   <!-- Paths to exclude from the Project Explorer tree -->
   <hiddenPaths>
-    <hidden path="src\com\kenshisoft\captions\formats\ass\Copy of ASSCaption.as" />
+    <!-- example: <hidden path="..." /> -->
   </hiddenPaths>
   <!-- Executed before build -->
   <preBuildCommand />
@@ -83,7 +82,7 @@
   <postBuildCommand alwaysRun="False" />
   <!-- Other project options -->
   <options>
-    <option showHiddenPaths="True" />
+    <option showHiddenPaths="False" />
     <option testMovie="Default" />
   </options>
   <!-- Plugin storage -->

@@ -160,7 +160,7 @@ package com.kenshisoft.captions
 			switch (_captionsFormat)
 			{
 				case SubtitleFormat.ASS:
-					_captionsTimeLine = new ASSTimeLine(_parsedCaptions, _fontClasses, _renderer, animated);
+					_captionsTimeLine = new ASSTimeLine(_parsedCaptions, _fontClasses, _renderer, animated, _rawCaptions);
 					break;
 				case SubtitleFormat.CR:
 					_captionsTimeLine = new CRTimeLine(_parsedCaptions, _fontClasses, _renderer, animated);
