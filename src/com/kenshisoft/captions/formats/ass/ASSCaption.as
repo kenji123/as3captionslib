@@ -43,6 +43,7 @@ package com.kenshisoft.captions.formats.ass
 		public var event:ASSEvent;
 		
 		private var _orgWrapStyle:int;
+		private var _animOptions:ASSAnimOptions;
 		private var _isAnimated:Boolean = false;
 		private var _words:Vector.<SubtitleWord> = new Vector.<SubtitleWord>;
 		private var _lines:Vector.<SubtitleLine> = new Vector.<SubtitleLine>;
@@ -256,6 +257,16 @@ package com.kenshisoft.captions.formats.ass
 		public function get orgWrapStyle():int
 		{
 			return _orgWrapStyle;
+		}
+		
+		public function get animOptions():ASSAnimOptions
+		{
+			return _animOptions;
+		}
+		
+		public function set animOptions(value:ASSAnimOptions):void
+		{
+			_animOptions = value;
 		}
 		
 		public function get isAnimated():Boolean

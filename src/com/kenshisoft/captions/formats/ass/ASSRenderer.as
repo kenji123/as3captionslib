@@ -79,7 +79,7 @@ package com.kenshisoft.captions.formats.ass
 			_parser = new ASSParser();
 		}
 		
-		private function calculateAnimation(dst:Number, src:Number, isAnimated:Boolean, options:Object):Number
+		private function calculateAnimation(dst:Number, src:Number, isAnimated:Boolean, options:ASSAnimOptions):Number
 		{
 			var s:int = options.animStart > 0 ? options.animStart : 0;
 			var e:int = options.animEnd > 0 ? options.animEnd : options.duration;
@@ -102,7 +102,7 @@ package com.kenshisoft.captions.formats.ass
 			return dst;
 		}
 		
-		private function styleModifier(caption:ASSCaption, tagsParsed:Vector.<Vector.<String>>, isAnimated:Boolean, style:ASSStyle, orgStyle:ASSStyle, styles:Vector.<ASSStyle>, options:Object):ASSStyle
+		private function styleModifier(caption:ASSCaption, tagsParsed:Vector.<Vector.<String>>, isAnimated:Boolean, style:ASSStyle, orgStyle:ASSStyle, styles:Vector.<ASSStyle>):ASSStyle
 		{
 			var j:int; // inner loop index
 			var d:Number; // dest
@@ -128,9 +128,9 @@ package com.kenshisoft.captions.formats.ass
 						var nc_d:uint = uint(tagOptions[0]);
 						var nc_s:uint = style.colours[j];
 						
-						style.colours[j] = int(calculateAnimation(nc_d & 0x00ff, nc_s & 0x00ff, isAnimated, options)) & 0x00ff
-							| int(calculateAnimation(nc_d & 0x00ff00, nc_s & 0x00ff00, isAnimated, options)) & 0x00ff00
-							| int(calculateAnimation(nc_d & 0x00ff0000, nc_s & 0x00ff0000, isAnimated, options)) & 0x00ff0000;
+						style.colours[j] = int(calculateAnimation(nc_d & 0x00ff, nc_s & 0x00ff, isAnimated, caption.animOptions)) & 0x00ff
+							| int(calculateAnimation(nc_d & 0x00ff00, nc_s & 0x00ff00, isAnimated, caption.animOptions)) & 0x00ff00
+							| int(calculateAnimation(nc_d & 0x00ff0000, nc_s & 0x00ff0000, isAnimated, caption.animOptions)) & 0x00ff0000;
 						
 						break;
 					case "1a":
@@ -141,12 +141,12 @@ package com.kenshisoft.captions.formats.ass
 						
 						if (tagOptions[0].length <= 0) { style.colours[j] = (orgStyle.colours[j] >> 24) << 24 | Util.removeAlpha(orgStyle.colours[j]); continue; }
 						
-						style.colours[j] = int(calculateAnimation(uint(tagOptions[0]) << 24 | Util.removeAlpha(style.colours[j]), style.colours[j], isAnimated, options));
+						style.colours[j] = int(calculateAnimation(uint(tagOptions[0]) << 24 | Util.removeAlpha(style.colours[j]), style.colours[j], isAnimated, caption.animOptions));
 						
 						break;
 					case "alpha":
 						for (j = 0; j < 4; j++)
-							style.colours[j] = tagOptions[0].length > 0 ? int(calculateAnimation(uint(tagOptions[0]) << 24 | Util.removeAlpha(style.colours[j]), style.colours[j], isAnimated, options)) : (orgStyle.colours[j] >> 24) << 24 | Util.removeAlpha(orgStyle.colours[j]);
+							style.colours[j] = tagOptions[0].length > 0 ? int(calculateAnimation(uint(tagOptions[0]) << 24 | Util.removeAlpha(style.colours[j]), style.colours[j], isAnimated, caption.animOptions)) : (orgStyle.colours[j] >> 24) << 24 | Util.removeAlpha(orgStyle.colours[j]);
 						
 						break;
 					case "an":
@@ -162,7 +162,7 @@ package com.kenshisoft.captions.formats.ass
 					case "blur":
 						if (tagOptions[0].length <= 0) { style.gaussianBlur = orgStyle.gaussianBlur; continue; }
 						
-						n = calculateAnimation(Number(tagOptions[0]), style.gaussianBlur, isAnimated, options);
+						n = calculateAnimation(Number(tagOptions[0]), style.gaussianBlur, isAnimated, caption.animOptions);
 						style.gaussianBlur = n < 0 ? 0 : n;
 						
 						break;
@@ -177,15 +177,15 @@ package com.kenshisoft.captions.formats.ass
 						
 						d = Number(tagOptions[0]);
 						
-						n = calculateAnimation(d, style.outlineWidthX, isAnimated, options);
+						n = calculateAnimation(d, style.outlineWidthX, isAnimated, caption.animOptions);
 						style.outlineWidthX = n < 0 ? 0 : n;
 						
-						n = calculateAnimation(d, style.outlineWidthY, isAnimated, options);
+						n = calculateAnimation(d, style.outlineWidthY, isAnimated, caption.animOptions);
 						style.outlineWidthY = n < 0 ? 0 : n;
 						
 						break;
 					case "be":
-						style.blur = tagOptions[0].length > 0 ? calculateAnimation(Number(tagOptions[0]), style.blur, isAnimated, options) : orgStyle.blur;
+						style.blur = tagOptions[0].length > 0 ? calculateAnimation(Number(tagOptions[0]), style.blur, isAnimated, caption.animOptions) : orgStyle.blur;
 						
 						break;
 					case "b":
@@ -204,14 +204,14 @@ package com.kenshisoft.captions.formats.ass
 						var c_d:uint = uint(tagOptions[0]);
 						var c_s:uint = style.colours[0];
 						
-						style.colours[j] = int(calculateAnimation(c_d & 0x00ff, c_s & 0x00ff, isAnimated, options)) & 0x00ff
-							| int(calculateAnimation(c_d & 0x00ff00, c_s & 0x00ff00, isAnimated, options)) & 0x00ff00
-							| int(calculateAnimation(c_d & 0x00ff0000, c_s & 0x00ff0000, isAnimated, options)) & 0x00ff0000;
+						style.colours[j] = int(calculateAnimation(c_d & 0x00ff, c_s & 0x00ff, isAnimated, caption.animOptions)) & 0x00ff
+							| int(calculateAnimation(c_d & 0x00ff00, c_s & 0x00ff00, isAnimated, caption.animOptions)) & 0x00ff00
+							| int(calculateAnimation(c_d & 0x00ff0000, c_s & 0x00ff0000, isAnimated, caption.animOptions)) & 0x00ff0000;
 						
 						break;
 					case "fade":
 					case "fad":
-						if (!options.animate) continue;
+						if (!caption.animOptions.animate) continue;
 						
 						if(tagOptions.length == 7 && !caption.effects.FADE) // {\fade(a1=param[0], a2=param[1], a3=param[2], t1=t[0], t2=t[1], t3=t[2], t4=t[3])}
 						{
@@ -245,42 +245,42 @@ package com.kenshisoft.captions.formats.ass
 						
 						break;
 					case "fn":
-						style.fontName = _parser.getFontNameByAlias(tagOptions[0].length > 0 ? tagOptions[0] : orgStyle.fontName, options.fontInfo);
+						style.fontName = _parser.getFontNameByAlias(tagOptions[0].length > 0 ? tagOptions[0] : orgStyle.fontName, _parser.fontClasses);
 						_parser.setTrueFontHeight(style);
 						
 						break;
 					case "frx":
-						style.fontAngleX = tagOptions[0].length > 0 ? calculateAnimation(Number(tagOptions[0]), style.fontAngleX, isAnimated, options) : orgStyle.fontAngleX;
+						style.fontAngleX = tagOptions[0].length > 0 ? calculateAnimation(Number(tagOptions[0]), style.fontAngleX, isAnimated, caption.animOptions) : orgStyle.fontAngleX;
 						
 						break;
 					case "fry":
-						style.fontAngleY = tagOptions[0].length > 0 ? calculateAnimation(Number(tagOptions[0]), style.fontAngleY, isAnimated, options) : orgStyle.fontAngleY;
+						style.fontAngleY = tagOptions[0].length > 0 ? calculateAnimation(Number(tagOptions[0]), style.fontAngleY, isAnimated, caption.animOptions) : orgStyle.fontAngleY;
 						
 						break;
 					case "frz":
 					case "fr":
-						style.fontAngleZ = tagOptions[0].length > 0 ? calculateAnimation(Number(tagOptions[0]), style.fontAngleZ, isAnimated, options) : orgStyle.fontAngleZ;
+						style.fontAngleZ = tagOptions[0].length > 0 ? calculateAnimation(Number(tagOptions[0]), style.fontAngleZ, isAnimated, caption.animOptions) : orgStyle.fontAngleZ;
 						
 						break;
 					case "fax":
-						style.fontShiftX = caption.fax = tagOptions[0].length > 0 ? calculateAnimation(Number(tagOptions[0]), style.fontShiftX, isAnimated, options) : orgStyle.fontShiftX;
+						style.fontShiftX = caption.fax = tagOptions[0].length > 0 ? calculateAnimation(Number(tagOptions[0]), style.fontShiftX, isAnimated, caption.animOptions) : orgStyle.fontShiftX;
 						
 						break;
 					case "fay":
-						style.fontShiftY = caption.fay = tagOptions[0].length > 0 ? calculateAnimation(Number(tagOptions[0]), style.fontShiftY, isAnimated, options) : orgStyle.fontShiftY;
+						style.fontShiftY = caption.fay = tagOptions[0].length > 0 ? calculateAnimation(Number(tagOptions[0]), style.fontShiftY, isAnimated, caption.animOptions) : orgStyle.fontShiftY;
 						
 						break;
 					case "fscx":
 						if (tagOptions[0].length <= 0) { style.fontScaleX = orgStyle.fontScaleX; continue; }
 						
-						n = calculateAnimation(Number(tagOptions[0]), style.fontScaleX, isAnimated, options);
+						n = calculateAnimation(Number(tagOptions[0]), style.fontScaleX, isAnimated, caption.animOptions);
 						style.fontScaleX = n < 0 ? 0 : n;
 						
 						break;
 					case "fscy":
 						if (tagOptions[0].length <= 0) { style.fontScaleY = orgStyle.fontScaleY; continue; }
 						
-						n = calculateAnimation(Number(tagOptions[0]), style.fontScaleY, isAnimated, options);
+						n = calculateAnimation(Number(tagOptions[0]), style.fontScaleY, isAnimated, caption.animOptions);
 						style.fontScaleY = n < 0 ? 0 : n;
 						
 						break;
@@ -292,7 +292,7 @@ package com.kenshisoft.captions.formats.ass
 					case "fsp":
 						if (tagOptions[0].length <= 0) { style.fontSpacing = orgStyle.fontSpacing; continue; }
 						
-						n = calculateAnimation(Number(tagOptions[0]), style.fontSpacing, isAnimated, options);
+						n = calculateAnimation(Number(tagOptions[0]), style.fontSpacing, isAnimated, caption.animOptions);
 						style.fontSpacing = n < 0 ? 0 : n;
 						
 						break;
@@ -303,13 +303,13 @@ package com.kenshisoft.captions.formats.ass
 						
 						if (tagOptions[0].charAt(0) == '-' || tagOptions[0].charAt(0) == '+')
 						{
-							n = calculateAnimation(style.orgFontSize + ((style.orgFontSize * d) / 10), style.orgFontSize, isAnimated, options);
+							n = calculateAnimation(style.orgFontSize + ((style.orgFontSize * d) / 10), style.orgFontSize, isAnimated, caption.animOptions);
 							style.orgFontSize = n > 0 ? n : orgStyle.orgFontSize;
 							_parser.setTrueFontHeight(style);
 						}
 						else
 						{
-							n = calculateAnimation(d, style.orgFontSize, isAnimated, options);
+							n = calculateAnimation(d, style.orgFontSize, isAnimated, caption.animOptions);
 							style.orgFontSize = n > 0 ? n : orgStyle.orgFontSize;
 							_parser.setTrueFontHeight(style);
 						}
@@ -321,27 +321,27 @@ package com.kenshisoft.captions.formats.ass
 						
 						break;
 					case "kt": //TODO: write render code
-						options.kStart = tagOptions[0].length > 0 ? Number(tagOptions[0]) * 10 : 0;
-						options.kEnd = options.kStart;
+						caption.animOptions.kStart = tagOptions[0].length > 0 ? Number(tagOptions[0]) * 10 : 0;
+						caption.animOptions.kEnd = caption.animOptions.kStart;
 						
 						break;
 					case "kf":
 					case "K": //TODO: write render code
-						options.kType = 1;
-						options.kStart = options.kEnd;
-						options.kEnd += tagOptions[0].length > 0 ? Number(tagOptions[0]) * 10 : 1000;
+						caption.animOptions.kType = 1;
+						caption.animOptions.kStart = caption.animOptions.kEnd;
+						caption.animOptions.kEnd += tagOptions[0].length > 0 ? Number(tagOptions[0]) * 10 : 1000;
 						
 						break;
 					case "ko": //TODO: write render code
-						options.kType = 2;
-						options.kStart = options.kEnd;
-						options.kEnd += tagOptions[0].length > 0 ? Number(tagOptions[0]) * 10 : 1000;
+						caption.animOptions.kType = 2;
+						caption.animOptions.kStart = caption.animOptions.kEnd;
+						caption.animOptions.kEnd += tagOptions[0].length > 0 ? Number(tagOptions[0]) * 10 : 1000;
 						
 						break;
 					case "k": //TODO: write render code
-						options.kType = 0;
-						options.kStart = options.kEnd;
-						options.kEnd += tagOptions[0].length > 0 ? Number(tagOptions[0]) * 10 : 1000;
+						caption.animOptions.kType = 0;
+						caption.animOptions.kStart = caption.animOptions.kEnd;
+						caption.animOptions.kEnd += tagOptions[0].length > 0 ? Number(tagOptions[0]) * 10 : 1000;
 						
 						break;
 					case "move": // {\move(x1=param[0], y1=param[1], x2=param[2], y2=param[3][, t1=t[0], t2=t[1]])}
@@ -349,8 +349,8 @@ package com.kenshisoft.captions.formats.ass
 						{
 							e = new ASSEffect(SubtitleEffect.MOVE);
 							
-							e.param[0] = int(caption.scaleX * (options.animate ? int(tagOptions[0]) : int(tagOptions[2])));
-							e.param[1] = int(caption.scaleY * (options.animate ? int(tagOptions[1]) : int(tagOptions[3])));
+							e.param[0] = int(caption.scaleX * (caption.animOptions.animate ? int(tagOptions[0]) : int(tagOptions[2])));
+							e.param[1] = int(caption.scaleY * (caption.animOptions.animate ? int(tagOptions[1]) : int(tagOptions[3])));
 							e.param[2] = int(caption.scaleX * int(tagOptions[2]));
 							e.param[3] = int(caption.scaleY * int(tagOptions[3]));
 							
@@ -363,7 +363,7 @@ package com.kenshisoft.captions.formats.ass
 							}
 							
 							caption.effects.MOVE = e;
-							if (options.animate) caption.effects.COUNT += 1;
+							if (caption.animOptions.animate) caption.effects.COUNT += 1;
 						}
 						
 						break;
@@ -376,12 +376,12 @@ package com.kenshisoft.captions.formats.ass
 							e.param[1] = int(caption.scaleY * int(tagOptions[1]));
 							
 							caption.effects.ORG = e;
-							if (options.animate) caption.effects.COUNT += 1;
+							if (caption.animOptions.animate) caption.effects.COUNT += 1;
 						}
 						
 						break;
 					case "pbo": //TODO: write render code
-						options.polygonBaselineOffset = Number(tagOptions[0]);
+						caption.animOptions.polygonBaselineOffset = Number(tagOptions[0]);
 						
 						break;
 					case "pos":
@@ -399,7 +399,7 @@ package com.kenshisoft.captions.formats.ass
 						break;
 					case "p": //TODO: write render code
 						n = Number(tagOptions[0]);
-						options.nPolygon = n <= 0 ? 0 : n;
+						caption.animOptions.nPolygon = n <= 0 ? 0 : n;
 						
 						break;
 					case "q":
@@ -424,10 +424,10 @@ package com.kenshisoft.captions.formats.ass
 						
 						d = Number(tagOptions[0]);
 						
-						n = calculateAnimation(d, style.shadowDepthX, isAnimated, options);
+						n = calculateAnimation(d, style.shadowDepthX, isAnimated, caption.animOptions);
 						style.shadowDepthX = n < 0 ? 0 : n;
 						
-						n = calculateAnimation(d, style.shadowDepthY, isAnimated, options);
+						n = calculateAnimation(d, style.shadowDepthY, isAnimated, caption.animOptions);
 						style.shadowDepthY = n < 0 ? 0 : n;
 						
 						break;
@@ -439,8 +439,8 @@ package com.kenshisoft.captions.formats.ass
 					case "t": // \t([<t1>,<t2>,][<accel>,]<style modifiers>)
 						var p:String;
 						
-						options.animStart = options.animEnd = 0;
-						options.animAccel = 1;
+						caption.animOptions.animStart = caption.animOptions.animEnd = 0;
+						caption.animOptions.animAccel = 1;
 						
 						if(tagOptions.length == 1)
 						{
@@ -448,26 +448,26 @@ package com.kenshisoft.captions.formats.ass
 						}
 						else if(tagOptions.length == 2)
 						{
-							options.animAccel = Number(tagOptions[0]);
+							caption.animOptions.animAccel = Number(tagOptions[0]);
 							p = tagOptions[1];
 						}
 						else if(tagOptions.length == 3)
 						{
-							options.animStart = int(tagOptions[0]);
-							options.animEnd = int(tagOptions[1]);
+							caption.animOptions.animStart = int(tagOptions[0]);
+							caption.animOptions.animEnd = int(tagOptions[1]);
 							p = tagOptions[2];
 						}
 						else if(tagOptions.length == 4)
 						{
-							options.animStart = int(tagOptions[0]); 
-							options.animEnd = int(tagOptions[1]);
-							options.animAccel = Number(tagOptions[2]);
+							caption.animOptions.animStart = int(tagOptions[0]); 
+							caption.animOptions.animEnd = int(tagOptions[1]);
+							caption.animOptions.animAccel = Number(tagOptions[2]);
 							p = tagOptions[3];
 						}
 						
-						style = styleModifier(caption, _parser.parseTag(p), options.animate, style, orgStyle, styles, options);
+						style = styleModifier(caption, _parser.parseTag(p), caption.animOptions.animate, style, orgStyle, styles);
 						
-						caption.isAnimated = options.animate;
+						caption.isAnimated = caption.animOptions.animate;
 						
 						break;
 					case "u":
@@ -478,27 +478,27 @@ package com.kenshisoft.captions.formats.ass
 					case "xbord":
 						if (tagOptions[0].length <= 0) { style.outlineWidthX = orgStyle.outlineWidthX; continue; }
 						
-						n = calculateAnimation(Number(tagOptions[0]), style.outlineWidthX, isAnimated, options);
+						n = calculateAnimation(Number(tagOptions[0]), style.outlineWidthX, isAnimated, caption.animOptions);
 						style.outlineWidthX = n < 0 ? 0 : n;
 						
 						break;
 					case "xshad":
 						if (tagOptions[0].length <= 0) { style.shadowDepthX = orgStyle.shadowDepthX; continue; }
 						
-						style.shadowDepthX = calculateAnimation(Number(tagOptions[0]), style.shadowDepthX, isAnimated, options);
+						style.shadowDepthX = calculateAnimation(Number(tagOptions[0]), style.shadowDepthX, isAnimated, caption.animOptions);
 						
 						break;
 					case "ybord":
 						if (tagOptions[0].length <= 0) { style.outlineWidthY = orgStyle.outlineWidthY; continue; }
 						
-						n = calculateAnimation(Number(tagOptions[0]), style.outlineWidthY, isAnimated, options);
+						n = calculateAnimation(Number(tagOptions[0]), style.outlineWidthY, isAnimated, caption.animOptions);
 						style.outlineWidthY = n < 0 ? 0 : n;
 						
 						break;
 					case "yshad":
 						if (tagOptions[0].length <= 0) { style.shadowDepthY = orgStyle.shadowDepthY; continue; }
 						
-						style.shadowDepthY = calculateAnimation(Number(tagOptions[0]), style.shadowDepthY, isAnimated, options);
+						style.shadowDepthY = calculateAnimation(Number(tagOptions[0]), style.shadowDepthY, isAnimated, caption.animOptions);
 						
 						break;
 				}
@@ -958,7 +958,7 @@ package com.kenshisoft.captions.formats.ass
 			return matrix3d;
 		}
 		
-		public function render(subtitle_:ISubtitle, event_:IEvent, videoRect:Rectangle, container:DisplayObjectContainer, fontClasses:Vector.<FontClass>, time:Number = -1, animate:Boolean = true, caption_:ICaption = null):ICaption
+		public function render(subtitle_:ISubtitle, event_:IEvent, videoRect:Rectangle, container:DisplayObjectContainer, time:Number = -1, animate:Boolean = true, caption_:ICaption = null):ICaption
 		{
 			var subtitle:ASSSubtitle = ASSSubtitle(subtitle_);
 			var event:ASSEvent = ASSEvent(event_);
@@ -978,18 +978,7 @@ package com.kenshisoft.captions.formats.ass
 				caption.scaleY = subtitle.screenSize.height > 0 ? (1.0 * (style.relativeTo == 1 ? videoRect.height : container.height) / subtitle.screenSize.height) : 1.0;
 			}
 			
-			//TODO: create animation options class
-			var options:Object = new Object();
-			options.time = (time - event.startSeconds) * 1000;
-			options.duration = event.duration * 1000;
-			options.fontInfo = fontClasses;
-			options.animate = animate;
-			
-			options.animStart = options.animEnd = 0;
-			options.animAccel = 1;
-			options.kType = options.kStart = options.kEnd = 0;
-			options.nPolygon = 0;
-			options.polygonBaselineOffset = 0;
+			caption.animOptions = new ASSAnimOptions((time - event.startSeconds) * 1000, event.duration * 1000, animate);
 			
 			if (animate) _parser.parseEffect(caption, event.effect);
 			
@@ -1010,7 +999,7 @@ package com.kenshisoft.captions.formats.ass
 					{
 						tmpStyleStr += str.substr(1, i-1);
 						
-						style = styleModifier(caption, _parser.parseTag(str.substr(1, i-1)), false, style, orgStyle, subtitle.styles, options);
+						style = styleModifier(caption, _parser.parseTag(str.substr(1, i-1)), false, style, orgStyle, subtitle.styles);
 						
 						str = str.substr(i+1);
 					}
@@ -1030,7 +1019,7 @@ package com.kenshisoft.captions.formats.ass
 					if (textStr.length == 0) styleStr += tmpStyleStr; else styleStr = tmpStyleStr;
 					textStr = str.substr(0, i);
 					
-					if (options.nPolygon > 0)
+					if (caption.animOptions.nPolygon > 0)
 						_parser.parsePolygon(caption, str.substr(0, i), tmp);
 					else
 						_parser.parseString(caption, str.substr(0, i), tmp, this, styleStr);
@@ -1051,7 +1040,7 @@ package com.kenshisoft.captions.formats.ass
 					if (textStr.length == 0) styleStr += tmpStyleStr; else styleStr = tmpStyleStr;
 					textStr = (match[1] == null && match[2] == null) ? match[3] : match[2]; textStr = textStr ? textStr : "";
 					
-					style = styleModifier(caption, _parser.parseTag(styleStr), false, style, orgStyle, subtitle.styles, options);
+					style = styleModifier(caption, _parser.parseTag(styleStr), false, style, orgStyle, subtitle.styles);
 					
 					var tmp:ASSStyle = style.copy();
 					tmp.fontSize = caption.scaleY * tmp.fontSize;
@@ -1073,7 +1062,7 @@ package com.kenshisoft.captions.formats.ass
 			{
 				for (var i:int; i < caption.words.length; i++)
 				{
-					style = styleModifier(caption, _parser.parseTag(caption.words[i].styleStr), false, style, orgStyle, subtitle.styles, options);
+					style = styleModifier(caption, _parser.parseTag(caption.words[i].styleStr), false, style, orgStyle, subtitle.styles);
 					
 					var tmp:ASSStyle = style.copy();
 					tmp.fontSize = caption.scaleY * tmp.fontSize;

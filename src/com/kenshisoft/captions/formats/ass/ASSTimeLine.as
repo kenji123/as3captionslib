@@ -47,7 +47,6 @@ package com.kenshisoft.captions.formats.ass
 		private const BUFFER_LENGTH:int = 30; // buffer in seconds
 		
 		public var captions:ASSSubtitle;
-		public var fontClasses:Vector.<FontClass>;
 		public var renderer:ASSRenderer;
 		
 		private var _animated:Boolean;
@@ -76,12 +75,11 @@ package com.kenshisoft.captions.formats.ass
 		public var _captionRemoveSignal:Signal = new Signal(ICaption);
 		public function get captionRemoveSignal():Signal { return _captionRemoveSignal; }
 		
-		public function ASSTimeLine(captions:ISubtitle, fontClasses:Vector.<FontClass>, renderer:IRenderer, animated:Boolean)
+		public function ASSTimeLine(captions:ISubtitle, renderer:IRenderer, animated:Boolean)
 		{
 			super();
 			
 			this.captions = ASSSubtitle(captions);
-			this.fontClasses = fontClasses;
 			this.renderer = ASSRenderer(renderer);
 			
 			_animated = animated;
@@ -99,6 +97,7 @@ package com.kenshisoft.captions.formats.ass
 		private function buffer(event:TimerEvent):void
 		{
 			_bufferTimer.stop();
+			_timeLine2Timer.stop();
 			
 			_currentTime = _stream.time - _timeShift;
 			
@@ -108,7 +107,7 @@ package com.kenshisoft.captions.formats.ass
 			{
 				if ((captions.events[i].startSeconds - _currentTime) < BUFFER_LENGTH)
 				{
-					_captionsBuffer.push(renderer.render(captions, captions.events[i], _videoRect, _container, fontClasses, captions.events[i].startSeconds, animated));
+					_captionsBuffer.push(renderer.render(captions, captions.events[i], _videoRect, _container, captions.events[i].startSeconds, animated));
 					
 					/*var frameLength:Number = captions.events[i].duration / 24;
 					var eevent:ASSEvent = captions.events[i].copy();
@@ -124,7 +123,7 @@ package com.kenshisoft.captions.formats.ass
 					
 					_lastBufferIndex++;
 					
-					if (24 > (getTimer() - start)) break;
+					if (32 > (getTimer() - start)) break;
 				}
 				else
 				{
@@ -132,6 +131,7 @@ package com.kenshisoft.captions.formats.ass
 				}
 			}
 			
+			_timeLine2Timer.start();
 			_bufferTimer.start();
 		}
 		
@@ -177,6 +177,7 @@ package com.kenshisoft.captions.formats.ass
 		private function timeLine2(event:TimerEvent):void
 		{
 			_timeLine2Timer.stop();
+			_bufferTimer.stop();
 			
 			_currentTime = _stream.time - _timeShift;
 			
@@ -192,17 +193,18 @@ package com.kenshisoft.captions.formats.ass
 					
 					//renderer.remove(caption, _container);
 					
-					//caption = ASSCaption(renderer.render(captions, caption.event, _videoRect, _container, fontClasses, _stream.time, animated));
-					renderer.render(captions, caption.event, _videoRect, _container, fontClasses, _stream.time, animated, caption);
+					//caption = ASSCaption(renderer.render(captions, caption.event, _videoRect, _container, _stream.time, animated));
+					renderer.render(captions, caption.event, _videoRect, _container, _stream.time, animated, caption);
 					
 					renderer.add(caption, Vector.<ICaption>(_captionsOnDisplay), _container, true);
 					
 					_captionsOnDisplay.push(caption);
 					
-					if (24 > (getTimer() - start)) break;
+					if (32 > (getTimer() - start)) break;
 				}
 			}
 			
+			_bufferTimer.start();
 			_timeLine2Timer.start();
 		}
 		

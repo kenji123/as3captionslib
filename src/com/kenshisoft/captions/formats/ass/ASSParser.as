@@ -47,6 +47,8 @@ package com.kenshisoft.captions.formats.ass
 	
 	public class ASSParser implements IParser
 	{
+		private var _fontClasses:Vector.<FontClass>;
+		
 		public function ASSParser()
 		{
 			super();
@@ -54,6 +56,8 @@ package com.kenshisoft.captions.formats.ass
 		
 		public function parse(subtitleStr:String, fontClasses:Vector.<FontClass>):ISubtitle
 		{
+			_fontClasses = fontClasses;
+			
 			// comment, picture, sound, movie, and command events are ignored
 			var styleV5RegExp:RegExp = /(.*),(.*),(\d*),&H(.{0,8}?),&H(.{0,8}?),&H(.{0,8}?),&H(.{0,8}?),(-?\d),(-?\d),(-?\d),(-?\d),(\d*),(\d*),(\d*\.?\d*?),(\d*\.?\d*?),(\d*),(\d*\.?\d*?),(\d*\.?\d*?),(\d*),(\d*),(\d*),(\d*),(\d*)/im;
 			var eventV5RegExp:RegExp = /(\d),(\d:\d\d:\d\d.\d\d),(\d:\d\d:\d\d.\d\d),(.*?),(.*?),(\d{4}),(\d{4}),(\d{4}),(.*?),(.*)/i;
@@ -635,6 +639,11 @@ package com.kenshisoft.captions.formats.ass
 					return;
 				}
 			}
+		}
+		
+		public function get fontClasses():Vector.<FontClass>
+		{
+			return _fontClasses;
 		}
 	}
 }

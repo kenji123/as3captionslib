@@ -153,7 +153,7 @@ package com.kenshisoft.captions.formats.cr
             }
         }
 		
-		public function render(subtitle_:ISubtitle, event_:IEvent, videoRect:Rectangle, container:DisplayObjectContainer, fontClasses:Vector.<FontClass>, time:Number = -1, animate:Boolean = true, caption_:ICaption = null):ICaption
+		public function render(subtitle_:ISubtitle, event_:IEvent, videoRect:Rectangle, container:DisplayObjectContainer, time:Number = -1, animate:Boolean = true, caption_:ICaption = null):ICaption
 		{
 			var subtitle:CRSubtitleScript = CRSubtitleScript(subtitle_);
 			var event:CREvent = CREvent(event_);

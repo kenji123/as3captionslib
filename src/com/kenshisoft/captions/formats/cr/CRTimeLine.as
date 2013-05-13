@@ -22,7 +22,6 @@ package com.kenshisoft.captions.formats.cr
 		private const BUFFER_LENGTH:int = 30; // buffer in seconds
 		
 		public var captions:CRSubtitleScript;
-		public var fontClasses:Vector.<FontClass>;
 		public var renderer:CRRenderer;
 		
 		private var _animated:Boolean;
@@ -50,12 +49,11 @@ package com.kenshisoft.captions.formats.cr
 		public var _captionRemoveSignal:Signal = new Signal(ICaption);
 		public function get captionRemoveSignal():Signal { return _captionRemoveSignal; }
 		
-		public function CRTimeLine(captions:ISubtitle, fontClasses:Vector.<FontClass>, renderer:IRenderer, animated:Boolean)
+		public function CRTimeLine(captions:ISubtitle, renderer:IRenderer, animated:Boolean)
 		{
 			super();
 			
 			this.captions = CRSubtitleScript(captions);
-			this.fontClasses = fontClasses;
 			this.renderer = CRRenderer(renderer);
 			
 			_animated = animated;
@@ -75,7 +73,7 @@ package com.kenshisoft.captions.formats.cr
 			{
 				if ((captions.events[i].startSeconds - _currentTime) < BUFFER_LENGTH)
 				{
-					_captionsBuffer.push(renderer.render(captions, captions.events[i], _videoRect, _container, fontClasses, captions.events[i].startSeconds, animated));
+					_captionsBuffer.push(renderer.render(captions, captions.events[i], _videoRect, _container, captions.events[i].startSeconds, animated));
 					
 					_lastBufferIndex++;
 				}

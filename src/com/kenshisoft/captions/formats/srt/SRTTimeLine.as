@@ -22,7 +22,6 @@ package com.kenshisoft.captions.formats.srt
 		private const BUFFER_LENGTH:int = 30; // buffer in seconds
 		
 		public var captions:SRTSubtitle;
-		public var fontClasses:Vector.<FontClass>;
 		public var renderer:SRTRenderer;
 		
 		private var _animated:Boolean;
@@ -50,12 +49,11 @@ package com.kenshisoft.captions.formats.srt
 		public var _captionRemoveSignal:Signal = new Signal(ICaption);
 		public function get captionRemoveSignal():Signal { return _captionRemoveSignal; }
 		
-		public function SRTTimeLine(captions:ISubtitle, fontClasses:Vector.<FontClass>, renderer:IRenderer, animated:Boolean)
+		public function SRTTimeLine(captions:ISubtitle, renderer:IRenderer, animated:Boolean)
 		{
 			super();
 			
 			this.captions = SRTSubtitle(captions);
-			this.fontClasses = fontClasses;
 			this.renderer = SRTRenderer(renderer);
 			
 			_animated = animated;
@@ -75,7 +73,7 @@ package com.kenshisoft.captions.formats.srt
 			{
 				if ((captions.events[i].startSeconds - _currentTime) < BUFFER_LENGTH)
 				{
-					_captionsBuffer.push(renderer.render(captions, captions.events[i], _videoRect, _container, fontClasses, captions.events[i].startSeconds, animated));
+					_captionsBuffer.push(renderer.render(captions, captions.events[i], _videoRect, _container, captions.events[i].startSeconds, animated));
 					
 					_lastBufferIndex++;
 				}
