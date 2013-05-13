@@ -19,7 +19,6 @@
 
 package com.kenshisoft.captions.formats.ass
 {
-	//import fl.motion.Color;
 	import flash.text.FontType;
 	import flash.text.TextField;
 	import flash.text.TextFormat;
@@ -138,13 +137,9 @@ package com.kenshisoft.captions.formats.ass
 						
 						var style:ASSStyle = new ASSStyle();
 						style.name = styleMatch[index++];
-						//style.fontName = String(styleMatch[index++]).replace(/^@/, '');
 						style.fontName = getFontNameByAlias(String(styleMatch[index++]).replace(/^@/, ''), fontClasses);
-						//style.fontSize = Number(styleMatch[index++]);
 						style.fontSize = style.orgFontSize = Number(styleMatch[index++]);
-						//style.colours = new Vector.<Color>; style.colours.push(Util.toColor(styleMatch[index++]), Util.toColor(styleMatch[index++]), Util.toColor(styleMatch[index++]), Util.toColor(styleMatch[index++]));
 						style.colours = new Vector.<uint>; style.colours.push("0x" + styleMatch[index++], "0x" + styleMatch[index++], "0x" + styleMatch[index++], "0x" + styleMatch[index++]);
-						//style.colours = new Vector.<uint>; style.colours.push(Util.invertColor(uint("0x" + styleMatch[index++])), Util.invertColor(uint("0x" + styleMatch[index++])), Util.invertColor(uint("0x" + styleMatch[index++])), Util.invertColor(uint("0x" + styleMatch[index++])));
 						style.fontWeight = int(styleMatch[index++]) < 0 ? "bold" : "normal";
 						style.italic = int(styleMatch[index++]) < 0 ? "italic" : "normal";
 						if (subtitle.styleVersion >= 5) style.underline = int(styleMatch[index++]) < 0 ? "underline" : "none";
@@ -161,15 +156,12 @@ package com.kenshisoft.captions.formats.ass
 						if (subtitle.styleVersion >= 6) style.marginRect.bottom = int(styleMatch[index++]);
 						if (subtitle.styleVersion <= 4)
 						{
-							//style.colours[2] = new Color(1, 1, 1, 1, style.colours[3].redOffset, style.colours[3].greenOffset, style.colours[3].blueOffset, style.colours[3].alphaOffset);
 							style.colours[2] = style.colours[3];
 							
 							var alpha:int = int(styleMatch[index]) < 0xff ? int(styleMatch[index]) : 0xff; index++; alpha = alpha > 0 ? alpha : 0;
 							for (var j:int; j < 3; j++)
 								style.colours[j] = alpha << 24 | Util.removeAlpha(style.colours[j]);
-								//style.colours[j].alphaOffset = alpha;
 							
-							//style.colours[3].alphaOffset = 0x80;
 							style.colours[3] = 0x80 << 24 | Util.removeAlpha(style.colours[3]);
 						}
 						style.charSet = int(styleMatch[index++]);
@@ -259,7 +251,7 @@ package com.kenshisoft.captions.formats.ass
 			
 			var e:ASSEffect;
 			
-			if(effect.toLowerCase() == "banner;") // Banner;delay=param[0][;leftoright=param[1];fadeawaywidth=param[2]]
+			if (effect.toLowerCase() == "banner;") // Banner;delay=param[0][;leftoright=param[1];fadeawaywidth=param[2]]
 			{
 				paramMatch = bannerRegExp.exec(params);
 				if (paramMatch == null) return;
@@ -274,7 +266,7 @@ package com.kenshisoft.captions.formats.ass
 				caption.effects.COUNT += 1;
 				caption.wrapStyle = 2;
 			}
-			else if(effect.toLowerCase() == "scroll up;" || effect.toLowerCase() == "scroll down;") // Scroll up/down(toptobottom=param[3]);top=param[0];bottom=param[1];delay=param[2][;fadeawayheight=param[4]]
+			else if (effect.toLowerCase() == "scroll up;" || effect.toLowerCase() == "scroll down;") // Scroll up/down(toptobottom=param[3]);top=param[0];bottom=param[1];delay=param[2][;fadeawayheight=param[4]]
 			{
 				paramMatch = scrollRegExp.exec(params);
 				if (paramMatch == null) return;
@@ -495,7 +487,7 @@ package com.kenshisoft.captions.formats.ass
 		{
 			//var start_time:int = getTimer();
 			//var start:Number = new Date().time;
-			/*str = str.replace(/\\N/g, '\n');
+			str = str.replace(/\\N/g, '\n');
 			str = str.replace(/\\n/g, (caption.wrapStyle < 2 || caption.wrapStyle == 3) ? ' ' : '\n');
 			str = str.replace(/\\h/g, ' ');// '\x00A0');
 			
@@ -509,25 +501,25 @@ package com.kenshisoft.captions.formats.ass
 				var w:SubtitleWord;
 				if (i < j)
 				{
-					w = new SubtitleWord(str.substr(i, j - i), style, renderer)
+					w = new SubtitleWord(str.substr(i, j - i), style, renderer, styleStr)
 					caption.words.push(w);
 				}
 				
 				if (c == '\n')
 				{
-					w = new SubtitleWord('\n', style, renderer)
+					w = new SubtitleWord('\n', style, renderer, styleStr)
 					caption.words.push(w);
 				}
 				else if (c == ' ')
 				{
-					w = new SubtitleWord(' ', style, renderer)
+					w = new SubtitleWord(' ', style, renderer, styleStr)
 					caption.words.push(w);
 				}
 				
 				i = j + 1;
-			}*/
+			}
 			
-			str = str.replace(/\\N/g, '\n').replace(/\\n/g, (caption.wrapStyle < 2 || caption.wrapStyle == 3) ? ' ' : '\n').replace(/\\h/g, ' ');// '\x00A0');
+			/*str = str.replace(/\\N/g, '\n').replace(/\\n/g, (caption.wrapStyle < 2 || caption.wrapStyle == 3) ? ' ' : '\n').replace(/\\h/g, ' ');// '\x00A0');
 			
 			var lines:Array = str.split('\n');
 			var textRegExp:RegExp = /([^\s]+)|(\s)/g;
@@ -545,7 +537,7 @@ package com.kenshisoft.captions.formats.ass
 				
 				if (i != lines.length - 1)
 					caption.words.push(new SubtitleWord('\n', style, renderer, styleStr));
-			}
+			}*/
 			//trace("execution time: ", getTimer()-start_time);
 			//trace(new Date().time-start);
 		}

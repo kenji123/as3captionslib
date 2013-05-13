@@ -45,7 +45,7 @@ package com.kenshisoft.captions.config
 	public class Config
 	{
 		/**
-		 * The unparsed JSON representation of this this class.
+		 * The unparsed JSON representation of this class.
 		 */
 		public var parameters:Object;
 		

@@ -30,7 +30,7 @@ package com.kenshisoft.captions.config
 	public class FontConfig
 	{
 		/**
-		 * The unparsed JSON representation of this this class.
+		 * The unparsed JSON representation of this class.
 		 */
 		public var properties:Object;
 		

@@ -31,7 +31,7 @@ package com.kenshisoft.captions.formats.srt
 			_parser = new SRTParser();
 		}
 		
-		public function render(subtitle_:ISubtitle, event_:IEvent, videoRect:Rectangle, container:DisplayObjectContainer, fontClasses:Vector.<FontClass>, rerender:ICaption, time:Number = -1, animate:Boolean = true):ICaption
+		public function render(subtitle_:ISubtitle, event_:IEvent, videoRect:Rectangle, container:DisplayObjectContainer, fontClasses:Vector.<FontClass>, time:Number = -1, animate:Boolean = true, caption_:ICaption = null):ICaption
 		{
 			var subtitle:SRTSubtitle = SRTSubtitle(subtitle_);
 			var event:SRTEvent = SRTEvent(event_);
@@ -59,7 +59,7 @@ package com.kenshisoft.captions.formats.srt
 			return caption;
 		}
 		
-		public function add(caption_:ICaption, captionsOnDisplay_:Vector.<ICaption>, container:DisplayObjectContainer):void
+		public function add(caption_:ICaption, captionsOnDisplay_:Vector.<ICaption>, container:DisplayObjectContainer, rerender:Boolean = false):void
 		{
 			var caption:SRTCaption = SRTCaption(caption_);
 			var captionsOnDisplay:Vector.<SRTCaption> = Vector.<SRTCaption>(captionsOnDisplay_);
@@ -76,9 +76,9 @@ package com.kenshisoft.captions.formats.srt
 			try { insertAt == -1 ? container.addChild(caption.renderSprite) : container.addChildAt(caption.renderSprite, insertAt); } catch (error:Error) { }
 		}
 		
-		public function remove(caption:ICaption, container:DisplayObjectContainer):void
+		public function remove(caption_:ICaption, container:DisplayObjectContainer):void
 		{
-			try { container.removeChild(caption.renderSprite); } catch (error:Error) { }
+			try { container.removeChild(caption_.renderSprite); } catch (error:Error) { }
 		}
 		
 		public function get parser():IParser

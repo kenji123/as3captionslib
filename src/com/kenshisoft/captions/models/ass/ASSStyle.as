@@ -19,8 +19,6 @@
 
 package com.kenshisoft.captions.models.ass
 {
-	//import fl.motion.Color;
-	
 	import com.kenshisoft.captions.misc.MarginRectangle;
 	import com.kenshisoft.captions.misc.Util;
 	
@@ -31,7 +29,6 @@ package com.kenshisoft.captions.models.ass
 		private var _fontEmbed:Boolean = false; // whether or not to use embedded fonts
 		private var _fontSize:Number = 18;
 		private var _orgFontSize:Number = 18;
-		//private var _colours:Vector.<Color> = new Vector.<Color>; // primary, secondary, outline, back
 		private var _colours:Vector.<uint> = new Vector.<uint>; // primary, secondary, outline, back
 		private var _fontWeight:String = "bold";
 		private var _italic:String = "normal";
@@ -61,7 +58,6 @@ package com.kenshisoft.captions.models.ass
 		{
 			super();
 			
-			//_colours.push(Util.toColor("0x00ffffff"), Util.toColor("0x0000ffff"), Util.toColor("0x00000000"), Util.toColor("0x80000000"));
 			_colours.push(0x00ffffff, 0x0000ffff, 0x00000000, 0x80000000);
 		}
 		
@@ -115,13 +111,11 @@ package com.kenshisoft.captions.models.ass
             _orgFontSize = value;
 		}
 		
-		//public function get colours():Vector.<Color>
 		public function get colours():Vector.<uint>
 		{
         	return _colours;
 		}
 		
-        //public function set colours(value:Vector.<Color>):void
 		public function set colours(value:Vector.<uint>):void
 		{
             _colours = value;
@@ -365,10 +359,6 @@ package com.kenshisoft.captions.models.ass
 			newStyle.fontEmbed = _fontEmbed;
 			newStyle.fontSize = _fontSize;
 			newStyle.orgFontSize = orgFontSize;
-			
-			/*newStyle.colours = new Vector.<Color>;
-			for (var i:int; i < _colours.length; i++)
-				newStyle.colours.push(Util.toColor(Util.toHexColor(_colours[i])));*/
 			
 			newStyle.colours = new Vector.<uint>;
 			for (var i:int; i < _colours.length; i++)

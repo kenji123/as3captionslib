@@ -75,7 +75,7 @@ package com.kenshisoft.captions.formats.srt
 			{
 				if ((captions.events[i].startSeconds - _currentTime) < BUFFER_LENGTH)
 				{
-					_captionsBuffer.push(renderer.render(captions, captions.events[i], _videoRect, _container, fontClasses, null, captions.events[i].startSeconds, animated));
+					_captionsBuffer.push(renderer.render(captions, captions.events[i], _videoRect, _container, fontClasses, captions.events[i].startSeconds, animated));
 					
 					_lastBufferIndex++;
 				}

@@ -21,6 +21,7 @@ package com.kenshisoft.captions
 {
 	import flash.text.engine.TextLine;
 	
+	import com.kenshisoft.captions.formats.IRenderer;
 	import com.kenshisoft.captions.formats.ass.ASSRenderer;
 	import com.kenshisoft.captions.models.ass.ASSStyle;
 	
@@ -52,13 +53,15 @@ package com.kenshisoft.captions
 		public var _kstart:int;
 		public var _kend:int;
 		
-		public function SubtitleWord(text:String, style:ASSStyle, renderer:ASSRenderer, styleStr:String)
+		public function SubtitleWord(text:String, style:ASSStyle, renderer_:IRenderer, styleStr:String)
 		{
 			super();
 			
 			this.text = text;
 			this.style = style;
 			this.styleStr = styleStr;
+			
+			var renderer:ASSRenderer = ASSRenderer(renderer_);
 			
 			if (text == '\n') _isLineBreak = true;
 			if (text == ' ') _isWhiteSpace = true;

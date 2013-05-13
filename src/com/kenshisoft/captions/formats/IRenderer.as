@@ -13,9 +13,9 @@ package com.kenshisoft.captions.formats
 	 */
 	public interface IRenderer
 	{
-		function render(subtitle:ISubtitle, event:IEvent, videoRect:Rectangle, container:DisplayObjectContainer, fontClasses:Vector.<FontClass>, rerender:ICaption, time:Number = -1, animate:Boolean = true):ICaption
-		//function add(caption:ICaption, captionsOnDisplay:Vector.<ICaption>, container:DisplayObjectContainer):void
-		function remove(caption:ICaption, container:DisplayObjectContainer):void
+		function render(subtitle_:ISubtitle, event_:IEvent, videoRect:Rectangle, container:DisplayObjectContainer, fontClasses:Vector.<FontClass>, time:Number = -1, animate:Boolean = true, caption_:ICaption = null):ICaption
+		function add(caption_:ICaption, captionsOnDisplay_:Vector.<ICaption>, container:DisplayObjectContainer, rerender:Boolean = false):void
+		function remove(caption_:ICaption, container:DisplayObjectContainer):void
 		
 		function get parser():IParser;
 	}

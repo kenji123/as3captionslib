@@ -58,9 +58,6 @@ package com.kenshisoft.captions.formats.ass
 		private var _fay:int = 0;
 		private var _renderSprite:Sprite;
 		
-		//TODO: testing
-		public var bitmap:Bitmap;
-		
 		public function ASSCaption(wrapStyle:int, alignment:int, event:ASSEvent)
 		{
 			super();
@@ -186,7 +183,6 @@ package com.kenshisoft.captions.formats.ass
 					
 					//var minwidth:int = fullwidth / ((Math.abs(fullwidth) / maxwidth) + 1); // from RTS.cpp
 					var minWidth:int = fullWidth / int(((fullWidth > 0 ? fullWidth : -fullWidth) / maxWidth) + 1);
-					//var minWidth:int = fullWidth / Math.ceil((fullWidth / maxWidth));
 					
 					var widthh:int = 0;
 					var wordWidth:int = 0;

@@ -19,19 +19,8 @@
 
 package com.kenshisoft.captions.misc
 {
-	//import flash.utils.ByteArray;
-	
 	public class Util
 	{
-		/*public static function copy(obj:Object):Object 
-		{
-			var bytes:ByteArray = new ByteArray();
-			bytes.writeObject(obj);
-			bytes.position = 0;
-			
-			return bytes.readObject();
-		}*/
-		
 		public static function toSeconds(str:String):Number
 		{
 			// assumes <hours>:<minutes>:<seconds>[.|,]<milliseconds> format
@@ -46,31 +35,6 @@ package com.kenshisoft.captions.misc
 			
 			return time.length < 4 ? -1 : ((((time[0]*60 + time[1])*60) + time[2]) + (time[3]/1000));
 		}
-		
-		/*public static function toColor(hexColor:String):Color
-        {
-			if (hexColor.indexOf("0x") >= 0)
-				hexColor = hexColor.substr(hexColor.indexOf("0x"));
-			
-			while(hexColor.length < 8)
-				hexColor = "0" + hexColor;
-			
-            var hexRegExp:RegExp = new RegExp("([0-9a-fA-F][0-9a-fA-F])([0-9a-fA-F][0-9a-fA-F])([0-9a-fA-F][0-9a-fA-F])([0-9a-fA-F][0-9a-fA-F])", "i");
-            var hexMatch:Object = hexRegExp.exec(hexColor);
-			
-            return hexMatch == null ? new Color() : new Color(1, 1, 1, 1, int("0x" + hexMatch[4]), int("0x" + hexMatch[3]), int("0x" + hexMatch[2]), int("0x" + hexMatch[1]));
-        }
-		
-		public static function toHexColor(color:Color, alpha:Boolean = true):String
-		{
-			var abgr:uint = (alpha ? color.alphaOffset << 24 : 0) | color.blueOffset << 16 | color.greenOffset << 8 | color.redOffset;
-			var hexColor:String = abgr.toString(16).toUpperCase();
-			
-			while(hexColor.length < (alpha ? 8 : 6))
-				hexColor = "0" + hexColor;
-			
-			return "0x" + hexColor;
-		}*/
 		
 		public static function toHexColor2(color:uint, alpha:Boolean = true):String
 		{

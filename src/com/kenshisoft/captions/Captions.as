@@ -19,15 +19,7 @@
 
 package com.kenshisoft.captions
 {
-	import com.kenshisoft.captions.formats.ass.ASSRenderer;
-	import com.kenshisoft.captions.formats.ass.ASSTimeLine;
-	import com.kenshisoft.captions.formats.cr.CRRenderer;
-	import com.kenshisoft.captions.formats.cr.CRTimeLine;
-	import com.kenshisoft.captions.formats.ICaption;
-	import com.kenshisoft.captions.formats.srt.SRTRenderer;
-	import com.kenshisoft.captions.formats.srt.SRTTimeLine;
-	import flash.display.Bitmap;
-	import flash.display.BitmapData;
+	
 	import flash.display.DisplayObjectContainer;
 	import flash.geom.Rectangle;
 	import flash.net.NetStream;
@@ -35,15 +27,23 @@ package com.kenshisoft.captions
 	import org.osflash.signals.Signal;
 	
 	import com.kenshisoft.captions.config.FontConfig;
+	import com.kenshisoft.captions.enums.SubtitleFormat;
+	import com.kenshisoft.captions.formats.ICaption;
 	import com.kenshisoft.captions.formats.IParser;
 	import com.kenshisoft.captions.formats.IRenderer;
 	import com.kenshisoft.captions.formats.ass.ASSCaption;
-	import com.kenshisoft.captions.enums.SubtitleFormat;
+	import com.kenshisoft.captions.formats.ass.ASSRenderer;
+	import com.kenshisoft.captions.formats.ass.ASSTimeLine;
+	import com.kenshisoft.captions.formats.cr.CRRenderer;
+	import com.kenshisoft.captions.formats.cr.CRTimeLine;
+	import com.kenshisoft.captions.formats.srt.SRTRenderer;
+	import com.kenshisoft.captions.formats.srt.SRTTimeLine;
 	import com.kenshisoft.captions.loaders.FontLoader;
 	import com.kenshisoft.captions.loaders.SubtitleLoader;
 	import com.kenshisoft.captions.misc.Size;
 	import com.kenshisoft.captions.models.ISubtitle;
 	import com.kenshisoft.captions.models.ass.ASSSubtitle;
+	
 	
 	/**
 	 * The Captions class provides the functionaltiy of displaying formated text based captions.
@@ -160,7 +160,7 @@ package com.kenshisoft.captions
 			switch (_captionsFormat)
 			{
 				case SubtitleFormat.ASS:
-					_captionsTimeLine = new ASSTimeLine(_parsedCaptions, _fontClasses, _renderer, animated, _rawCaptions);
+					_captionsTimeLine = new ASSTimeLine(_parsedCaptions, _fontClasses, _renderer, animated);
 					break;
 				case SubtitleFormat.CR:
 					_captionsTimeLine = new CRTimeLine(_parsedCaptions, _fontClasses, _renderer, animated);
@@ -170,15 +170,13 @@ package com.kenshisoft.captions
 					break;
 			}
 			
-			//_captionsTimeLine = new CaptionsTimeLine(_captionsFormat, _parsedCaptions, _fontClasses, animated, _renderer);
 			_captionsTimeLine.setContainer(_container);
 			_captionsTimeLine.setStream(_stream);
 			_captionsTimeLine.setVideoRect(_videoRect);
 			_captionsTimeLine.captionDisplaySignal.add(onDisplayCaption);
 			_captionsTimeLine.captionRemoveSignal.add(onRemoveCaption);
 			
-			if (enabled)
-				_captionsTimeLine.start();
+			if (enabled) _captionsTimeLine.start();
 		}
 		
 		private function onDisplayCaption(event:ICaption):void

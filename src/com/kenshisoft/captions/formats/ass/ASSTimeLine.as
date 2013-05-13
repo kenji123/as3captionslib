@@ -19,40 +19,30 @@
 
 package com.kenshisoft.captions.formats.ass
 {
-	import com.kenshisoft.captions.FontClass;
-	import com.kenshisoft.captions.formats.ICaption;
-	import com.kenshisoft.captions.ICaptionsTimeLine;
-	import com.kenshisoft.captions.models.ass.ASSEvent;
-	import flash.display.Bitmap;
-	import flash.display.BitmapData;
 	import flash.display.DisplayObjectContainer;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.TimerEvent;
 	import flash.geom.Rectangle;
 	import flash.net.NetStream;
-	import flash.net.registerClassAlias;
-	import flash.utils.ByteArray;
+	import flash.utils.getTimer;
 	import flash.utils.Timer;
-	
-	import flash.display.Sprite;
-	import flash.events.Event;
-	import flash.system.Capabilities;
-	import flash.system.MessageChannel;
-	import flash.system.Worker;
-	import flash.system.WorkerDomain;
 	
 	import org.osflash.signals.Signal;
 	
+	import com.kenshisoft.captions.FontClass;
+	import com.kenshisoft.captions.ICaptionsTimeLine;
+	import com.kenshisoft.captions.formats.ICaption;
 	import com.kenshisoft.captions.formats.IRenderer;
 	import com.kenshisoft.captions.formats.ass.ASSCaption;
 	import com.kenshisoft.captions.formats.ass.ASSRenderer;
 	import com.kenshisoft.captions.enums.SubtitleFormat;
 	import com.kenshisoft.captions.misc.Size;
 	import com.kenshisoft.captions.models.ISubtitle;
+	import com.kenshisoft.captions.models.ass.ASSEvent;
 	import com.kenshisoft.captions.models.ass.ASSSubtitle;
 	
-	public class ASSTimeLine extends Sprite implements ICaptionsTimeLine
+	public class ASSTimeLine implements ICaptionsTimeLine
 	{
 		private const BUFFER_LENGTH:int = 30; // buffer in seconds
 		
@@ -76,6 +66,7 @@ package com.kenshisoft.captions.formats.ass
 		private var _captionsEnabled:Boolean = false;
 		private var _bufferTimer:Timer;
 		private var _timeLineTimer:Timer;
+		private var _timeLine2Timer:Timer;
 		private var _currentTime:Number = 0;
 		private var _lastBufferIndex:int = 0;
 		
@@ -85,16 +76,7 @@ package com.kenshisoft.captions.formats.ass
 		public var _captionRemoveSignal:Signal = new Signal(ICaption);
 		public function get captionRemoveSignal():Signal { return _captionRemoveSignal; }
 		
-		[Embed(source="../../../../../../bin/as3captionslibworker.swf", mimeType="application/octet-stream")]
-		private var aclworker:Class;
-		
-		private	var	_worker:Worker;
-		private	var	_channelToMain:MessageChannel;
-		private	var	_channelToWorker:MessageChannel;
-		
-		private var _rawCaptions:String;
-		
-		public function ASSTimeLine(captions:ISubtitle, fontClasses:Vector.<FontClass>, renderer:IRenderer, animated:Boolean, rawCaptions:String)
+		public function ASSTimeLine(captions:ISubtitle, fontClasses:Vector.<FontClass>, renderer:IRenderer, animated:Boolean)
 		{
 			super();
 			
@@ -104,86 +86,53 @@ package com.kenshisoft.captions.formats.ass
 			
 			_animated = animated;
 			
-			_rawCaptions = rawCaptions;
-			
-			registerClassAlias("com.kenshisoft.captions.FontClass", FontClass);
-			
-			if(WorkerDomain.isSupported)
-			{
-				createMainThread();
-			}
-			
-			_bufferTimer = new Timer(60);
+			_bufferTimer = new Timer(16);
 			_bufferTimer.addEventListener(TimerEvent.TIMER, buffer);
 			
-			_timeLineTimer = new Timer(60);
+			_timeLineTimer = new Timer(16);
 			_timeLineTimer.addEventListener(TimerEvent.TIMER, timeLine);
-		}
-		
-		private function createMainThread():void
-		{
-			// create worker
-			_worker = WorkerDomain.current.createWorker(new aclworker());
-
-			// create message channels
-			_channelToMain = _worker.createMessageChannel(Worker.current);
-			_channelToWorker = Worker.current.createMessageChannel(_worker);
-
-			// set shared properties
-			_worker.setSharedProperty('C2M', _channelToMain);
-			_worker.setSharedProperty('C2W', _channelToWorker);
-
-			// add event listener to channel
-			_channelToMain.addEventListener(Event.CHANNEL_MESSAGE, onMessageReceived);
-
-			// start worker
-			_worker.start();
-		}
-		
-		private function onMessageReceived(event:Event):void
-		{
-			if(_channelToMain.messageAvailable)
-			{
-				//var caption:ASSCaption = _channelToMain.receive(true) as ASSCaption;
-				
-				var b:ByteArray = _channelToMain.receive() as ByteArray;
-				b.position = 0;
-				var m:Array = b.readObject();
-				
-				var rendersprite:Sprite = new Sprite();
-				var bitmap:Bitmap = new Bitmap(m[11] as BitmapData, "auto", true);
-				//bitmap.transform.matrix = caption.renderSprite.transform.matrix;
-				rendersprite.addChild(bitmap);
-				var caption:ASSCaption = new ASSCaption(0, 0, captions.events[(m[2] as int)]);
-				caption.renderSprite = rendersprite;
-				caption.isAnimated = true;
-				_captionsBuffer.push(caption);
-			}
+			
+			_timeLine2Timer = new Timer(16);
+			_timeLine2Timer.addEventListener(TimerEvent.TIMER, timeLine2);
 		}
 		
 		private function buffer(event:TimerEvent):void
 		{
+			_bufferTimer.stop();
+			
 			_currentTime = _stream.time - _timeShift;
+			
+			var start:int = getTimer();
 			
 			for (var i:int = _lastBufferIndex; i < captions.events.length; i++)
 			{
 				if ((captions.events[i].startSeconds - _currentTime) < BUFFER_LENGTH)
 				{
-					//_captionsBuffer.push(renderer.render(captions, captions.events[i], _videoRect, _container, fontClasses, null, captions.events[i].startSeconds, animated));
+					_captionsBuffer.push(renderer.render(captions, captions.events[i], _videoRect, _container, fontClasses, captions.events[i].startSeconds, animated));
 					
-					var b:ByteArray = new ByteArray();
-					//b.writeObject([captions, captions.events[i], _videoRect, _container, fontClasses, captions.events[i].startSeconds, animated]);
-					b.writeObject([0, _rawCaptions, i, _videoRect.x, _videoRect.y, _videoRect.width, _videoRect.height, _container.width, _container.height, captions.events[i].startSeconds, animated]);
-					
-					_channelToWorker.send(b);
+					/*var frameLength:Number = captions.events[i].duration / 24;
+					var eevent:ASSEvent = captions.events[i].copy();
+					var startTime:Number = eevent.startSeconds;
+					for (var t:int=0; t < 10; t++)
+					{
+					_captionsBuffer.push(renderer.render(captions, eevent, _videoRect, _container, fontClasses, null, startTime, animated));
+					eevent.startSeconds = startTime;
+					eevent.endSeconds = eevent.startSeconds + frameLength;
+					eevent = eevent.copy();
+					startTime += frameLength;
+					}*/
 					
 					_lastBufferIndex++;
+					
+					if (24 > (getTimer() - start)) break;
 				}
 				else
 				{
 					break;
 				}
 			}
+			
+			_bufferTimer.start();
 		}
 		
 		private function timeLine(event:TimerEvent):void
@@ -192,35 +141,10 @@ package com.kenshisoft.captions.formats.ass
 			
 			var caption:ASSCaption;
 			var removedCaption:Boolean = false;
+			var start:int = getTimer();
 			
 			for (var j:int; j < _captionsOnDisplay.length; j++)
 			{
-				if ((_captionsOnDisplay[j].isAnimated || _captionsOnDisplay[j].effects.COUNT > 0) && _currentTime < _captionsOnDisplay[j].event.endSeconds)
-				{
-					caption = _captionsOnDisplay.splice(j, 1)[0];
-					
-					//caption = _captionsOnDisplay[j];
-					
-					//renderer.remove(caption, _container);
-					
-					//var newCaption:ASSCaption = ASSCaption(renderer.render(captions, caption.event, _videoRect, _container, fontClasses, null, _stream.time, animated));
-					////var newCaption:ASSCaption = ASSCaption(renderer.render(captions, caption.event, _videoRect, _container, fontClasses, caption, _stream.time, animated));
-					var b:ByteArray = new ByteArray();
-					//b.writeObject([captions, caption.event, _videoRect, _container, fontClasses, _stream.time, animated]);
-					b.writeObject([0, _rawCaptions, caption.event.id, _videoRect.x, _videoRect.y, _videoRect.width, _videoRect.height, _container.width, _container.height, _stream.time, animated]);
-					
-					_channelToWorker.send(b);
-					//var start = new Date().time;
-					//renderer.rerender(captions, caption.event, caption, _videoRect, _container, fontClasses, Vector.<ICaption>(_captionsOnDisplay), _stream.time, animated);
-					//trace(new Date().time-start);
-					////renderer.add(caption, Vector.<ICaption>(_captionsOnDisplay), _container, true);
-					
-					////_captionsOnDisplay.push(newCaption);
-					//_captionsOnDisplay.push(caption);
-					
-					continue;
-				}
-				
 				if (_currentTime < _captionsOnDisplay[j].event.startSeconds || _currentTime >= _captionsOnDisplay[j].event.endSeconds)
 				{
 					caption = _captionsOnDisplay.splice(j, 1)[0];
@@ -250,12 +174,45 @@ package com.kenshisoft.captions.formats.ass
 			}
 		}
 		
+		private function timeLine2(event:TimerEvent):void
+		{
+			_timeLine2Timer.stop();
+			
+			_currentTime = _stream.time - _timeShift;
+			
+			var caption:ASSCaption;
+			var start:int = getTimer();
+			
+			for (var j:int; j < _captionsOnDisplay.length; j++)
+			{
+				if ((_captionsOnDisplay[j].isAnimated || _captionsOnDisplay[j].effects.COUNT > 0) && _currentTime < _captionsOnDisplay[j].event.endSeconds)
+				{
+					caption = _captionsOnDisplay.splice(j, 1)[0];
+					//caption = _captionsOnDisplay[j];
+					
+					//renderer.remove(caption, _container);
+					
+					//caption = ASSCaption(renderer.render(captions, caption.event, _videoRect, _container, fontClasses, _stream.time, animated));
+					renderer.render(captions, caption.event, _videoRect, _container, fontClasses, _stream.time, animated, caption);
+					
+					renderer.add(caption, Vector.<ICaption>(_captionsOnDisplay), _container, true);
+					
+					_captionsOnDisplay.push(caption);
+					
+					if (24 > (getTimer() - start)) break;
+				}
+			}
+			
+			_timeLine2Timer.start();
+		}
+		
 		public function start():void
 		{
 			_captionsEnabled = true;
 			
 			_bufferTimer.start();
 			_timeLineTimer.start();
+			_timeLine2Timer.start();
 		}
 		
 		public function pause():void
@@ -264,6 +221,7 @@ package com.kenshisoft.captions.formats.ass
 			
 			_bufferTimer.stop();
 			_timeLineTimer.stop();
+			_timeLine2Timer.stop();
 		}
 		
 		public function resume():void
