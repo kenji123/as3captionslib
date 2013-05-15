@@ -982,10 +982,12 @@ package com.kenshisoft.captions.formats.ass
 			
 			if (animate) _parser.parseEffect(caption, event.effect);
 			
+			var i:int;
+			var tmp:ASSStyle;
+			
 			if (!caption_)
 			{
 				var str:String = event.text;
-				var i:int;
 				
 				var tmpStyleStr:String = '';
 				var styleStr:String = '';
@@ -1008,7 +1010,7 @@ package com.kenshisoft.captions.formats.ass
 					if(i < 0) i = str.length;
 					if(i == 0) continue;
 					
-					var tmp:ASSStyle = style.copy();
+					tmp = style.copy();
 					tmp.fontSize = caption.scaleY * tmp.fontSize;
 					tmp.fontSpacing = caption.scaleX * tmp.fontSpacing;
 					tmp.outlineWidthX *= subtitle.scaledBorderAndShadow ? caption.scaleX : 1;
@@ -1060,11 +1062,11 @@ package com.kenshisoft.captions.formats.ass
 			}
 			else
 			{
-				for (var i:int; i < caption.words.length; i++)
+				for (i = 0; i < caption.words.length; i++)
 				{
 					style = styleModifier(caption, _parser.parseTag(caption.words[i].styleStr), false, style, orgStyle, subtitle.styles);
 					
-					var tmp:ASSStyle = style.copy();
+					tmp = style.copy();
 					tmp.fontSize = caption.scaleY * tmp.fontSize;
 					tmp.fontSpacing = caption.scaleX * tmp.fontSpacing;
 					tmp.outlineWidthX *= subtitle.scaledBorderAndShadow ? caption.scaleX : 1;
@@ -1277,49 +1279,57 @@ package com.kenshisoft.captions.formats.ass
 				}
 			}
 			
+			var so:int = 0;
+			var sb:int = 0;
+			var o:int = 0;
+			var b:int = 0;
+			
 			if (!caption_)
 			{
 				// shadow
-				for (var so:int; so < rendered.length; so++)
+				for (so; so < rendered.length; so++)
 					rendered[so][3] != null ? renderSprite.addChild(rendered[so][3]) : null;
 				
-				for (var sb:int; sb < rendered.length; sb++)
+				for (sb; sb < rendered.length; sb++)
 					rendered[sb][2] != null ? renderSprite.addChild(rendered[sb][2]) : null;
 				
 				// outline
-				for (var o:int; o < rendered.length; o++)
+				for (o; o < rendered.length; o++)
 					rendered[o][1] != null ? renderSprite.addChild(rendered[o][1]) : null;
 				
 				// body
-				for (var b:int; b < rendered.length; b++)
+				for (b; b < rendered.length; b++)
 					rendered[b][0] != null ? renderSprite.addChild(rendered[b][0]) : null;
 			}
 			else
 			{
+				var tl:int = 0;
+				var t:DisplayObject;
+				
 				// shadow
-				for (var so:int, tl:int; so < rendered.length; so++, tl++)
+				for (so, tl; so < rendered.length; so++, tl++)
 				{
-					var t:DisplayObject = renderSprite.getChildAt(tl);
+					t = renderSprite.getChildAt(tl);
 					if (rendered[so][3] != null) t = rendered[so][3];
 				}
 				
-				for (var sb:int; sb < rendered.length; sb++, tl++)
+				for (sb; sb < rendered.length; sb++, tl++)
 				{
-					var t:DisplayObject = renderSprite.getChildAt(tl);
+					t = renderSprite.getChildAt(tl);
 					if (rendered[sb][2] != null) t = rendered[sb][2];
 				}
 				
 				// outline
-				for (var o:int; o < rendered.length; o++, tl++)
+				for (o; o < rendered.length; o++, tl++)
 				{
-					var t:DisplayObject = renderSprite.getChildAt(tl);
+					t = renderSprite.getChildAt(tl);
 					if (rendered[o][1] != null) t = rendered[o][1];
 				}
 				
 				// body
-				for (var b:int; b < rendered.length; b++, tl++)
+				for (b; b < rendered.length; b++, tl++)
 				{
-					var t:DisplayObject = renderSprite.getChildAt(tl);
+					t = renderSprite.getChildAt(tl);
 					if (rendered[b][0] != null) t = rendered[b][0];
 				}
 			}

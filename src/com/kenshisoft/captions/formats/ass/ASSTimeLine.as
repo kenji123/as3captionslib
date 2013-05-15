@@ -109,18 +109,6 @@ package com.kenshisoft.captions.formats.ass
 				{
 					_captionsBuffer.push(renderer.render(captions, captions.events[i], _videoRect, _container, captions.events[i].startSeconds, animated));
 					
-					/*var frameLength:Number = captions.events[i].duration / 24;
-					var eevent:ASSEvent = captions.events[i].copy();
-					var startTime:Number = eevent.startSeconds;
-					for (var t:int=0; t < 10; t++)
-					{
-					_captionsBuffer.push(renderer.render(captions, eevent, _videoRect, _container, fontClasses, null, startTime, animated));
-					eevent.startSeconds = startTime;
-					eevent.endSeconds = eevent.startSeconds + frameLength;
-					eevent = eevent.copy();
-					startTime += frameLength;
-					}*/
-					
 					_lastBufferIndex++;
 					
 					if (32 > (getTimer() - start)) break;

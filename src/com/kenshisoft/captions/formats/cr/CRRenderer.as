@@ -66,6 +66,123 @@ package com.kenshisoft.captions.formats.cr
 			_parser = new CRParser();
 		}
 		
+		private function styleModifier(caption:ASSCaption, tagsParsed:Vector.<Vector.<String>>, isAnimated:Boolean, style:ASSStyle, orgStyle:ASSStyle, styles:Vector.<ASSStyle>):ASSStyle
+		{
+			var j:int; // inner loop index
+			var d:Number; // dest
+			var s:Number; // src
+			var n:Number; // calculateAnimation result
+			var e:ASSEffect;
+			
+			for (var i:int; i < tagsParsed.length; i++)
+			{
+				var tag:String = tagsParsed[i][0];
+				var tagOptions:Vector.<String> = tagsParsed[i].slice(1);
+				
+				switch (tag)
+				{
+					case "an":
+						d = Number(tagOptions[0]);
+						if (caption.alignment < 0) caption.alignment = (d > 0 && d < 10) ? d : orgStyle.alignment;
+						
+						break;
+					case "a":
+						d = Number(tagOptions[0]);
+						if (caption.alignment < 0) caption.alignment = (d > 0 && d < 12) ? ((((d - 1) & 3) + 1) + ((d & 4)?6:0) + ((d & 8)?3:0)) : orgStyle.alignment;
+						
+						break;
+					case "b":
+						d = Number(tagOptions[0]);
+						style.fontWeight = tagOptions[0].length > 0 ? (d == 0 ? "normal" : d == 1 ? "bold" : d >= 100 ? "bold" : orgStyle.fontWeight) : orgStyle.fontWeight;
+						
+						break;
+					case "c":
+						if (tagOptions[0].length <= 0) { style.colours[0] = orgStyle.colours[0]; continue; }
+						
+						var c_d:uint = uint(tagOptions[0]);
+						var c_s:uint = style.colours[0];
+						
+						style.colours[j] = int(calculateAnimation(c_d & 0x00ff, c_s & 0x00ff, isAnimated, caption.animOptions)) & 0x00ff
+							| int(calculateAnimation(c_d & 0x00ff00, c_s & 0x00ff00, isAnimated, caption.animOptions)) & 0x00ff00
+							| int(calculateAnimation(c_d & 0x00ff0000, c_s & 0x00ff0000, isAnimated, caption.animOptions)) & 0x00ff0000;
+						
+						break;
+					case "fade": // CR doesn't seem to use "fade" only "fad". leave it anyway
+					case "fad":
+						if (!caption.animOptions.animate) continue;
+						
+						if(tagOptions.length == 7 && !caption.effects.FADE) // {\fade(a1=param[0], a2=param[1], a3=param[2], t1=t[0], t2=t[1], t3=t[2], t4=t[3])}
+						{
+							e = new ASSEffect(SubtitleEffect.FADE);
+							
+							for(j = 0; j < 3; j++)
+								e.param[i] = tagOptions[j];
+							for(j = 0; j < 4; j++)
+								e.t[j] = tagOptions[3+j];
+							
+							caption.effects.FADE = e;
+							caption.effects.COUNT += 1;
+						}
+						else if(tagOptions.length == 2 && !caption.effects.FADE) // {\fad(t1=t[1], t2=t[2])}
+						{
+							e = new ASSEffect(SubtitleEffect.FADE);
+							
+							e.param[0] = e.param[2] = 0xff;
+							e.param[1] = 0x00;
+							for(j = 1; j < 3; j++) 
+								e.t[j] = tagOptions[j-1];
+							e.t[0] = e.t[3] = -1; // will be substituted with "start" and "end"
+							
+							caption.effects.FADE = e;
+							caption.effects.COUNT += 1;
+						}
+						
+						break;
+					case "fn":
+						style.fontName = _parser.getFontNameByAlias(tagOptions[0].length > 0 ? tagOptions[0] : orgStyle.fontName, _parser.fontClasses);
+						_parser.setTrueFontHeight(style);
+						
+						break;
+					case "fs":
+						if (tagOptions[0].length <= 0) { style.fontSize = orgStyle.fontSize; style.orgFontSize = orgStyle.orgFontSize; continue; }
+						
+						d = Number(tagOptions[0]);
+						
+						if (tagOptions[0].charAt(0) == '-' || tagOptions[0].charAt(0) == '+')
+						{
+							n = calculateAnimation(style.orgFontSize + ((style.orgFontSize * d) / 10), style.orgFontSize, isAnimated, caption.animOptions);
+							style.orgFontSize = n > 0 ? n : orgStyle.orgFontSize;
+							_parser.setTrueFontHeight(style);
+						}
+						else
+						{
+							n = calculateAnimation(d, style.orgFontSize, isAnimated, caption.animOptions);
+							style.orgFontSize = n > 0 ? n : orgStyle.orgFontSize;
+							_parser.setTrueFontHeight(style);
+						}
+						
+						break;
+					case "i":
+						d = Number(tagOptions[0]);
+						style.italic = tagOptions[0].length > 0 ? (d == 0 ? "normal" : d == 1 ? "italic" : orgStyle.italic) : orgStyle.italic;
+						
+						break;
+					case "q":
+						d = Number(tagOptions[0]);
+						caption.wrapStyle = tagOptions[0].length > 0 && (0 <= d && d <= 3) ? d : caption.orgWrapStyle;
+						
+						break;
+					case "u":
+						d = Number(tagOptions[0]);
+						style.underline = tagOptions[0].length > 0 ? (d == 0 ? "none" : d == 1 ? "underline" : orgStyle.underline) : orgStyle.underline;
+						
+						break;
+				}
+			}
+			
+			return style;
+		}
+		
 		private function getWrapStyle(subtitle:CRSubtitleScript):Array //TODO: do parse() text, then FIXME
 		{
 			var wrapStyles:Array = [WRAP1, WRAP2, NONE, WRAP3];

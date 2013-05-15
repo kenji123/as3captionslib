@@ -38,8 +38,10 @@ package com.kenshisoft.captions.formats.cr
 			subtitle.progress_string = subtitleXml.@progresss_string;
 			subtitle.status_string = subtitleXml.@status_string;
 			
+			var i:String;
+			
 			var styles:XMLList = subtitleXml.styles.style;
-			for (var i:String in styles)
+			for (i in styles)
 			{
 				var style:CRStyle = new CRStyle();
 				style.id = styles[i].@id;
@@ -62,7 +64,7 @@ package com.kenshisoft.captions.formats.cr
 			}
 			
 			var events:XMLList = subtitleXml.events.event;
-			for (var i:String in events)
+			for (i in events)
 			{
 				var event:CREvent = new CREvent();
 				event.id = events[i].@id;
