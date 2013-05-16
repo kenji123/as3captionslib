@@ -1028,37 +1028,6 @@ package com.kenshisoft.captions.formats.ass
 					
 					str = str.substr(i);
 				}
-				
-				/*var styleTextRegExp:RegExp = /\{([^\}]+)\}([^\{]*)|(.+)$/g;
-				var match:Object = styleTextRegExp.exec(event.text);
-				
-				var tmpStyleStr:String = '';
-				var styleStr:String = '';
-				var textStr:String = '';
-				
-				while (match != null)
-				{
-					tmpStyleStr = match[1] ? match[1] : '';
-					if (textStr.length == 0) styleStr += tmpStyleStr; else styleStr = tmpStyleStr;
-					textStr = (match[1] == null && match[2] == null) ? match[3] : match[2]; textStr = textStr ? textStr : "";
-					
-					style = styleModifier(caption, _parser.parseTag(styleStr), false, style, orgStyle, subtitle.styles);
-					
-					var tmp:ASSStyle = style.copy();
-					tmp.fontSize = caption.scaleY * tmp.fontSize;
-					tmp.fontSpacing = caption.scaleX * tmp.fontSpacing;
-					tmp.outlineWidthX *= subtitle.scaledBorderAndShadow ? caption.scaleX : 1;
-					tmp.outlineWidthY *= subtitle.scaledBorderAndShadow ? caption.scaleY : 1;
-					tmp.shadowDepthX *= subtitle.scaledBorderAndShadow ? caption.scaleX : 1;
-					tmp.shadowDepthY *= subtitle.scaledBorderAndShadow ? caption.scaleY : 1;
-					
-					if (options.nPolygon > 0)
-						_parser.parsePolygon(caption, textStr, tmp);
-					else
-						_parser.parseString(caption, textStr, tmp, this, styleStr);
-					
-					match = styleTextRegExp.exec(event.text);
-				}*/
 			}
 			else
 			{

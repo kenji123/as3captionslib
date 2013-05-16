@@ -8,6 +8,7 @@ package com.kenshisoft.captions.formats.cr
 	import com.kenshisoft.captions.models.cr.CRStyle;
 	import com.kenshisoft.captions.models.ISubtitle;
 	import com.kenshisoft.captions.models.cr.CRSubtitleScript;
+	import com.kenshisoft.captions.SubtitleWord;
 	
 	/**
 	 * ...
@@ -85,6 +86,29 @@ package com.kenshisoft.captions.formats.cr
 			}
 			
 			return subtitle;
+		}
+		
+		public function parseString(caption:CRCaption, str:String, style:CRStyle, renderer:CRRenderer, styleStr:String):void
+		{
+			str = str.replace(/\\N/g, '\n').replace(/\\n/g, (caption.wrapStyle < 2 || caption.wrapStyle == 3) ? ' ' : '\n')
+			
+			var lines:Array = str.split('\n');
+			var textRegExp:RegExp = /([^\s]+)|(\s)/g;
+			
+			for (var i:int; i < lines.length; i++)
+			{
+				var match:Object = textRegExp.exec(lines[i]);
+				
+				while (match != null)
+				{
+					caption.words.push(new SubtitleWord((match[1] ? match[1] : match[2]), style, renderer, styleStr));
+					
+					match = textRegExp.exec(lines[i]);
+				}
+				
+				if (i != lines.length - 1)
+					caption.words.push(new SubtitleWord('\n', style, renderer, styleStr));
+			}
 		}
 		
 		public function getStyle(name:String, styles:Vector.<CRStyle>):CRStyle

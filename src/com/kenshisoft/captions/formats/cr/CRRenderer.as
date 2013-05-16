@@ -66,7 +66,7 @@ package com.kenshisoft.captions.formats.cr
 			_parser = new CRParser();
 		}
 		
-		private function styleModifier(caption:ASSCaption, tagsParsed:Vector.<Vector.<String>>, isAnimated:Boolean, style:ASSStyle, orgStyle:ASSStyle, styles:Vector.<ASSStyle>):ASSStyle
+		/*private function styleModifier(caption:ASSCaption, tagsParsed:Vector.<Vector.<String>>, isAnimated:Boolean, style:ASSStyle, orgStyle:ASSStyle, styles:Vector.<ASSStyle>):ASSStyle
 		{
 			var j:int; // inner loop index
 			var d:Number; // dest
@@ -181,7 +181,7 @@ package com.kenshisoft.captions.formats.cr
 			}
 			
 			return style;
-		}
+		}*/
 		
 		private function getWrapStyle(subtitle:CRSubtitleScript):Array //TODO: do parse() text, then FIXME
 		{
@@ -285,7 +285,28 @@ package com.kenshisoft.captions.formats.cr
 			calcHeight = (subtitle.play_res_y > 0 ? subtitle.play_res_y : defaultHeight) * scaleX;
 			calcWidth = (Math.floor((calcHeight * videoRect.width) / videoRect.height));
 			
-			style.font_size *= scaleY;
+			var styleTextRegExp:RegExp = /\{([^\}]+)\}([^\{]*)|([^\{\}]+)/g;
+			var match:Object = styleTextRegExp.exec(event.text);
+			
+			var tmpStyleStr:String = '';
+			var styleStr:String = '';
+			var textStr:String = '';
+			
+			while (match != null)
+			{
+				tmpStyleStr = match[1] ? match[1] : '';
+				if (textStr.length == 0) styleStr += tmpStyleStr; else styleStr = tmpStyleStr;
+				textStr = (match[1] == null && match[2] == null) ? match[3] : match[2]; textStr = textStr ? textStr : "";
+				
+				style = styleModifier(caption, _parser.parseTag(styleStr), false, style, orgStyle, subtitle.styles);
+				
+				var tmp:CRStyle = style.copy();
+				tmp.font_size = scaleY * tmp.font_size;
+				
+				_parser.parseString(caption, textStr, tmp, this, styleStr);
+				
+				match = styleTextRegExp.exec(event.text);
+			}
 			
 			var textFormat:TextFormat = new TextFormat();
 			//textFormat.font = getPreferredFont(_ -1g.style.font_name);
@@ -313,6 +334,9 @@ package com.kenshisoft.captions.formats.cr
 			//textField.text = _-0._-1();
             //textField.text = _-0._-8f();
 			textField.text = event.text;
+			
+			
+			
 			//textField.wordWrap = _local2._-3c;
             //var _local3:Array = _-0.false();
             //var _local4:Number = 0;

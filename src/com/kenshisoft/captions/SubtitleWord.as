@@ -32,7 +32,7 @@ package com.kenshisoft.captions
 	public class SubtitleWord
 	{
 		public var text:String;
-		public var style:ASSStyle;
+		public var style:IStyle;
 		public var styleStr:String;
 		
 		private var _isLineBreak:Boolean = false;
@@ -53,7 +53,7 @@ package com.kenshisoft.captions
 		public var _kstart:int;
 		public var _kend:int;
 		
-		public function SubtitleWord(text:String, style:ASSStyle, renderer_:IRenderer, styleStr:String)
+		public function SubtitleWord(text:String, style_:IStyle, renderer_:IRenderer, styleStr:String)
 		{
 			super();
 			
@@ -61,12 +61,10 @@ package com.kenshisoft.captions
 			this.style = style;
 			this.styleStr = styleStr;
 			
-			var renderer:ASSRenderer = ASSRenderer(renderer_);
-			
 			if (text == '\n') _isLineBreak = true;
 			if (text == ' ') _isWhiteSpace = true;
 			
-			_textLine = renderer.renderText(text, style);
+			_textLine = renderer_.renderText(text, style);
 			
 			var textWidth:Number = 0;
 			for (var i:int; i < _textLine.atomCount; i++)
