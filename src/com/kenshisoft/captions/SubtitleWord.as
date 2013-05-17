@@ -19,11 +19,12 @@
 
 package com.kenshisoft.captions
 {
+	import com.kenshisoft.captions.formats.ass.ASSRenderer;
+	import com.kenshisoft.captions.models.ass.ASSStyle;
 	import flash.text.engine.TextLine;
 	
 	import com.kenshisoft.captions.formats.IRenderer;
-	import com.kenshisoft.captions.formats.ass.ASSRenderer;
-	import com.kenshisoft.captions.models.ass.ASSStyle;
+	import com.kenshisoft.captions.models.IStyle;
 	
 	/**
 	 * ...
@@ -32,7 +33,7 @@ package com.kenshisoft.captions
 	public class SubtitleWord
 	{
 		public var text:String;
-		public var style:IStyle;
+		public var style:ASSStyle;
 		public var styleStr:String;
 		
 		private var _isLineBreak:Boolean = false;
@@ -53,7 +54,7 @@ package com.kenshisoft.captions
 		public var _kstart:int;
 		public var _kend:int;
 		
-		public function SubtitleWord(text:String, style_:IStyle, renderer_:IRenderer, styleStr:String)
+		public function SubtitleWord(text:String, style:ASSStyle, renderer:ASSRenderer, styleStr:String)
 		{
 			super();
 			
@@ -64,7 +65,7 @@ package com.kenshisoft.captions
 			if (text == '\n') _isLineBreak = true;
 			if (text == ' ') _isWhiteSpace = true;
 			
-			_textLine = renderer_.renderText(text, style);
+			_textLine = renderer.renderText(text, style);
 			
 			var textWidth:Number = 0;
 			for (var i:int; i < _textLine.atomCount; i++)

@@ -5,6 +5,7 @@ package com.kenshisoft.captions.formats.srt
 	import com.kenshisoft.captions.formats.IParser;
 	import com.kenshisoft.captions.formats.IRenderer;
 	import com.kenshisoft.captions.models.IEvent;
+	import com.kenshisoft.captions.models.IStyle;
 	import com.kenshisoft.captions.models.ISubtitle;
 	import com.kenshisoft.captions.models.srt.SRTEvent;
 	import com.kenshisoft.captions.models.srt.SRTSubtitle;

@@ -21,12 +21,13 @@ package com.kenshisoft.captions.models.cr
 {
 	import com.kenshisoft.captions.misc.MarginRectangle;
 	import com.kenshisoft.captions.misc.Util;
+	import com.kenshisoft.captions.models.IStyle;
 	
 	/**
 	 * ...
 	 * @author 
 	 */
-	public class CRStyle
+	public class CRStyle implements IStyle
 	{
 		private var _id:int;
 		private var _name:String = "Default";

@@ -88,7 +88,65 @@ package com.kenshisoft.captions.formats.cr
 			return subtitle;
 		}
 		
-		public function parseString(caption:CRCaption, str:String, style:CRStyle, renderer:CRRenderer, styleStr:String):void
+		public function parseTag(str:String):Vector.<Vector.<String>>
+		{
+			var tags:Vector.<String> = Vector.<String>(str.split("\\"));
+			var tagsParsed:Vector.<Vector.<String>> = new Vector.<Vector.<String>>;
+			
+			for (var i:int; i < tags.length; i++)
+			{
+				var tag:String = tags[i];
+				var tagParams:Vector.<String> = new Vector.<String>;
+				
+				if (tag.indexOf("an") == 0)
+				{
+					tagParams.push("an", tag.substr(2));
+				}
+				else if (tag.indexOf("a") == 0)
+				{
+					tagParams.push("a", tag.substr(2));
+				}
+				else if (tag.indexOf("b") == 0)
+				{
+					tagParams.push("b", tag.substr(1));
+				}
+				else if (tag.indexOf("c") == 0)
+				{
+					tagParams.push("c", "0x" + tag.substr(3, (tag.length - 1) - 3));
+				}
+				else if (tag.indexOf("fade") == 0 || tag.indexOf("fad") == 0)
+				{
+					tagParams = Vector.<String>(tag.substr(tag.indexOf("(")+1, (tag.length-1)-(tag.indexOf("(")+1)).split(","));
+					tagParams.unshift("fade");
+				}
+				else if (tag.indexOf("fn") == 0)
+				{
+					tagParams.push("fn", tag.substr(2));
+				}
+				else if (tag.indexOf("fs") == 0)
+				{
+					tagParams.push("fs", tag.substr(2));
+				}
+				else if (tag.indexOf("i") == 0)
+				{
+					tagParams.push("i", tag.substr(1));
+				}
+				else if (tag.indexOf("q") == 0)
+				{
+					tagParams.push("q", tag.substr(1));
+				}
+				else if (tag.indexOf("u") == 0)
+				{
+					tagParams.push("u", tag.substr(1));
+				}
+				
+				if (tagParams.length > 0) tagsParsed.push(tagParams);
+			}
+			
+			return tagsParsed;
+		}
+		
+		/*public function parseString(caption:CRCaption, str:String, style:CRStyle, renderer:CRRenderer, styleStr:String):void
 		{
 			str = str.replace(/\\N/g, '\n').replace(/\\n/g, (caption.wrapStyle < 2 || caption.wrapStyle == 3) ? ' ' : '\n')
 			
@@ -109,7 +167,7 @@ package com.kenshisoft.captions.formats.cr
 				if (i != lines.length - 1)
 					caption.words.push(new SubtitleWord('\n', style, renderer, styleStr));
 			}
-		}
+		}*/
 		
 		public function getStyle(name:String, styles:Vector.<CRStyle>):CRStyle
 		{

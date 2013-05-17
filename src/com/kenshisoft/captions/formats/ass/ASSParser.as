@@ -502,18 +502,13 @@ package com.kenshisoft.captions.formats.ass
 				if (c != '\n' && c != ' ' && c.length != 0)
 					continue;
 				
-				var w:SubtitleWord;
-				
 				if (i < j)
-					w = new SubtitleWord(str.substr(i, j - i), style, renderer, styleStr)
+					caption.words.push(new SubtitleWord(str.substr(i, j - i), style, renderer, styleStr));
 				
 				if (c == '\n')
-					w = new SubtitleWord('\n', style, renderer, styleStr)
+					caption.words.push(new SubtitleWord('\n', style, renderer, styleStr));
 				else if (c == ' ')
-					w = new SubtitleWord(' ', style, renderer, styleStr)
-				
-				if (w)
-					caption.words.push(w);
+					caption.words.push(new SubtitleWord(' ', style, renderer, styleStr));
 				
 				i = j + 1;
 			}

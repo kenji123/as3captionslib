@@ -19,6 +19,7 @@
 
 package com.kenshisoft.captions.formats.ass
 {
+	import com.kenshisoft.captions.models.IStyle;
 	import flash.display.DisplayObject;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
@@ -714,8 +715,10 @@ package com.kenshisoft.captions.formats.ass
 			return point;
 		}
 		
-		public function renderText(text:String, style:ASSStyle, outline:Boolean = false, bodyShadow:Boolean = false, outlineShadow:Boolean = false):TextLine
+		public function renderText(text:String, style_:IStyle, outline:Boolean = false, bodyShadow:Boolean = false, outlineShadow:Boolean = false):TextLine
 		{
+			var style:ASSStyle = ASSStyle(style_);
+			
 			var elementFormat:ElementFormat = new ElementFormat();
 			elementFormat.fontDescription = new FontDescription(style.fontName, style.fontWeight, style.italic, (style.fontEmbed ? FontLookup.EMBEDDED_CFF : FontLookup.DEVICE));
 			elementFormat.fontSize = style.fontSize;
@@ -963,8 +966,8 @@ package com.kenshisoft.captions.formats.ass
 			var subtitle:ASSSubtitle = ASSSubtitle(subtitle_);
 			var event:ASSEvent = ASSEvent(event_);
 			
-			var style:ASSStyle = _parser.getStyle(event.style, subtitle.styles).copy();
 			var orgStyle:ASSStyle = _parser.getStyle(event.style, subtitle.styles);
+			var style:ASSStyle = orgStyle.copy();
 			
 			var caption:ASSCaption = caption_ ? ASSCaption(caption_) : new ASSCaption(subtitle.wrapStyle, style.alignment, event);
 			

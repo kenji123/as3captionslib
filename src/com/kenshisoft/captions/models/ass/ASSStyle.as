@@ -21,8 +21,9 @@ package com.kenshisoft.captions.models.ass
 {
 	import com.kenshisoft.captions.misc.MarginRectangle;
 	import com.kenshisoft.captions.misc.Util;
+	import com.kenshisoft.captions.models.IStyle;
 	
-	public class ASSStyle
+	public class ASSStyle implements IStyle
 	{
 		private var _name:String = "Default";
 		private var _fontName:String = "Arial";
