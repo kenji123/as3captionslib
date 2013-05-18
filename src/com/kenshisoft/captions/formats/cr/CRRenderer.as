@@ -108,13 +108,13 @@ package com.kenshisoft.captions.formats.cr
             return filters;
         }
 		
-		private function getAlignment(style:CRStyle):Array
+		private function getAlignment(alignment:int):Array
 		{
 			var alignments:Array = [BOTTOM_LEFT, BOTTOM_CENTER, BOTTOM_RIGHT, MIDDLE_LEFT, MIDDLE_CENTER, MIDDLE_RIGHT, TOP_LEFT, TOP_CENTER, TOP_RIGHT];
 			
 			for (var i:int; i < alignments.length; i++)
             {
-                if (alignments[i][0] == style.alignment)
+                if (alignments[i][0] == alignment)
                     return alignments[i];
             }
 			
@@ -127,7 +127,7 @@ package com.kenshisoft.captions.formats.cr
 			textFormat.font = FontLoader.isFontRegistered("Embedded " + style.font_name) ? "Embedded " + style.font_name : style.font_name;
 			textFormat.size = caption.scaleY * style.font_size;
 			textFormat.color = Util.removeAlpha(style.colours[0]);
-			textFormat.align = getAlignment(style)[3];
+			textFormat.align = getAlignment(caption.alignment > 0 ? caption.alignment : style.alignment)[3];
 			textFormat.bold = style.bold;
 			textFormat.italic = style.italic;
 			textFormat.underline = style.underline;
@@ -167,29 +167,24 @@ package com.kenshisoft.captions.formats.cr
 				{
 					case "an":
 						d = Number(tagOptions[0]);
-						//if (caption.alignment < 0) caption.alignment = (d > 0 && d < 10) ? d : orgStyle.alignment;
+						if (caption.alignment < 0) caption.alignment = (d > 0 && d < 10) ? d : orgStyle.alignment;
 						
 						break;
 					case "a":
 						d = Number(tagOptions[0]);
-						//if (caption.alignment < 0) caption.alignment = (d > 0 && d < 12) ? ((((d - 1) & 3) + 1) + ((d & 4)?6:0) + ((d & 8)?3:0)) : orgStyle.alignment;
+						if (caption.alignment < 0) caption.alignment = (d > 0 && d < 12) ? ((((d - 1) & 3) + 1) + ((d & 4)?6:0) + ((d & 8)?3:0)) : orgStyle.alignment;
 						
 						break;
 					case "b":
 						d = Number(tagOptions[0]);
-						style.bold = tagOptions[0].length > 0 ? (d == 0 ? 0 /*"normal"*/ : d == 1 ? 1 /*"bold"*/ : d >= 100 ? 1 /*"bold"*/ : orgStyle.bold) : orgStyle.bold;
+						style.bold = tagOptions[0].length > 0 ? (d == 0 ? false : d == 1 ? true : d >= 100 ? true : orgStyle.bold) : orgStyle.bold;
 						
 						break;
 					case "c":
 						if (tagOptions[0].length <= 0) { style.colours[0] = orgStyle.colours[0]; continue; }
 						
-						var c_d:uint = uint(tagOptions[0]);
-						var c_s:uint = style.colours[0];
+						style.colours[0] = uint(tagOptions[0]);
 						
-						/*style.colours[j] = int(calculateAnimation(c_d & 0x00ff, c_s & 0x00ff, isAnimated, caption.animOptions)) & 0x00ff
-							| int(calculateAnimation(c_d & 0x00ff00, c_s & 0x00ff00, isAnimated, caption.animOptions)) & 0x00ff00
-							| int(calculateAnimation(c_d & 0x00ff0000, c_s & 0x00ff0000, isAnimated, caption.animOptions)) & 0x00ff0000;
-						*/
 						break;
 					/*case "fade": // CR doesn't seem to use "fade" only "fad". leave it anyway
 					case "fad":
@@ -247,7 +242,7 @@ package com.kenshisoft.captions.formats.cr
 						break;
 					case "i":
 						d = Number(tagOptions[0]);
-						style.italic = tagOptions[0].length > 0 ? (d == 0 ? 0 /*"normal"*/ : d == 1 ? 1 /*"italic"*/ : orgStyle.italic) : orgStyle.italic;
+						style.italic = tagOptions[0].length > 0 ? (d == 0 ? false : d == 1 ? true : orgStyle.italic) : orgStyle.italic;
 						
 						break;
 					case "q":
@@ -257,7 +252,7 @@ package com.kenshisoft.captions.formats.cr
 						break;
 					case "u":
 						d = Number(tagOptions[0]);
-						style.underline = tagOptions[0].length > 0 ? (d == 0 ? 0 /*"none"*/ : d == 1 ? 1 /*"underline"*/ : orgStyle.underline) : orgStyle.underline;
+						style.underline = tagOptions[0].length > 0 ? (d == 0 ? false : d == 1 ? true : orgStyle.underline) : orgStyle.underline;
 						
 						break;
 				}
@@ -266,19 +261,19 @@ package com.kenshisoft.captions.formats.cr
 			caption.textField.setTextFormat(getStyleFormat(caption, style), beginIndex, endIndex);
 		}
 		
-		private function getY(textField:TextField, event:CREvent, style:CRStyle):Number
+		private function getY(caption:CRCaption, style:CRStyle):Number
 		{
-			var t:int = (event.margin.bottom > 0 ? event.margin.bottom : style.margin.bottom) + style.outline;
+			var t:int = (caption.event.margin.bottom > 0 ? caption.event.margin.bottom : style.margin.bottom) + style.outline;
 			
-            switch (getAlignment(style)[2])
+            switch (getAlignment(caption.alignment > 0 ? caption.alignment : style.alignment)[2])
             {
 				case TOP:
 					return t - staticMultiplier;
                 case MIDDLE:
-					return (calcHeight - textField.textHeight) / 2;
+					return (calcHeight - caption.textField.textHeight) / 2;
 				case BOTTOM:
                 default:
-                    return (((calcHeight + staticMultiplier) - textField.textHeight) - t) - textField.getLineMetrics(0).descent;
+                    return (((calcHeight + staticMultiplier) - caption.textField.textHeight) - t) - caption.textField.getLineMetrics(0).descent;
             }
         }
 		
@@ -287,16 +282,16 @@ package com.kenshisoft.captions.formats.cr
 			var subtitle:CRSubtitleScript = CRSubtitleScript(subtitle_);
 			var event:CREvent = CREvent(event_);
 			
-			var caption:CRCaption = new CRCaption(event);
+			var orgStyle:CRStyle = _parser.getStyle(event.style, subtitle.styles);
+			var style:CRStyle = orgStyle.copy();
+			
+			var caption:CRCaption = new CRCaption(style.alignment, event);
 			
 			caption.scaleX = subtitle.play_res_x > 0 ? (1.0 * videoRect.width / subtitle.play_res_x) : 1.0;
 			caption.scaleY = subtitle.play_res_y > 0 ? (1.0 * videoRect.height / subtitle.play_res_y) : 1.0;
 			
 			calcHeight = (subtitle.play_res_y > 0 ? subtitle.play_res_y : defaultHeight) * caption.scaleX;
 			calcWidth = (Math.floor((calcHeight * videoRect.width) / videoRect.height));
-			
-			var orgStyle:CRStyle = _parser.getStyle(event.style, subtitle.styles);
-			var style:CRStyle = orgStyle.copy();
 			
 			caption.textField = new TextField();
 			//var _local5:Object;
@@ -331,12 +326,8 @@ package com.kenshisoft.captions.formats.cr
 				var beginIndex:int = caption.textField.text.length - 1;
 				caption.textField.text += textStr;
 				
-				styleModifier(caption, _parser.parseTag(styleStr), false, style, orgStyle, beginIndex, caption.textField.text.length - 1);
-				
-				/*var tmp:CRStyle = style.copy();
-				tmp.font_size = scaleY * tmp.font_size;
-				
-				_parser.parseString(caption, textStr, tmp, this, styleStr);*/
+				if (styleStr.length > 0)
+					styleModifier(caption, _parser.parseTag(styleStr), false, style, orgStyle, beginIndex, caption.textField.text.length - 1);
 				
 				match = styleTextRegExp.exec(str);
 			}
@@ -366,7 +357,7 @@ package com.kenshisoft.captions.formats.cr
 			//, (_local1.gridFitType = GridFitType.NONE), continue)
 			caption.textField.antiAliasType = AntiAliasType.ADVANCED;
 			
-			caption.textField.y = getY(caption.textField, event, style) + videoRect.y;
+			caption.textField.y = getY(caption, style) + videoRect.y;
             //_-1Q = _-1J(textField);
             //var _local4:DisplayObjectContainer = _-6c(_-2z, _-53, _-5r, _-m);
             //addChild(_local4);

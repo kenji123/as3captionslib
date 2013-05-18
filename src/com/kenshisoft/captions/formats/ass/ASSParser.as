@@ -319,7 +319,7 @@ package com.kenshisoft.captions.formats.ass
 				}
 				else if (tag.indexOf("a") == 0)
 				{
-					tagParams.push("a", tag.substr(2));
+					tagParams.push("a", tag.substr(1));
 				}
 				else if (tag.indexOf("blur") == 0)
 				{
@@ -512,6 +512,26 @@ package com.kenshisoft.captions.formats.ass
 				
 				i = j + 1;
 			}
+			
+			/*str = str.replace(/\\N/g, '\n').replace(/\\n/g, (caption.wrapStyle < 2 || caption.wrapStyle == 3) ? ' ' : '\n').replace(/\\h/g, ' ');// '\x00A0');
+			
+			var lines:Array = str.split('\n');
+			var textRegExp:RegExp = /([^\s]+)|(\s)/g;
+			
+			for (var i:int; i < lines.length; i++)
+			{
+				var match:Object = textRegExp.exec(lines[i]);
+				
+				while (match != null)
+				{
+					caption.words.push(new SubtitleWord((match[1] ? match[1] : match[2]), style, renderer, styleStr));
+					
+					match = textRegExp.exec(lines[i]);
+				}
+				
+				if (i != lines.length - 1)
+					caption.words.push(new SubtitleWord('\n', style, renderer, styleStr));
+			}*/
 			//trace("execution time: ", getTimer()-start_time);
 			//trace(new Date().time-start);
 		}

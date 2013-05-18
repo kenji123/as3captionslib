@@ -12,6 +12,7 @@ package com.kenshisoft.captions.formats.cr
 	 */
 	public class CRCaption implements ICaption
 	{
+		public var alignment:int;
 		public var event:CREvent;
 		
 		private var _textField:TextField;
@@ -19,10 +20,11 @@ package com.kenshisoft.captions.formats.cr
 		private var _scaleY:Number = 1;
 		private var _renderSprite:Sprite;
 		
-		public function CRCaption(event:CREvent)
+		public function CRCaption(alignment:int, event:CREvent)
 		{
 			super();
 			
+			this.alignment = -alignment;
 			this.event = event;
 		}
 		

@@ -19,18 +19,17 @@
 
 package com.kenshisoft.captions.formats.ass
 {
-	import com.kenshisoft.captions.formats.ICaption;
-	import flash.display.Bitmap;
 	import flash.display.Sprite;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	
 	import com.kenshisoft.captions.SubtitleLine;
 	import com.kenshisoft.captions.SubtitleWord;
-	import com.kenshisoft.captions.models.ass.ASSEvent;
+	import com.kenshisoft.captions.formats.ICaption;
 	import com.kenshisoft.captions.misc.MarginRectangle;
 	import com.kenshisoft.captions.misc.Position;
 	import com.kenshisoft.captions.misc.VectorPosition;
+	import com.kenshisoft.captions.models.ass.ASSEvent;
 	
 	/**
 	 * ...

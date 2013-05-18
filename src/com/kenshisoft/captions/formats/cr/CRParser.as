@@ -4,11 +4,10 @@ package com.kenshisoft.captions.formats.cr
 	import com.kenshisoft.captions.formats.IParser;
 	import com.kenshisoft.captions.misc.MarginRectangle;
 	import com.kenshisoft.captions.misc.Util;
+	import com.kenshisoft.captions.models.ISubtitle;
 	import com.kenshisoft.captions.models.cr.CREvent;
 	import com.kenshisoft.captions.models.cr.CRStyle;
-	import com.kenshisoft.captions.models.ISubtitle;
 	import com.kenshisoft.captions.models.cr.CRSubtitleScript;
-	import com.kenshisoft.captions.SubtitleWord;
 	
 	/**
 	 * ...
@@ -31,13 +30,12 @@ package com.kenshisoft.captions.formats.cr
 			subtitle.title = subtitleXml.@title;
 			subtitle.play_res_x = subtitleXml.@play_res_x;
 			subtitle.play_res_y = subtitleXml.@play_res_y;
-			subtitle.wrap_style = subtitleXml.@wrap_style;
-			
 			subtitle.lang_code = subtitleXml.@lang_code;
 			subtitle.lang_string = subtitleXml.@lang_string;
 			subtitle.created = subtitleXml.@created;
 			subtitle.progress_string = subtitleXml.@progresss_string;
 			subtitle.status_string = subtitleXml.@status_string;
+			subtitle.wrap_style = subtitleXml.@wrap_style;
 			
 			var i:String;
 			
@@ -50,16 +48,20 @@ package com.kenshisoft.captions.formats.cr
 				style.font_name = styles[i].@font_name;
 				style.font_size = styles[i].@font_size;
 				style.colours = new Vector.<uint>; style.colours.push(uint("0x" + String(styles[i].@primary_colour).substr(2)), uint("0x" + String(styles[i].@secondary_colour).substr(2)), uint("0x" + String(styles[i].@outline_colour).substr(2)), uint("0x" + String(styles[i].@back_colour).substr(2)));
-				style.bold = styles[i].@bold;
-				style.italic = styles[i].@italic;
-				style.underline = styles[i].@underline;
+				style.bold = styles[i].@bold > 0 ? true : false;
+				style.italic = styles[i].@italic > 0 ? true : false;
+				style.underline = styles[i].@underline > 0 ? true : false;
+				style.strikeout = styles[i].@srikeout > 0 ? true : false;
+				style.scale_x = styles[i].@scale_x;
+				style.scale_y = styles[i].@scale_y;
+				style.spacing = styles[i].@spacing;
+				style.angle = styles[i].@angle;
 				style.border_style = styles[i].@border_style;
 				style.outline = styles[i].@outline;
 				style.shadow = styles[i].@shadow;
 				style.alignment = styles[i].@alignment;
 				style.margin = new MarginRectangle(styles[i].@margin_l, styles[i].@margin_r, styles[i].@margin_v, styles[i].@margin_v);
-				
-				style.angle = styles[i].@angle;
+				style.encoding = styles[i].@encoding;
 				
 				subtitle.styles.push(style);
 			}
@@ -71,12 +73,11 @@ package com.kenshisoft.captions.formats.cr
 				event.id = events[i].@id;
 				event.start = events[i].@start;
 				event.end = events[i].@end;
-				event.margin = new MarginRectangle(events[i].@margin_l, events[i].@margin_r, events[i].@margin_v, events[i].@margin_v);
-				event.text = events[i].@text;
-				
 				event.style = events[i].@style;
 				event.name = events[i].@name;
+				event.margin = new MarginRectangle(events[i].@margin_l, events[i].@margin_r, events[i].@margin_v, events[i].@margin_v);
 				event.effect = events[i].@effect;
+				event.text = events[i].@text;
 				
 				event.startSeconds = Util.toSeconds(event.start);
 				event.endSeconds = Util.toSeconds(event.end);
@@ -104,7 +105,7 @@ package com.kenshisoft.captions.formats.cr
 				}
 				else if (tag.indexOf("a") == 0)
 				{
-					tagParams.push("a", tag.substr(2));
+					tagParams.push("a", tag.substr(1));
 				}
 				else if (tag.indexOf("b") == 0)
 				{
@@ -145,29 +146,6 @@ package com.kenshisoft.captions.formats.cr
 			
 			return tagsParsed;
 		}
-		
-		/*public function parseString(caption:CRCaption, str:String, style:CRStyle, renderer:CRRenderer, styleStr:String):void
-		{
-			str = str.replace(/\\N/g, '\n').replace(/\\n/g, (caption.wrapStyle < 2 || caption.wrapStyle == 3) ? ' ' : '\n')
-			
-			var lines:Array = str.split('\n');
-			var textRegExp:RegExp = /([^\s]+)|(\s)/g;
-			
-			for (var i:int; i < lines.length; i++)
-			{
-				var match:Object = textRegExp.exec(lines[i]);
-				
-				while (match != null)
-				{
-					caption.words.push(new SubtitleWord((match[1] ? match[1] : match[2]), style, renderer, styleStr));
-					
-					match = textRegExp.exec(lines[i]);
-				}
-				
-				if (i != lines.length - 1)
-					caption.words.push(new SubtitleWord('\n', style, renderer, styleStr));
-			}
-		}*/
 		
 		public function getStyle(name:String, styles:Vector.<CRStyle>):CRStyle
 		{

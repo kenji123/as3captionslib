@@ -34,10 +34,10 @@ package com.kenshisoft.captions.models.cr
 		private var _font_name:String = "Arial";
 		private var _font_size:Number = 20;
 		private var _colours:Vector.<uint> = new Vector.<uint>; // primary, secondary, outline, back
-		private var _bold:int = 0;
-		private var _italic:int = 0;
-		private var _underline:int = 0;
-		private var _strikeout:int;
+		private var _bold:Boolean = false;
+		private var _italic:Boolean = false;
+		private var _underline:Boolean = false;
+		private var _strikeout:Boolean = false;
 		private var _scale_x:Number;
 		private var _scale_y:Number;
 		private var _spacing:int;
@@ -106,42 +106,42 @@ package com.kenshisoft.captions.models.cr
             _colours = value;
 		}
 		
-		public function get bold():int
+		public function get bold():Boolean
 		{
         	return _bold;
 		}
 		
-        public function set bold(value:int):void
+        public function set bold(value:Boolean):void
 		{
             _bold = value;
 		}
 		
-		public function get italic():int
+		public function get italic():Boolean
 		{
         	return _italic;
 		}
 		
-        public function set italic(value:int):void
+        public function set italic(value:Boolean):void
 		{
             _italic = value;
 		}
 		
-		public function get underline():int
+		public function get underline():Boolean
 		{
         	return _underline;
 		}
 		
-        public function set underline(value:int):void
+        public function set underline(value:Boolean):void
 		{
             _underline = value;
 		}
 		
-		public function get strikeout():int
+		public function get strikeout():Boolean
 		{
         	return _strikeout;
 		}
 		
-        public function set strikeout(value:int):void
+        public function set strikeout(value:Boolean):void
 		{
             _strikeout = value;
 		}
