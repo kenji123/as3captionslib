@@ -137,20 +137,7 @@ package com.kenshisoft.captions.formats.cr
 			return textFormat;
 		}
 		
-		private function getWrapStyle(subtitle:CRSubtitleScript):Array //TODO: do parse() text, then FIXME
-		{
-			var wrapStyles:Array = [WRAP1, WRAP2, NONE, WRAP3];
-			
-			for (var i:int; i < wrapStyles.length; i++)
-            {
-                if (wrapStyles[i][0] == subtitle.wrap_style)
-                    return wrapStyles[i];
-            }
-			
-            return null;
-		}
-		
-		private function styleModifier(caption:CRCaption, tagsParsed:Vector.<Vector.<String>>, isAnimated:Boolean, style:CRStyle, orgStyle:CRStyle, beginIndex:int, endIndex:int):void
+		private function styleModifier(caption:CRCaption, tagsParsed:Vector.<Vector.<String>>, isAnimated:Boolean, style:CRStyle, orgStyle:CRStyle, beginIndex:int, endIndex:int):CRStyle
 		{
 			var j:int; // inner loop index
 			var d:Number; // dest
@@ -226,18 +213,15 @@ package com.kenshisoft.captions.formats.cr
 						
 						d = Number(tagOptions[0]);
 						
-						/*if (tagOptions[0].charAt(0) == '-' || tagOptions[0].charAt(0) == '+')
+						if (tagOptions[0].charAt(0) == '-' || tagOptions[0].charAt(0) == '+')
 						{
-							n = calculateAnimation(style.orgFontSize + ((style.orgFontSize * d) / 10), style.orgFontSize, isAnimated, caption.animOptions);
-							style.orgFontSize = n > 0 ? n : orgStyle.orgFontSize;
-							_parser.setTrueFontHeight(style);
+							d = style.font_size + ((style.font_size * d) / 10);
+							style.font_size = int(d > 0 ? d : orgStyle.font_size);
 						}
 						else
 						{
-							n = calculateAnimation(d, style.orgFontSize, isAnimated, caption.animOptions);
-							style.orgFontSize = n > 0 ? n : orgStyle.orgFontSize;
-							_parser.setTrueFontHeight(style);
-						}*/
+							style.font_size = int(d > 0 ? d : orgStyle.font_size);
+						}
 						
 						break;
 					case "i":
@@ -247,7 +231,7 @@ package com.kenshisoft.captions.formats.cr
 						break;
 					case "q":
 						d = Number(tagOptions[0]);
-						//caption.wrapStyle = tagOptions[0].length > 0 && (0 <= d && d <= 3) ? d : caption.orgWrapStyle;
+						caption.wrapStyle = tagOptions[0].length > 0 && (0 <= d && d <= 3) ? d : caption.orgWrapStyle;
 						
 						break;
 					case "u":
@@ -259,11 +243,26 @@ package com.kenshisoft.captions.formats.cr
 			}
 			
 			caption.textField.setTextFormat(getStyleFormat(caption, style), beginIndex, endIndex);
+			
+			return style;
+		}
+		
+		private function getWrapStyle(wrapStyle:int):Array
+		{
+			var wrapStyles:Array = [WRAP1, WRAP2, NONE, WRAP3];
+			
+			for (var i:int; i < wrapStyles.length; i++)
+            {
+                if (wrapStyles[i][0] == wrapStyle)
+                    return wrapStyles[i];
+            }
+			
+            return null;
 		}
 		
 		private function getY(caption:CRCaption, style:CRStyle):Number
 		{
-			var t:int = (caption.event.margin.bottom > 0 ? caption.event.margin.bottom : style.margin.bottom) + style.outline;
+			var t:int = ((caption.event.margin.bottom > 0 ? caption.event.margin.bottom : style.margin.bottom) * caption.scaleY) + style.outline;
 			
             switch (getAlignment(caption.alignment > 0 ? caption.alignment : style.alignment)[2])
             {
@@ -285,7 +284,7 @@ package com.kenshisoft.captions.formats.cr
 			var orgStyle:CRStyle = _parser.getStyle(event.style, subtitle.styles);
 			var style:CRStyle = orgStyle.copy();
 			
-			var caption:CRCaption = new CRCaption(style.alignment, event);
+			var caption:CRCaption = new CRCaption(subtitle.wrap_style, style.alignment, event);
 			
 			caption.scaleX = subtitle.play_res_x > 0 ? (1.0 * videoRect.width / subtitle.play_res_x) : 1.0;
 			caption.scaleY = subtitle.play_res_y > 0 ? (1.0 * videoRect.height / subtitle.play_res_y) : 1.0;
@@ -294,19 +293,12 @@ package com.kenshisoft.captions.formats.cr
 			calcWidth = (Math.floor((calcHeight * videoRect.width) / videoRect.height));
 			
 			caption.textField = new TextField();
-			//var _local5:Object;
-            //var _local6:TextFormat;
-            //var _local7:String;
 			caption.textField.filters = getFilters(style);
 			caption.textField.defaultTextFormat = getStyleFormat(caption, style);
 			caption.textField.height = calcHeight;
 			caption.textField.width = calcWidth + (2 * staticMultiplier);
 			caption.textField.x = -staticMultiplier + videoRect.x;
 			caption.textField.blendMode = BlendMode.LAYER;
-			var wrapStyle:Array = getWrapStyle(subtitle);
-			//textField.text = _-0._-1();
-            //textField.text = _-0._-8f();
-			
 			
 			var str:String = event.text.replace(/\\N/g, '\n');
 			
@@ -327,36 +319,19 @@ package com.kenshisoft.captions.formats.cr
 				caption.textField.text += textStr;
 				
 				if (styleStr.length > 0)
-					styleModifier(caption, _parser.parseTag(styleStr), false, style, orgStyle, beginIndex, caption.textField.text.length - 1);
+					style = styleModifier(caption, _parser.parseTag(styleStr), false, style, orgStyle, beginIndex, caption.textField.text.length - 1);
 				
 				match = styleTextRegExp.exec(str);
 			}
 			
-			
-			
-			
-			
-			
-			
-			//textField.wordWrap = _local2._-3c;
-            //var _local3:Array = _-0.false();
-            //var _local4:Number = 0;
-            /*while (_local4 < _local3.length)
-            {
-                _local5 = _local3[_local4];
-                _local6 = new TextFormat();
-                for (_local7 in _local5)
-                {
-                    _local6[_local7] = _local5[_local7];
-                };
-                textField.setTextFormat(_local6, _local4, (_local4 + 1));
-                _local4++;
-            };*/
-            //textField.embedFonts = isEveryFontEmbedded(_local1);
-            //for (;!(textField.embedFonts);(textField.sharpness = -100), //unresolved jump
-			//, (_local1.gridFitType = GridFitType.NONE), continue)
+			caption.textField.wordWrap = getWrapStyle(caption.wrapStyle)[2];
+            caption.textField.embedFonts = _parser.isFontEmbedded(style.font_name);
+            if (!caption.textField.embedFonts)
+			{
+				caption.textField.sharpness = -100;
+				caption.textField.gridFitType = GridFitType.NONE;
+			}
 			caption.textField.antiAliasType = AntiAliasType.ADVANCED;
-			
 			caption.textField.y = getY(caption, style) + videoRect.y;
             //_-1Q = _-1J(textField);
             //var _local4:DisplayObjectContainer = _-6c(_-2z, _-53, _-5r, _-m);
@@ -380,7 +355,6 @@ package com.kenshisoft.captions.formats.cr
 			var caption:CRCaption = CRCaption(caption_);
 			var captionsOnDisplay:Vector.<CRCaption> = Vector.<CRCaption>(captionsOnDisplay_);
 			
-			// let's keep "newer" captions at the front
 			var insertAt:int = -1;
 			
 			for (var c:int; c < captionsOnDisplay.length; c++)

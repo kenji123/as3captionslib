@@ -12,20 +12,28 @@ package com.kenshisoft.captions.formats.cr
 	 */
 	public class CRCaption implements ICaption
 	{
+		public var wrapStyle:int;
 		public var alignment:int;
 		public var event:CREvent;
 		
+		private var _orgWrapStyle:int;
 		private var _textField:TextField;
 		private var _scaleX:Number = 1;
 		private var _scaleY:Number = 1;
 		private var _renderSprite:Sprite;
 		
-		public function CRCaption(alignment:int, event:CREvent)
+		public function CRCaption(wrapStyle:int, alignment:int, event:CREvent)
 		{
 			super();
 			
+			this.wrapStyle = _orgWrapStyle = wrapStyle;
 			this.alignment = -alignment;
 			this.event = event;
+		}
+		
+		public function get orgWrapStyle():int
+		{
+			return _orgWrapStyle;
 		}
 		
 		public function get textField():TextField

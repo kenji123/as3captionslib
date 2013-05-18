@@ -1,7 +1,10 @@
 package com.kenshisoft.captions.formats.cr
 {
+	import flash.text.FontType;
+	
 	import com.kenshisoft.captions.FontClass;
 	import com.kenshisoft.captions.formats.IParser;
+	import com.kenshisoft.captions.loaders.FontLoader;
 	import com.kenshisoft.captions.misc.MarginRectangle;
 	import com.kenshisoft.captions.misc.Util;
 	import com.kenshisoft.captions.models.ISubtitle;
@@ -156,6 +159,14 @@ package com.kenshisoft.captions.formats.cr
 			}
 			
 			return new CRStyle();
+		}
+		
+		public function isFontEmbedded(fontName:String):Boolean
+		{
+			var df3:Boolean = FontLoader.isFontRegistered(fontName, true, true, null, FontType.EMBEDDED);
+			var df4:Boolean = FontLoader.isFontRegistered(fontName, true, true, null, FontType.EMBEDDED_CFF);
+			
+			return df3 || df4;
 		}
 	}
 }
