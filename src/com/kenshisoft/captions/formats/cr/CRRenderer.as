@@ -25,6 +25,7 @@ package com.kenshisoft.captions.formats.cr
 	import flash.text.TextFieldAutoSize;
 	import flash.text.TextFormat;
 	import flash.text.TextFormatAlign;
+	import flash.text.TextLineMetrics;
 	
 	/**
 	 * ...
@@ -35,7 +36,7 @@ package com.kenshisoft.captions.formats.cr
 		private var _parser:CRParser;
 		
 		private var defaultHeight:int = 480;
-		private var staticMultiplier:int = 2;
+		//private var staticMultiplier:int = 2; // orig
 		private var calcHeight:Number;
 		private var calcWidth:Number;
 		
@@ -90,7 +91,7 @@ package com.kenshisoft.captions.formats.cr
 		{
 			var filters:Array = new Array();
             
-            if (style.border_style != 1) // _-58._-0Q = 1
+            if (style.border_style != 1)
                 return filters;
             
             var glowStrength:Number = getGlowStrength(style.outline);
@@ -267,14 +268,44 @@ package com.kenshisoft.captions.formats.cr
             switch (getAlignment(caption.alignment > 0 ? caption.alignment : style.alignment)[2])
             {
 				case TOP:
-					return t - staticMultiplier;
+					//return t - staticMultiplier; // orig
+					return t;
                 case MIDDLE:
 					return (calcHeight - caption.textField.textHeight) / 2;
 				case BOTTOM:
                 default:
-                    return (((calcHeight + staticMultiplier) - caption.textField.textHeight) - t) - caption.textField.getLineMetrics(0).descent;
+                    //return (((calcHeight + staticMultiplier) - caption.textField.textHeight) - t) - caption.textField.getLineMetrics(0).descent; // orig
+                    return ((calcHeight - caption.textField.textHeight) - t) - caption.textField.getLineMetrics(0).descent;
             }
         }
+		
+		private function getOpaqueBoxRect(caption:CRCaption, style:CRStyle):Rectangle
+		{
+            var metrics:TextLineMetrics = caption.textField.getLineMetrics(0);
+			
+            return new Rectangle(
+				(caption.textField.x + (caption.event.margin.left > 0 ? caption.event.margin.left : style.margin.left)), 
+				(caption.textField.y - style.outline), 
+				((caption.textField.width - (caption.event.margin.left > 0 ? caption.event.margin.left : style.margin.left)) - (caption.event.margin.right > 0 ? caption.event.margin.right : style.margin.right)), 
+				(((metrics.height * caption.textField.numLines) + (2 * style.outline)) + metrics.descent)
+			);
+        }
+		
+		private function createOpaqueBox(caption:CRCaption, style:CRStyle, renderSprite:Sprite):void
+		{
+			var rect:Rectangle = getOpaqueBoxRect(caption, style);
+            var opaqueSprite:Sprite = new Sprite();
+            
+			opaqueSprite.x = caption.textField.x;
+			opaqueSprite.y = caption.textField.y;
+			
+			opaqueSprite.graphics.beginFill(Util.removeAlpha(style.colours[3]), Util.getAlphaMultiplier(style.colours[3]));
+			//opaqueSprite.graphics.drawRect(0, 0, rect.width, rect.height);
+			opaqueSprite.graphics.drawRect((caption.textField.width - rect.width)/2, 0, rect.width, rect.height);
+			opaqueSprite.graphics.endFill();
+			
+            renderSprite.addChild(opaqueSprite);
+		}
 		
 		public function render(subtitle_:ISubtitle, event_:IEvent, videoRect:Rectangle, container:DisplayObjectContainer, time:Number = -1, animate:Boolean = true, caption_:ICaption = null):ICaption
 		{
@@ -296,8 +327,10 @@ package com.kenshisoft.captions.formats.cr
 			caption.textField.filters = getFilters(style);
 			caption.textField.defaultTextFormat = getStyleFormat(caption, style);
 			caption.textField.height = calcHeight;
-			caption.textField.width = calcWidth + (2 * staticMultiplier);
-			caption.textField.x = -staticMultiplier + videoRect.x;
+			//caption.textField.width = calcWidth + (2 * staticMultiplier); // orig
+			caption.textField.width = videoRect.width;
+			//caption.textField.x = -staticMultiplier + videoRect.x; // orig
+			caption.textField.x = videoRect.x;
 			caption.textField.blendMode = BlendMode.LAYER;
 			
 			var str:String = event.text.replace(/\\N/g, '\n');
@@ -333,15 +366,14 @@ package com.kenshisoft.captions.formats.cr
 			}
 			caption.textField.antiAliasType = AntiAliasType.ADVANCED;
 			caption.textField.y = getY(caption, style) + videoRect.y;
-            //_-1Q = _-1J(textField);
-            //var _local4:DisplayObjectContainer = _-6c(_-2z, _-53, _-5r, _-m);
-            //addChild(_local4);
-            //_tweens = _-32(_arg1);
-            //_local4.addChild(textField);
-            //_local4.addChild(_-1Q);
-            //_-1Q.visible = false;
 			
 			var renderSprite:Sprite = new Sprite();
+			
+			if (style.border_style == 0)
+				createOpaqueBox(caption, style, renderSprite);
+			
+            //_tweens = _-32(_arg1);
+			
 			renderSprite.addChild(caption.textField);
 			
 			renderSprite.cacheAsBitmap = true;
