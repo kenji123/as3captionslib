@@ -1,17 +1,38 @@
+//
+// Copyright 2011-2013 Jamal Edey
+// 
+// This file is part of as3captionslib.
+// 
+// as3captionslib is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// as3captionslib is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public License
+// along with as3captionslib.  If not, see <http://www.gnu.org/licenses/>.
+//
+
 package com.kenshisoft.captions.formats.cr
 {
-	import com.kenshisoft.captions.FontClass;
-	import com.kenshisoft.captions.formats.ICaption;
-	import com.kenshisoft.captions.formats.IRenderer;
-	import com.kenshisoft.captions.models.cr.CRSubtitleScript;
-	import com.kenshisoft.captions.models.ISubtitle;
-	import flash.geom.Rectangle;
-	import flash.net.NetStream;
-	import com.kenshisoft.captions.ICaptionsTimeLine;
 	import flash.display.DisplayObjectContainer;
 	import flash.events.TimerEvent;
+	import flash.geom.Rectangle;
+	import flash.net.NetStream;
 	import flash.utils.Timer;
+	
 	import org.osflash.signals.Signal;
+	
+	import com.kenshisoft.captions.FontClass;
+	import com.kenshisoft.captions.ICaptionsTimeLine;
+	import com.kenshisoft.captions.formats.ICaption;
+	import com.kenshisoft.captions.formats.IRenderer;
+	import com.kenshisoft.captions.models.ISubtitle;
+	import com.kenshisoft.captions.models.cr.CRSubtitleScript;
 	
 	/**
 	 * ...
@@ -58,10 +79,10 @@ package com.kenshisoft.captions.formats.cr
 			
 			_animated = animated;
 			
-			_bufferTimer = new Timer(20);
+			_bufferTimer = new Timer(16);
 			_bufferTimer.addEventListener(TimerEvent.TIMER, buffer);
 			
-			_timeLineTimer = new Timer(20);
+			_timeLineTimer = new Timer(16);
 			_timeLineTimer.addEventListener(TimerEvent.TIMER, timeLine);
 		}
 		
@@ -93,6 +114,13 @@ package com.kenshisoft.captions.formats.cr
 			
 			for (var j:int; j < _captionsOnDisplay.length; j++)
 			{
+				if (_captionsOnDisplay[j].effects.COUNT > 0 && _currentTime < _captionsOnDisplay[j].event.endSeconds)
+				{
+					caption = _captionsOnDisplay[j];
+					
+					renderer.render(captions, caption.event, _videoRect, _container, _stream.time, animated, caption);
+				}
+				
 				if (_currentTime < _captionsOnDisplay[j].event.startSeconds || _currentTime >= _captionsOnDisplay[j].event.endSeconds)
 				{
 					caption = _captionsOnDisplay.splice(j, 1)[0];

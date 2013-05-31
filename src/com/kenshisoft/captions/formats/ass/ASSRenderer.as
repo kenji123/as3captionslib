@@ -19,7 +19,6 @@
 
 package com.kenshisoft.captions.formats.ass
 {
-	import com.kenshisoft.captions.models.IStyle;
 	import flash.display.DisplayObject;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
@@ -60,6 +59,7 @@ package com.kenshisoft.captions.formats.ass
 	import com.kenshisoft.captions.misc.Size;
 	import com.kenshisoft.captions.misc.Util;
 	import com.kenshisoft.captions.models.IEvent;
+	import com.kenshisoft.captions.models.IStyle;
 	import com.kenshisoft.captions.models.ISubtitle;
 	import com.kenshisoft.captions.models.ass.ASSEvent;
 	import com.kenshisoft.captions.models.ass.ASSStyle;
@@ -214,25 +214,25 @@ package com.kenshisoft.captions.formats.ass
 					case "fad":
 						if (!caption.animOptions.animate) continue;
 						
-						if(tagOptions.length == 7 && !caption.effects.FADE) // {\fade(a1=param[0], a2=param[1], a3=param[2], t1=t[0], t2=t[1], t3=t[2], t4=t[3])}
+						if (tagOptions.length == 7 && !caption.effects.FADE) // {\fade(a1=param[0], a2=param[1], a3=param[2], t1=t[0], t2=t[1], t3=t[2], t4=t[3])}
 						{
 							e = new ASSEffect(SubtitleEffect.FADE);
 							
-							for(j = 0; j < 3; j++)
+							for (j = 0; j < 3; j++)
 								e.param[i] = tagOptions[j];
-							for(j = 0; j < 4; j++)
+							for (j = 0; j < 4; j++)
 								e.t[j] = tagOptions[3+j];
 							
 							caption.effects.FADE = e;
 							caption.effects.COUNT += 1;
 						}
-						else if(tagOptions.length == 2 && !caption.effects.FADE) // {\fad(t1=t[1], t2=t[2])}
+						else if (tagOptions.length == 2 && !caption.effects.FADE) // {\fad(t1=t[1], t2=t[2])}
 						{
 							e = new ASSEffect(SubtitleEffect.FADE);
 							
 							e.param[0] = e.param[2] = 0xff;
 							e.param[1] = 0x00;
-							for(j = 1; j < 3; j++) 
+							for (j = 1; j < 3; j++) 
 								e.t[j] = tagOptions[j-1];
 							e.t[0] = e.t[3] = -1; // will be substituted with "start" and "end"
 							
@@ -346,7 +346,7 @@ package com.kenshisoft.captions.formats.ass
 						
 						break;
 					case "move": // {\move(x1=param[0], y1=param[1], x2=param[2], y2=param[3][, t1=t[0], t2=t[1]])}
-						if((tagOptions.length == 4 || tagOptions.length == 6) && !caption.effects.MOVE)
+						if ((tagOptions.length == 4 || tagOptions.length == 6) && !caption.effects.MOVE)
 						{
 							e = new ASSEffect(SubtitleEffect.MOVE);
 							
@@ -357,7 +357,7 @@ package com.kenshisoft.captions.formats.ass
 							
 							e.t[0] = e.t[1] = -1;
 							
-							if(tagOptions.length == 6)
+							if (tagOptions.length == 6)
 							{
 								for(j = 0; j < 2; j++)
 									e.t[j] = tagOptions[4+j];
@@ -369,7 +369,7 @@ package com.kenshisoft.captions.formats.ass
 						
 						break;
 					case "org": // {\org(x=param[0], y=param[1])}
-						if(tagOptions.length == 2 && !caption.effects.ORG)
+						if (tagOptions.length == 2 && !caption.effects.ORG)
 						{
 							e = new ASSEffect(SubtitleEffect.ORG);
 							
@@ -386,7 +386,7 @@ package com.kenshisoft.captions.formats.ass
 						
 						break;
 					case "pos":
-						if(tagOptions.length == 2 && !caption.effects.MOVE)
+						if (tagOptions.length == 2 && !caption.effects.MOVE)
 						{
 							e = new ASSEffect(SubtitleEffect.MOVE);
 							
@@ -443,7 +443,7 @@ package com.kenshisoft.captions.formats.ass
 						caption.animOptions.animStart = caption.animOptions.animEnd = 0;
 						caption.animOptions.animAccel = 1;
 						
-						if(tagOptions.length == 1)
+						if (tagOptions.length == 1)
 						{
 							p = tagOptions[0];
 						}
@@ -452,13 +452,13 @@ package com.kenshisoft.captions.formats.ass
 							caption.animOptions.animAccel = Number(tagOptions[0]);
 							p = tagOptions[1];
 						}
-						else if(tagOptions.length == 3)
+						else if (tagOptions.length == 3)
 						{
 							caption.animOptions.animStart = int(tagOptions[0]);
 							caption.animOptions.animEnd = int(tagOptions[1]);
 							p = tagOptions[2];
 						}
-						else if(tagOptions.length == 4)
+						else if (tagOptions.length == 4)
 						{
 							caption.animOptions.animStart = int(tagOptions[0]); 
 							caption.animOptions.animEnd = int(tagOptions[1]);

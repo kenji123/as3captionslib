@@ -1,17 +1,24 @@
+//
+// Copyright 2011-2013 Jamal Edey
+// 
+// This file is part of as3captionslib.
+// 
+// as3captionslib is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// as3captionslib is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public License
+// along with as3captionslib.  If not, see <http://www.gnu.org/licenses/>.
+//
+
 package com.kenshisoft.captions.formats.cr
 {
-	import com.kenshisoft.captions.FontClass;
-	import com.kenshisoft.captions.formats.ass.ASSEffect;
-	import com.kenshisoft.captions.formats.ICaption;
-	import com.kenshisoft.captions.formats.IParser;
-	import com.kenshisoft.captions.formats.IRenderer;
-	import com.kenshisoft.captions.loaders.FontLoader;
-	import com.kenshisoft.captions.misc.Util;
-	import com.kenshisoft.captions.models.cr.CREvent;
-	import com.kenshisoft.captions.models.cr.CRStyle;
-	import com.kenshisoft.captions.models.cr.CRSubtitleScript;
-	import com.kenshisoft.captions.models.IEvent;
-	import com.kenshisoft.captions.models.ISubtitle;
 	import flash.display.BlendMode;
 	import flash.display.DisplayObjectContainer;
 	import flash.display.Sprite;
@@ -22,10 +29,24 @@ package com.kenshisoft.captions.formats.cr
 	import flash.text.AntiAliasType;
 	import flash.text.GridFitType;
 	import flash.text.TextField;
-	import flash.text.TextFieldAutoSize;
 	import flash.text.TextFormat;
 	import flash.text.TextFormatAlign;
 	import flash.text.TextLineMetrics;
+	
+	import com.kenshisoft.captions.FontClass;
+	import com.kenshisoft.captions.enums.SubtitleEffect;
+	import com.kenshisoft.captions.formats.ICaption;
+	import com.kenshisoft.captions.formats.IParser;
+	import com.kenshisoft.captions.formats.IRenderer;
+	import com.kenshisoft.captions.formats.ass.ASSAnimOptions;
+	import com.kenshisoft.captions.formats.ass.ASSEffect;
+	import com.kenshisoft.captions.loaders.FontLoader;
+	import com.kenshisoft.captions.misc.Util;
+	import com.kenshisoft.captions.models.IEvent;
+	import com.kenshisoft.captions.models.ISubtitle;
+	import com.kenshisoft.captions.models.cr.CREvent;
+	import com.kenshisoft.captions.models.cr.CRStyle;
+	import com.kenshisoft.captions.models.cr.CRSubtitleScript;
 	
 	/**
 	 * ...
@@ -138,13 +159,13 @@ package com.kenshisoft.captions.formats.cr
 			return textFormat;
 		}
 		
-		private function styleModifier(caption:CRCaption, tagsParsed:Vector.<Vector.<String>>, isAnimated:Boolean, style:CRStyle, orgStyle:CRStyle, beginIndex:int, endIndex:int):CRStyle
+		private function styleModifier(caption:CRCaption, tagsParsed:Vector.<Vector.<String>>, style:CRStyle, orgStyle:CRStyle, beginIndex:int, endIndex:int):CRStyle
 		{
 			var j:int; // inner loop index
 			var d:Number; // dest
 			var s:Number; // src
 			var n:Number; // calculateAnimation result
-			//var e:ASSEffect;
+			var e:ASSEffect;
 			
 			for (var i:int; i < tagsParsed.length; i++)
 			{
@@ -174,29 +195,29 @@ package com.kenshisoft.captions.formats.cr
 						style.colours[0] = uint(tagOptions[0]);
 						
 						break;
-					/*case "fade": // CR doesn't seem to use "fade" only "fad". leave it anyway
+					case "fade": // CR doesn't seem to use "fade" only "fad". leave it anyway
 					case "fad":
 						if (!caption.animOptions.animate) continue;
 						
-						if(tagOptions.length == 7 && !caption.effects.FADE) // {\fade(a1=param[0], a2=param[1], a3=param[2], t1=t[0], t2=t[1], t3=t[2], t4=t[3])}
+						if (tagOptions.length == 7 && !caption.effects.FADE) // {\fade(a1=param[0], a2=param[1], a3=param[2], t1=t[0], t2=t[1], t3=t[2], t4=t[3])}
 						{
 							e = new ASSEffect(SubtitleEffect.FADE);
 							
-							for(j = 0; j < 3; j++)
+							for (j = 0; j < 3; j++)
 								e.param[i] = tagOptions[j];
-							for(j = 0; j < 4; j++)
+							for (j = 0; j < 4; j++)
 								e.t[j] = tagOptions[3+j];
 							
 							caption.effects.FADE = e;
 							caption.effects.COUNT += 1;
 						}
-						else if(tagOptions.length == 2 && !caption.effects.FADE) // {\fad(t1=t[1], t2=t[2])}
+						else if (tagOptions.length == 2 && !caption.effects.FADE) // {\fad(t1=t[1], t2=t[2])}
 						{
 							e = new ASSEffect(SubtitleEffect.FADE);
 							
 							e.param[0] = e.param[2] = 0xff;
 							e.param[1] = 0x00;
-							for(j = 1; j < 3; j++) 
+							for (j = 1; j < 3; j++)
 								e.t[j] = tagOptions[j-1];
 							e.t[0] = e.t[3] = -1; // will be substituted with "start" and "end"
 							
@@ -204,7 +225,7 @@ package com.kenshisoft.captions.formats.cr
 							caption.effects.COUNT += 1;
 						}
 						
-						break;*/
+						break;
 					case "fn":
 						style.font_name = tagOptions[0].length > 0 ? tagOptions[0] : orgStyle.font_name;
 						
@@ -300,11 +321,57 @@ package com.kenshisoft.captions.formats.cr
 			opaqueSprite.y = caption.textField.y;
 			
 			opaqueSprite.graphics.beginFill(Util.removeAlpha(style.colours[3]), Util.getAlphaMultiplier(style.colours[3]));
-			//opaqueSprite.graphics.drawRect(0, 0, rect.width, rect.height);
+			//opaqueSprite.graphics.drawRect(0, 0, rect.width, rect.height); // orig
 			opaqueSprite.graphics.drawRect((caption.textField.width - rect.width)/2, 0, rect.width, rect.height);
 			opaqueSprite.graphics.endFill();
 			
             renderSprite.addChild(opaqueSprite);
+		}
+		
+		private function applyEffects(caption:CRCaption, renderSprite:Sprite, videoRect:Rectangle, time:Number):void
+		{
+			var t:Number;
+			var t1:int;
+			var t2:int;
+			var t3:int;
+			var t4:int;
+			
+			var m_delay:Number = caption.event.duration * 1000;
+			var m_time:Number = (time - caption.event.startSeconds) * 1000;
+			
+			for (var i:String in caption.effects)
+			{
+				if (caption.effects[i] == null || caption.effects[i] is int) continue;
+				
+				var effect:ASSEffect = caption.effects[i];
+				
+				switch (effect.type)
+				{
+					case SubtitleEffect.FADE:
+						t1 = effect.t[0];
+						t2 = effect.t[1];
+						t3 = effect.t[2];
+						t4 = effect.t[3];
+						
+						if (t1 == -1 && t4 == -1) { t1 = 0; t3 = m_delay - t3; t4 = m_delay; }
+						
+						if (m_time < t1) renderSprite.alpha = 1 - (effect.param[0] / 255);
+						else if (m_time >= t1 && m_time < t2)
+						{
+							t = 1.0 * (m_time - t1) / (t2 - t1);
+							renderSprite.alpha = 1 - (int(effect.param[0] * (1 - t) + effect.param[1] * t) / 255);
+						}
+						else if (m_time >= t2 && m_time < t3) renderSprite.alpha = 1 - (effect.param[1] / 255);
+						else if (m_time >= t3 && m_time < t4)
+						{
+							t = 1.0 * (m_time - t3) / (t4 - t3);
+							renderSprite.alpha = 1 - (int(effect.param[1] * (1 - t) + effect.param[2] * t) / 255);
+						}
+						else if (m_time >= t4) renderSprite.alpha = 1 - (effect.param[2] / 255);
+						
+						break;
+				}
+			}
 		}
 		
 		public function render(subtitle_:ISubtitle, event_:IEvent, videoRect:Rectangle, container:DisplayObjectContainer, time:Number = -1, animate:Boolean = true, caption_:ICaption = null):ICaption
@@ -315,10 +382,19 @@ package com.kenshisoft.captions.formats.cr
 			var orgStyle:CRStyle = _parser.getStyle(event.style, subtitle.styles);
 			var style:CRStyle = orgStyle.copy();
 			
-			var caption:CRCaption = new CRCaption(subtitle.wrap_style, style.alignment, event);
+			var caption:CRCaption = caption_ ? CRCaption(caption_) : new CRCaption(subtitle.wrap_style, style.alignment, event);
+			
+			if (caption_)
+			{
+				applyEffects(caption, caption.renderSprite, videoRect, time);
+				
+				return caption_;
+			}
 			
 			caption.scaleX = subtitle.play_res_x > 0 ? (1.0 * videoRect.width / subtitle.play_res_x) : 1.0;
 			caption.scaleY = subtitle.play_res_y > 0 ? (1.0 * videoRect.height / subtitle.play_res_y) : 1.0;
+			
+			caption.animOptions = new ASSAnimOptions((time - event.startSeconds) * 1000, event.duration * 1000, animate);
 			
 			calcHeight = (subtitle.play_res_y > 0 ? subtitle.play_res_y : defaultHeight) * caption.scaleX;
 			calcWidth = (Math.floor((calcHeight * videoRect.width) / videoRect.height));
@@ -352,7 +428,7 @@ package com.kenshisoft.captions.formats.cr
 				caption.textField.text += textStr;
 				
 				if (styleStr.length > 0)
-					style = styleModifier(caption, _parser.parseTag(styleStr), false, style, orgStyle, beginIndex, caption.textField.text.length - 1);
+					style = styleModifier(caption, _parser.parseTag(styleStr), style, orgStyle, beginIndex, caption.textField.text.length - 1);
 				
 				match = styleTextRegExp.exec(str);
 			}
@@ -372,7 +448,7 @@ package com.kenshisoft.captions.formats.cr
 			if (style.border_style == 0)
 				createOpaqueBox(caption, style, renderSprite);
 			
-            //_tweens = _-32(_arg1);
+			applyEffects(caption, renderSprite, videoRect, time);
 			
 			renderSprite.addChild(caption.textField);
 			
