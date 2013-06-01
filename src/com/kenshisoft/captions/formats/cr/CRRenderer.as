@@ -396,7 +396,8 @@ package com.kenshisoft.captions.formats.cr
 			
 			caption.animOptions = new ASSAnimOptions((time - event.startSeconds) * 1000, event.duration * 1000, animate);
 			
-			calcHeight = (subtitle.play_res_y > 0 ? subtitle.play_res_y : defaultHeight) * caption.scaleX;
+			//calcHeight = (subtitle.play_res_y > 0 ? subtitle.play_res_y : defaultHeight) * caption.scaleX; // orig
+			calcHeight = videoRect.height;
 			calcWidth = (Math.floor((calcHeight * videoRect.width) / videoRect.height));
 			
 			caption.textField = new TextField();
@@ -404,7 +405,7 @@ package com.kenshisoft.captions.formats.cr
 			caption.textField.defaultTextFormat = getStyleFormat(caption, style);
 			caption.textField.height = calcHeight;
 			//caption.textField.width = calcWidth + (2 * staticMultiplier); // orig
-			caption.textField.width = videoRect.width;
+			caption.textField.width = calcWidth;
 			//caption.textField.x = -staticMultiplier + videoRect.x; // orig
 			caption.textField.x = videoRect.x;
 			caption.textField.blendMode = BlendMode.LAYER;
