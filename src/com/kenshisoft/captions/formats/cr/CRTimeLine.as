@@ -27,7 +27,6 @@ package com.kenshisoft.captions.formats.cr
 	
 	import org.osflash.signals.Signal;
 	
-	import com.kenshisoft.captions.FontClass;
 	import com.kenshisoft.captions.ICaptionsTimeLine;
 	import com.kenshisoft.captions.formats.ICaption;
 	import com.kenshisoft.captions.formats.IRenderer;

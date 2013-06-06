@@ -20,16 +20,12 @@
 package com.kenshisoft.captions.formats.ass
 {
 	import flash.display.DisplayObject;
-	import flash.display.Bitmap;
-	import flash.display.BitmapData;
 	import flash.display.DisplayObjectContainer;
 	import flash.display.Shape;
 	import flash.display.Sprite;
 	import flash.filters.BitmapFilterQuality;
 	import flash.filters.BlurFilter;
 	import flash.filters.DropShadowFilter;
-	import flash.filters.GlowFilter;
-	import flash.geom.ColorTransform;
 	import flash.geom.Matrix;
 	import flash.geom.Matrix3D;
 	import flash.geom.PerspectiveProjection;
@@ -47,7 +43,6 @@ package com.kenshisoft.captions.formats.ass
 	import flash.text.engine.TextRotation;
 	import flash.utils.getTimer;
 	
-	import com.kenshisoft.captions.FontClass;
 	import com.kenshisoft.captions.SubtitleWord;
 	import com.kenshisoft.captions.enums.SubtitleEffect;
 	import com.kenshisoft.captions.formats.ICaption;
@@ -56,7 +51,6 @@ package com.kenshisoft.captions.formats.ass
 	import com.kenshisoft.captions.formats.ass.ASSCaption;
 	import com.kenshisoft.captions.loaders.FontLoader;
 	import com.kenshisoft.captions.misc.MarginRectangle;
-	import com.kenshisoft.captions.misc.Size;
 	import com.kenshisoft.captions.misc.Util;
 	import com.kenshisoft.captions.models.IEvent;
 	import com.kenshisoft.captions.models.IStyle;

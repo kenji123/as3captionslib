@@ -19,8 +19,6 @@
 
 package com.kenshisoft.captions.formats.ass
 {
-	import com.kenshisoft.captions.FontClass;
-	
 	/**
 	 * ...
 	 * @author 

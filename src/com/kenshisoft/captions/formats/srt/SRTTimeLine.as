@@ -19,18 +19,19 @@
 
 package com.kenshisoft.captions.formats.srt
 {
-	import com.kenshisoft.captions.FontClass;
-	import com.kenshisoft.captions.formats.ICaption;
-	import com.kenshisoft.captions.formats.IRenderer;
-	import com.kenshisoft.captions.ICaptionsTimeLine;
-	import com.kenshisoft.captions.models.ISubtitle;
-	import com.kenshisoft.captions.models.srt.SRTSubtitle;
 	import flash.display.DisplayObjectContainer;
 	import flash.events.TimerEvent;
 	import flash.geom.Rectangle;
 	import flash.net.NetStream;
 	import flash.utils.Timer;
+	
 	import org.osflash.signals.Signal;
+	
+	import com.kenshisoft.captions.formats.ICaption;
+	import com.kenshisoft.captions.formats.IRenderer;
+	import com.kenshisoft.captions.ICaptionsTimeLine;
+	import com.kenshisoft.captions.models.ISubtitle;
+	import com.kenshisoft.captions.models.srt.SRTSubtitle;
 	
 	/**
 	 * ...

@@ -79,7 +79,7 @@ package com.kenshisoft.captions.formats.ass
 				{
 					subtitle.screenSize.width = int(line[1]);
 					
-					if(subtitle.screenSize.height <= 0)
+					if (subtitle.screenSize.height <= 0)
 						subtitle.screenSize.height = subtitle.screenSize.width == 1280 ? 1024 : subtitle.screenSize.width * 3 / 4;
 				}
 				
@@ -87,7 +87,7 @@ package com.kenshisoft.captions.formats.ass
 				{
 					subtitle.screenSize.height = int(line[1]);
 					
-					if(subtitle.screenSize.width <= 0)
+					if (subtitle.screenSize.width <= 0)
 						subtitle.screenSize.width = subtitle.screenSize.height == 1024 ? 1280 : subtitle.screenSize.height * 4 / 3;
 				}
 				

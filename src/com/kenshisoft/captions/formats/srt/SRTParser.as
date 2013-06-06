@@ -55,7 +55,7 @@ package com.kenshisoft.captions.formats.srt
 				event.id = match[index++];
 				event.start = match[index++];
 				event.end = match[index++];
-				event.text = String(match[index++]).replace(/\r\n/, "\n");
+				event.text = SubRipper2SSA(String(match[index++]).replace(/\r\n/, "\n"));
 				
 				event.startSeconds = Util.toSeconds(event.start);
 				event.endSeconds = Util.toSeconds(event.end);
@@ -67,6 +67,47 @@ package com.kenshisoft.captions.formats.srt
 			}
 			
 			return subtitle;
+		}
+		
+		private function SubRipper2SSA(str:String):String
+		{
+			str.replace("<i>", "{\\i1}");
+			str.replace("</i>", "{\\i}");
+			str.replace("<b>", "{\\b1}");
+			str.replace("</b>", "{\\b}");
+			str.replace("<u>", "{\\u1}");
+			str.replace("</u>", "{\\u}");
+			
+			return str;
+		}
+		
+		public function parseTag(str:String):Vector.<Vector.<String>>
+		{
+			var tags:Vector.<String> = Vector.<String>(str.split("\\"));
+			var tagsParsed:Vector.<Vector.<String>> = new Vector.<Vector.<String>>;
+			
+			for (var i:int; i < tags.length; i++)
+			{
+				var tag:String = tags[i];
+				var tagParams:Vector.<String> = new Vector.<String>;
+				
+				if (tag.indexOf("b") == 0)
+				{
+					tagParams.push("b", tag.substr(1));
+				}
+				else if (tag.indexOf("i") == 0)
+				{
+					tagParams.push("i", tag.substr(1));
+				}
+				else if (tag.indexOf("u") == 0)
+				{
+					tagParams.push("u", tag.substr(1));
+				}
+				
+				if (tagParams.length > 0) tagsParsed.push(tagParams);
+			}
+			
+			return tagsParsed;
 		}
 	}
 }

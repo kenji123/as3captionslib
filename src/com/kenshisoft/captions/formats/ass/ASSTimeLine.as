@@ -20,8 +20,6 @@
 package com.kenshisoft.captions.formats.ass
 {
 	import flash.display.DisplayObjectContainer;
-	import flash.display.Sprite;
-	import flash.events.Event;
 	import flash.events.TimerEvent;
 	import flash.geom.Rectangle;
 	import flash.net.NetStream;
@@ -30,16 +28,12 @@ package com.kenshisoft.captions.formats.ass
 	
 	import org.osflash.signals.Signal;
 	
-	import com.kenshisoft.captions.FontClass;
 	import com.kenshisoft.captions.ICaptionsTimeLine;
 	import com.kenshisoft.captions.formats.ICaption;
 	import com.kenshisoft.captions.formats.IRenderer;
 	import com.kenshisoft.captions.formats.ass.ASSCaption;
 	import com.kenshisoft.captions.formats.ass.ASSRenderer;
-	import com.kenshisoft.captions.enums.SubtitleFormat;
-	import com.kenshisoft.captions.misc.Size;
 	import com.kenshisoft.captions.models.ISubtitle;
-	import com.kenshisoft.captions.models.ass.ASSEvent;
 	import com.kenshisoft.captions.models.ass.ASSSubtitle;
 	
 	public class ASSTimeLine implements ICaptionsTimeLine

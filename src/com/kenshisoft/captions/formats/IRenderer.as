@@ -21,11 +21,8 @@ package com.kenshisoft.captions.formats
 {
 	import flash.display.DisplayObjectContainer;
 	import flash.geom.Rectangle;
-	import flash.text.engine.TextLine;
 	
-	import com.kenshisoft.captions.FontClass;
 	import com.kenshisoft.captions.models.IEvent;
-	import com.kenshisoft.captions.models.IStyle;
 	import com.kenshisoft.captions.models.ISubtitle;
 	
 	/**

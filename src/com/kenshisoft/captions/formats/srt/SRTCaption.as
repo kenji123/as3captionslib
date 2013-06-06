@@ -19,9 +19,11 @@
 
 package com.kenshisoft.captions.formats.srt
 {
+	import flash.display.Sprite;
+	import flash.text.TextField;
+	
 	import com.kenshisoft.captions.formats.ICaption;
 	import com.kenshisoft.captions.models.srt.SRTEvent;
-	import flash.display.Sprite;
 	
 	/**
 	 * ...
@@ -31,6 +33,9 @@ package com.kenshisoft.captions.formats.srt
 	{
 		public var event:SRTEvent;
 		
+		private var _textField:TextField;
+		private var _scaleX:Number = 1;
+		private var _scaleY:Number = 1;
 		private var _renderSprite:Sprite;
 		
 		public function SRTCaption(event:SRTEvent)
@@ -38,6 +43,36 @@ package com.kenshisoft.captions.formats.srt
 			super();
 			
 			this.event = event;
+		}
+		
+		public function get textField():TextField
+		{
+			return _textField;
+		}
+		
+		public function set textField(value:TextField):void
+		{
+			_textField = value;
+		}
+		
+		public function get scaleX():Number
+		{
+			return _scaleX;
+		}
+		
+		public function set scaleX(value:Number):void
+		{
+			_scaleX = value;
+		}
+		
+		public function get scaleY():Number
+		{
+			return _scaleY;
+		}
+		
+		public function set scaleY(value:Number):void
+		{
+			_scaleY = value;
 		}
 		
 		public function get renderSprite():Sprite

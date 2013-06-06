@@ -33,7 +33,6 @@ package com.kenshisoft.captions.formats.cr
 	import flash.text.TextFormatAlign;
 	import flash.text.TextLineMetrics;
 	
-	import com.kenshisoft.captions.FontClass;
 	import com.kenshisoft.captions.enums.SubtitleEffect;
 	import com.kenshisoft.captions.formats.ICaption;
 	import com.kenshisoft.captions.formats.IParser;
@@ -143,7 +142,7 @@ package com.kenshisoft.captions.formats.cr
             return null;
 		}
 		
-		public function getStyleFormat(caption:CRCaption, style:CRStyle):TextFormat
+		private function getStyleFormat(caption:CRCaption, style:CRStyle):TextFormat
 		{
 			var textFormat:TextFormat = new TextFormat();
 			textFormat.font = FontLoader.isFontRegistered("Embedded " + style.font_name) ? "Embedded " + style.font_name : style.font_name;
