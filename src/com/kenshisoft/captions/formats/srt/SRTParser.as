@@ -21,9 +21,10 @@ package com.kenshisoft.captions.formats.srt
 {
 	import com.kenshisoft.captions.FontClass;
 	import com.kenshisoft.captions.formats.IParser;
+	import com.kenshisoft.captions.misc.Size;
 	import com.kenshisoft.captions.misc.Util;
 	import com.kenshisoft.captions.models.ISubtitle;
-	import com.kenshisoft.captions.models.srt.SRTEvent;
+	import com.kenshisoft.captions.models.ass.ASSEvent;
 	import com.kenshisoft.captions.models.srt.SRTSubtitle;
 	
 	/**
@@ -43,6 +44,8 @@ package com.kenshisoft.captions.formats.srt
 			var srtRegExp:RegExp = /(\d*)\r\n(\d\d:\d\d:\d\d,\d\d\d) --> (\d\d:\d\d:\d\d,\d\d\d)\r\n(.+?)\r\n\r\n/gis;
 			
 			var subtitle:SRTSubtitle = new SRTSubtitle();
+			subtitle.screenSize = new Size(384, 288);
+			
 			var index:int;
 			
 			var match:Object = srtRegExp.exec(subtitleStr);
@@ -51,7 +54,7 @@ package com.kenshisoft.captions.formats.srt
 			{
 				index = 1;
 				
-				var event:SRTEvent = new SRTEvent();
+				var event:ASSEvent = new ASSEvent();
 				event.id = match[index++];
 				event.start = match[index++];
 				event.end = match[index++];

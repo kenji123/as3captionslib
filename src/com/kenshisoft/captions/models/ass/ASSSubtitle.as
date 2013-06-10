@@ -20,11 +20,10 @@
 package com.kenshisoft.captions.models.ass
 {
 	import com.kenshisoft.captions.enums.SubtitleFormat;
-	import com.kenshisoft.captions.enums.SubtitleMode;
-	import com.kenshisoft.captions.misc.Size;
 	import com.kenshisoft.captions.models.ISubtitle;
+	import com.kenshisoft.captions.models.STS;
 	
-	public class ASSSubtitle implements ISubtitle
+	public class ASSSubtitle extends STS implements ISubtitle
 	{
 		public static const SCRIPT_HEADER:String = ( <![CDATA[
 											[Script Info]
@@ -52,15 +51,10 @@ package com.kenshisoft.captions.models.ass
 		
 		private static const FORMAT:SubtitleFormat = SubtitleFormat.ASS;
 		
-		private var _mode:SubtitleMode = SubtitleMode.TIME;
-		private var _screenSize:Size = new Size();
-		private var _wrapStyle:int = 0;
-		private var _collisions:int = 0;
-		private var _scaledBorderAndShadow:Boolean = false;
 		private var _scriptVersion:int = 5;
 		private var _styleVersion:int = 5;
 		private var _styles:Vector.<ASSStyle> = new Vector.<ASSStyle>;
-    	private var _events:Vector.<ASSEvent> = new Vector.<ASSEvent>;
+    	//private var _events:Vector.<ASSEvent> = new Vector.<ASSEvent>;
 		
 		// informational only
     	private var _title:String;
@@ -77,56 +71,6 @@ package com.kenshisoft.captions.models.ass
 		public function ASSSubtitle()
 		{
 			super();
-		}
-		
-		public function get mode():SubtitleMode
-        {
-            return _mode;
-		}
-		
-       	public function set mode(value:SubtitleMode):void
-        {
-            _mode = value;
-		}
-		
-		public function get screenSize():Size
-        {
-            return _screenSize;
-		}
-		
-       	public function set screenSize(value:Size):void
-        {
-            _screenSize = value;
-		}
-		
-		public function get wrapStyle():int
-        {
-            return _wrapStyle;
-		}
-		
-       	public function set wrapStyle(value:int):void
-        {
-            _wrapStyle = value;
-		}
-		
-		public function get collisions():int
-        {
-            return _collisions;
-		}
-		
-       	public function set collisions(value:int):void
-        {
-            _collisions = value;
-		}
-		
-		public function get scaledBorderAndShadow():Boolean
-        {
-            return _scaledBorderAndShadow;
-		}
-		
-       	public function set scaledBorderAndShadow(value:Boolean):void
-        {
-            _scaledBorderAndShadow = value;
 		}
 		
 		public function get scriptVersion():int
@@ -157,16 +101,6 @@ package com.kenshisoft.captions.models.ass
        	public function set styles(value:Vector.<ASSStyle>):void
         {
             _styles = value;
-		}
-		
-		public function get events():Vector.<ASSEvent>
-        {
-            return _events;
-		}
-		
-       	public function set events(value:Vector.<ASSEvent>):void
-        {
-            _events = value;
 		}
 		
    		public function get title():String

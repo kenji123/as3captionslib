@@ -404,8 +404,8 @@ package com.kenshisoft.captions.formats.ass
 						break;
 					case "r":
 						var newStyle:ASSStyle;
-						if (tagOptions[0].length > 0) newStyle = _parser.getStyle(tagOptions[0], styles).copy();
-						style = (newStyle != null) ? newStyle : orgStyle.copy();
+						if (tagOptions[0].length > 0) newStyle = ASSStyle(_parser.getStyle(tagOptions[0], styles).copy());
+						style = (newStyle != null) ? newStyle : ASSStyle(orgStyle.copy());
 						
 						break;
 					case "shad":
@@ -817,7 +817,8 @@ package com.kenshisoft.captions.formats.ass
 			outlineColour.distance = 0;
 			outlineColour.color = Util.invertColor(style.colours[3]);
 			outlineColour.alpha = Util.getAlphaMultiplier(style.colours[3]);
-			outlineColour.knockout = true;
+			//outlineColour.knockout = true;
+			//outlineColour.hideObject = true;
 			
 			var gBlur:BlurFilter = new BlurFilter(style.gaussianBlur, style.gaussianBlur, BitmapFilterQuality.HIGH);
 			var blur:BlurFilter = new BlurFilter(style.blur, style.blur, BitmapFilterQuality.LOW);
@@ -961,7 +962,7 @@ package com.kenshisoft.captions.formats.ass
 			var event:ASSEvent = ASSEvent(event_);
 			
 			var orgStyle:ASSStyle = _parser.getStyle(event.style, subtitle.styles);
-			var style:ASSStyle = orgStyle.copy();
+			var style:ASSStyle = ASSStyle(orgStyle.copy());
 			
 			var caption:ASSCaption = caption_ ? ASSCaption(caption_) : new ASSCaption(subtitle.wrapStyle, style.alignment, event);
 			
@@ -1007,7 +1008,7 @@ package com.kenshisoft.captions.formats.ass
 					if(i < 0) i = str.length;
 					if(i == 0) continue;
 					
-					tmp = style.copy();
+					tmp = ASSStyle(style.copy());
 					tmp.fontSize = caption.scaleY * tmp.fontSize;
 					tmp.fontSpacing = caption.scaleX * tmp.fontSpacing;
 					tmp.outlineWidthX *= subtitle.scaledBorderAndShadow ? caption.scaleX : 1;
@@ -1032,7 +1033,7 @@ package com.kenshisoft.captions.formats.ass
 				{
 					style = styleModifier(caption, _parser.parseTag(caption.words[i].styleStr), false, style, orgStyle, subtitle.styles);
 					
-					tmp = style.copy();
+					tmp = ASSStyle(style.copy());
 					tmp.fontSize = caption.scaleY * tmp.fontSize;
 					tmp.fontSpacing = caption.scaleX * tmp.fontSpacing;
 					tmp.outlineWidthX *= subtitle.scaledBorderAndShadow ? caption.scaleX : 1;

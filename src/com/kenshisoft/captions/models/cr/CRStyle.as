@@ -20,7 +20,6 @@
 package com.kenshisoft.captions.models.cr 
 {
 	import com.kenshisoft.captions.misc.MarginRectangle;
-	import com.kenshisoft.captions.misc.Util;
 	import com.kenshisoft.captions.models.IStyle;
 	
 	/**
