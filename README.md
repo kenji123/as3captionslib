@@ -105,7 +105,9 @@ captions.loadCaptions(currentSubtitle.format, currentSubtitle.url);
 
 AS3 Captions can be integrated into any flash video player natively or as a plugin via an API for example, and only requires the NetStream object of the video being played back.
 
-Flowplayer and JW Player are already supported. There are example implementations available under the [plugins folder] (plugins). Checkout the [Flowplayer/JW Player plugin demo] to see it in action.
+Flowplayer and JW Player are already supported. There are example implementations available under the [plugins folder]. Checkout the [Flowplayer/JW Player plugin demo] to see it in action.
+
+  [plugins folder]: https://github.com/kenji123/as3captionslib/tree/master/plugins
 
 ## Fonts
 
