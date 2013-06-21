@@ -107,8 +107,6 @@ AS3 Captions can be integrated into any flash video player natively or as a plug
 
 Flowplayer and JW Player are already supported. There are example implementations available under the [plugins folder] (plugins). Checkout the [Flowplayer/JW Player plugin demo] to see it in action.
 
-  [plugins folder]: https://github.com/kenji123/as3captionslib/tree/master/plugins
-
 ## Fonts
 
 Advanced Substation Alpha and CrunchyRoll use external fonts, and as3captionslib supports fonts as well. A built-in font loader is available. See the below example on how to load multiple fonts.
