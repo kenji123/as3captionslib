@@ -10,13 +10,13 @@ AS3 Captions is an AS3 library for various subtitle formats, that allows develop
 
 ## See It In Action
 
- - [Flowplayer/JW Player plugin demo] (a bit outdated)
+ - [Flowplayer/JW Player plugin demo] \(a bit outdated)
 
   [Flowplayer/JW Player plugin demo]: http://www.kenshisoft.com/projects-resos/as3captionslib/
 
 ## Dependencies
 
- - [as3-signals] (already included)
+ - [as3-signals] \(already included)
 
   [as3-signals]: https://github.com/robertpenner/as3-signals
 
@@ -105,7 +105,7 @@ captions.loadCaptions(currentSubtitle.format, currentSubtitle.url);
 
 AS3 Captions can be integrated into any flash video player natively or as a plugin via an API for example, and only requires the NetStream object of the video being played back.
 
-Flowplayer and JW Player are already supported. There are example implementations available under the [plugins folder]. Checkout the [Flowplayer/JW Player plugin demo] to see it in action.
+Flowplayer and JW Player are already supported. There are example implementations available under the [plugins folder] (plugins). Checkout the [Flowplayer/JW Player plugin demo] to see it in action.
 
   [plugins folder]: https://github.com/kenji123/as3captionslib/tree/master/plugins
 
@@ -136,34 +136,34 @@ captions.loadFontSwf(currentSubtitle.fonts[0]);
 
 public function Player()
 {
-	super();
+    super();
     
     loadFonts();
 }
 
 private function loadFonts():void
 {
-	if (currentSubtitle.fonts.length < 1) return;
-	
-	for (var k:int = 0, l:int = currentSubtitle.fonts.length; k < l; k++)
-	{
-		if (!currentSubtitle.fonts[k].registered)
-		{
-			captions.loadFontSwf(currentSubtitle.fonts[k]);
-			return;
-		}
-	}
+    if (currentSubtitle.fonts.length < 1) return;
+    
+    for (var k:int = 0, l:int = currentSubtitle.fonts.length; k < l; k++)
+    {
+        if (!currentSubtitle.fonts[k].registered)
+        {
+            captions.loadFontSwf(currentSubtitle.fonts[k]);
+            return;
+        }
+    }
 }
 
 private function onFontsRegistered(event:FontConfig):void
 {
-	for (var i:int = 0, j:int = currentSubtitle.fonts.length; i < j; i++)
-	{
-		if (currentSubtitle.fonts[i].url == event.url)
-			currentSubtitle.fonts[i].registered = true;
-	}
-	
-	loadFonts();
+    for (var i:int = 0, j:int = currentSubtitle.fonts.length; i < j; i++)
+    {
+        if (currentSubtitle.fonts[i].url == event.url)
+            currentSubtitle.fonts[i].registered = true;
+    }
+    
+    loadFonts();
 }
 ```
 
