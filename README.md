@@ -40,7 +40,7 @@ Unsupported effects:
 ### SubRipper/SubRip
 
  - Specific positioning in not yet supported. (X1:left X2:right Y1:top Y2:bottom)
- - The html <font\> tag with the 'color' attribute is not yet supported.
+ - The HTML <font\> tag with the 'color' attribute is not yet supported.
 
 ### CrunchyRoll
 
