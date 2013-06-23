@@ -36,13 +36,28 @@ package com.kenshisoft.captions.formats.ass
 	import com.kenshisoft.captions.models.ISubtitle;
 	import com.kenshisoft.captions.models.ass.ASSSubtitle;
 	
+	/**
+	 * The CaptionTimeLine class manages the buffering and the displayment of captions.
+	 * 
+	 * @playerversion Flash 10.3
+	 * @langversion 3.0
+	 */
 	public class ASSTimeLine implements ICaptionsTimeLine
 	{
 		private const BUFFER_LENGTH:int = 30; // buffer in seconds
 		
+		/**
+		 * Parsed subtitle object.
+		 */
 		public var captions:ASSSubtitle;
+		/**
+		 * The relevant rendering object that will render the captions of the subtitle object.
+		 */
 		public var renderer:ASSRenderer;
 		
+		/**
+		 * Whether captions are animated.
+		 */
 		private var _animated:Boolean;
 		public function get animated():Boolean { return _animated; };
 		public function set animated(value:Boolean):void { _animated = value; };
@@ -63,12 +78,27 @@ package com.kenshisoft.captions.formats.ass
 		private var _currentTime:Number = 0;
 		private var _lastBufferIndex:int = 0;
 		
+		/**
+		* Dispatched when a caption is addded to the captions container. 
+		* Returns the ASSCaption object displayed.
+		*/
 		public var _captionDisplaySignal:Signal = new Signal(ICaption);
 		public function get captionDisplaySignal():Signal { return _captionDisplaySignal; }
 		
+		/**
+		* Dispatched when a caption is removed from the captions container. 
+		* Returns the ASSCaption object removed.
+		*/
 		public var _captionRemoveSignal:Signal = new Signal(ICaption);
 		public function get captionRemoveSignal():Signal { return _captionRemoveSignal; }
 		
+		/**
+		 * Creates a ASSTimeLine object.
+		 * 
+		 * @param	captions	Parsed subtitle object.
+		 * @param	renderer	The relevant rendering object that will render the captions of the subtitle object.
+		 * @param	animated	Whether captions are animated.
+		 */
 		public function ASSTimeLine(captions:ISubtitle, renderer:IRenderer, animated:Boolean)
 		{
 			super();
@@ -88,6 +118,11 @@ package com.kenshisoft.captions.formats.ass
 			_timeLine2Timer.addEventListener(TimerEvent.TIMER, timeLine2);
 		}
 		
+		/**
+		 * Fills the captions buffer by prerendering captions up to the number of seconds assigned to BUFFER_LENGTH.
+		 * 
+		 * @param	event	The event dispatched by the associated Timer object.
+		 */
 		private function buffer(event:TimerEvent):void
 		{
 			_bufferTimer.stop();
@@ -190,6 +225,9 @@ package com.kenshisoft.captions.formats.ass
 			_timeLine2Timer.start();
 		}
 		
+		/**
+		 * Starts the internal timer and buffer of the timeline.
+		 */
 		public function start():void
 		{
 			_captionsEnabled = true;
@@ -199,6 +237,9 @@ package com.kenshisoft.captions.formats.ass
 			_timeLine2Timer.start();
 		}
 		
+		/**
+		 * Pauses (stops) the internal timer and buffer of the timeline.
+		 */
 		public function pause():void
 		{
 			_captionsEnabled = false;
@@ -208,11 +249,19 @@ package com.kenshisoft.captions.formats.ass
 			_timeLine2Timer.stop();
 		}
 		
+		/**
+		 * Resumes the internal timer and buffer of the timeline.
+		 */
 		public function resume():void
 		{
 			start();
 		}
 		
+		/**
+		 * Empties the captions buffer and resets the buffer caption index.
+		 * 
+		 * @param	time	The time to reset the buffer index to. The currently associated NetStream.time is used by default.
+		 */
 		public function flushBuffer(time:Number = -1):void
 		{
 			_captionsBuffer = new Vector.<ASSCaption>;
@@ -231,6 +280,9 @@ package com.kenshisoft.captions.formats.ass
 			flushDisplay();
 		}
 		
+		/**
+		 * Removes all captions currently in the caption display container.
+		 */
 		private function flushDisplay():void
 		{
 			_captionsOnDisplay = new Vector.<ASSCaption>;
@@ -244,16 +296,31 @@ package com.kenshisoft.captions.formats.ass
 			} catch (error:Error) { }
 		}
 		
+		/**
+		 * Sets the associated captions container.
+		 * 
+		 * @param	container	The captions container.
+		 */
 		public function setContainer(container:DisplayObjectContainer):void
 		{
 			_container = container;
 		}
 		
+		/**
+		 * Sets the associated NetStream of the video.
+		 * 
+		 * @param	stream	The NetStream of the video.
+		 */
 		public function setStream(stream:NetStream):void
 		{
 			_stream = stream;
 		}
 		
+		/**
+		 * Sets the associated video position resolution/bounds.
+		 * 
+		 * @param	videoRect	Position and size of the associated video.
+		 */
 		public function setVideoRect(videoRect:Rectangle):void
 		{
 			_videoRect = videoRect;

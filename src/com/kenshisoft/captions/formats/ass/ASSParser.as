@@ -214,8 +214,8 @@ package com.kenshisoft.captions.formats.ass
 			// change non-existent styles to use the default style
 			for (var m:int; m < subtitle.events.length; m++)
 			{
-				if (getStyle(subtitle.events[m].style, subtitle.styles).name != subtitle.events[m].style)
-					subtitle.events[m].style = "Default";
+				if (getStyle(ASSEvent(subtitle.events[m]).style, subtitle.styles).name != ASSEvent(subtitle.events[m]).style)
+					ASSEvent(subtitle.events[m]).style = "Default";
 			}
 			
 			// set screen size, if not set in script
@@ -231,8 +231,8 @@ package com.kenshisoft.captions.formats.ass
 				{
 					if (subtitle.events[k].startSeconds > subtitle.events[l].startSeconds) // ascending order
 					{
-						temp = subtitle.events[k].copy(); // swap
-						subtitle.events[k] = subtitle.events[l].copy();
+						temp = ASSEvent(ASSEvent(subtitle.events[k]).copy()); // swap
+						subtitle.events[k] = ASSEvent(ASSEvent(subtitle.events[l]).copy());
 						subtitle.events[l] = temp;
 					}
 				}
