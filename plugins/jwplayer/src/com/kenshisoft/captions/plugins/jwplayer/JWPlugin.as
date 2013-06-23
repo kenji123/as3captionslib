@@ -8,13 +8,10 @@ package com.kenshisoft.captions.plugins.jwplayer
 	import com.longtailvideo.jwplayer.plugins.IPlugin;
 	import com.longtailvideo.jwplayer.plugins.PluginConfig;
 	
-	import com.adobe.serialization.json.JSON;
-	
 	import com.kenshisoft.captions.Captions;
 	import com.kenshisoft.captions.FakeNetStream;
 	import com.kenshisoft.captions.config.CaptionConfig;
 	import com.kenshisoft.captions.config.Config;
-	import com.kenshisoft.captions.enums.SubtitleFormat;
 	
 	/**
 	 * ...
@@ -46,7 +43,7 @@ package com.kenshisoft.captions.plugins.jwplayer
 			var args:Object;
 			try
 			{
-				args = JSON.decode(config.args);
+				args = JSON.parse(config.args);
 			}
 			catch (error:Error)
 			{

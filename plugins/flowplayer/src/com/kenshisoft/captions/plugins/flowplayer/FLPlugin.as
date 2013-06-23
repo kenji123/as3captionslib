@@ -1,23 +1,18 @@
 package com.kenshisoft.captions.plugins.flowplayer
 {
-	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
 	import flash.display.Sprite;
 	import flash.geom.Rectangle;
 	import flash.text.TextField;
-	import org.flowplayer.model.Clip;
 	
 	import org.flowplayer.model.ClipEvent;
 	import org.flowplayer.model.Plugin;
     import org.flowplayer.model.PluginModel;
     import org.flowplayer.view.Flowplayer;
 	
-	import com.adobe.serialization.json.JSON;
-	
 	import com.kenshisoft.captions.Captions;
 	import com.kenshisoft.captions.config.CaptionConfig;
 	import com.kenshisoft.captions.config.Config;
-	import com.kenshisoft.captions.enums.SubtitleFormat;
 	
 	/**
 	 * ...
@@ -57,7 +52,7 @@ package com.kenshisoft.captions.plugins.flowplayer
 			var args:Object;
 			try
 			{
-				args = JSON.decode(model.config.args);
+				args = JSON.parse(model.config.args);
 			}
 			catch (error:Error)
 			{
