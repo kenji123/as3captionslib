@@ -10,7 +10,7 @@ AS3 Captions is an AS3 library for various subtitle formats, that allows develop
 
 ## See It In Action
 
- - [Flowplayer/JW Player plugin demo] \(a bit outdated)
+ - [Flowplayer/JW Player plugin demo]
 
   [Flowplayer/JW Player plugin demo]: http://www.kenshisoft.com/projects-resos/as3captionslib/
 
@@ -128,42 +128,45 @@ Advanced Substation Alpha and CrunchyRoll use external fonts, and as3captionslib
 ### Loading multiple fonts
 
 ```
-var config:Config = new Config(JSON.parse(_stage.loaderInfo.parameters.args));
-var currentSubtitle:CaptionConfig = config.getDefaultCaption();
-
-var captions:Captions = new Captions(config.captionsEnabled, config.captionsAnimated);
-captions.loadFontSwf(currentSubtitle.fonts[0]);
-
 public function Player()
 {
     super();
     
+	var config:Config = new Config(JSON.parse(stage.loaderInfo.parameters.args));
+	var currentSubtitle:CaptionConfig = config.getDefaultCaption();
+	
+	var captions:Captions = new Captions(config.captionsEnabled, config.captionsAnimated);
+	captions.loadFontSwf(currentSubtitle.fonts[0]);
+	
     loadFonts();
 }
 
 private function loadFonts():void
 {
-    if (currentSubtitle.fonts.length < 1) return;
-    
-    for (var k:int = 0, l:int = currentSubtitle.fonts.length; k < l; k++)
-    {
-        if (!currentSubtitle.fonts[k].registered)
-        {
-            captions.loadFontSwf(currentSubtitle.fonts[k]);
-            return;
-        }
-    }
+	if (currentSubtitle.fonts.length > 0)
+	{
+		for (var k:int = 0, l:int = currentSubtitle.fonts.length; k < l; k++)
+		{
+			if (!currentSubtitle.fonts[k].registered)
+			{
+				captions.loadFontSwf(currentSubtitle.fonts[k]);
+				return;
+			}
+		}
+	}
+	
+	loadCaptions();
 }
 
-private function onFontsRegistered(event:FontConfig):void
+private function onFontsRegistered(event:Object):void
 {
-    for (var i:int = 0, j:int = currentSubtitle.fonts.length; i < j; i++)
-    {
-        if (currentSubtitle.fonts[i].url == event.url)
-            currentSubtitle.fonts[i].registered = true;
-    }
-    
-    loadFonts();
+	for (var i:int = 0, j:int = currentSubtitle.fonts.length; i < j; i++)
+	{
+		if (currentSubtitle.fonts[i].url == event.url)
+			currentSubtitle.fonts[i].registered = true;
+	}
+	
+	loadFonts();
 }
 ```
 

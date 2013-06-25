@@ -3,9 +3,11 @@ package com.kenshisoft.captions.plugins.jwplayer
 	import flash.display.Sprite;
 	import flash.geom.Rectangle;
 	
+	import com.adobe.serialization.json.JSONDecoder;
+	
 	import com.longtailvideo.jwplayer.events.MediaEvent;
 	import com.longtailvideo.jwplayer.player.IPlayer;
-	import com.longtailvideo.jwplayer.plugins.IPlugin;
+	import com.longtailvideo.jwplayer.plugins.IPlugin6;
 	import com.longtailvideo.jwplayer.plugins.PluginConfig;
 	
 	import com.kenshisoft.captions.Captions;
@@ -17,7 +19,7 @@ package com.kenshisoft.captions.plugins.jwplayer
 	 * ...
 	 * @author Jamal Edey
 	 */
-	public class JWPlugin extends Sprite implements IPlugin
+	public class JWPlugin extends Sprite implements IPlugin6
 	{
 		private const ID:String = "as3captionslib";
 		
@@ -43,7 +45,8 @@ package com.kenshisoft.captions.plugins.jwplayer
 			var args:Object;
 			try
 			{
-				args = JSON.parse(config.args);
+				var jd:JSONDecoder = new JSONDecoder(config.args, true);
+				args = jd.getValue();
 			}
 			catch (error:Error)
 			{
@@ -52,7 +55,7 @@ package com.kenshisoft.captions.plugins.jwplayer
 			
 			this.config = new Config(args);
 			
-			currentSubtitle = config.getDefaultCaption();
+			currentSubtitle = this.config.getDefaultCaption();
 			
 			initCaptions();
 			
@@ -63,6 +66,11 @@ package com.kenshisoft.captions.plugins.jwplayer
 		public function get id():String
 		{
 			return ID;
+		}
+		
+		public function get target():String
+		{
+			return "6.0";
 		}
 		
 		public function resize(width:Number, height:Number):void
@@ -87,28 +95,26 @@ package com.kenshisoft.captions.plugins.jwplayer
 		
 		private function initCaptions():void
 		{
-			captions = new Captions(true, config.captionsAnimated);
+			captions = new Captions(config.captionsEnabled, config.captionsAnimated);
 			captions.setContainer(captionsContainer);
 			captions.setStream(fakeStream);
 			captions.setVideoRect(new Rectangle(0, 0, player.controls.display.width, player.controls.display.height));
+			captions.fontsRegisteredSignal.add(onFontsRegistered);
 			
 			loadFonts();
 		}
 		
 		private function loadFonts():void
 		{
-			if (currentSubtitle.fonts.length < 1)
+			if (currentSubtitle.fonts.length > 0)
 			{
-				loadCaptions();
-				return;
-			}
-			
-			for (var k:int = 0, l:int = currentSubtitle.fonts.length; k < l; k++)
-			{
-				if (!currentSubtitle.fonts[k].registered)
+				for (var k:int = 0, l:int = currentSubtitle.fonts.length; k < l; k++)
 				{
-					captions.loadFontSwf(currentSubtitle.fonts[k]);
-					return;
+					if (!currentSubtitle.fonts[k].registered)
+					{
+						captions.loadFontSwf(currentSubtitle.fonts[k]);
+						return;
+					}
 				}
 			}
 			
@@ -123,16 +129,7 @@ package com.kenshisoft.captions.plugins.jwplayer
 					currentSubtitle.fonts[i].registered = true;
 			}
 			
-			for (var k:int = 0, l:int = currentSubtitle.fonts.length; k < l; k++)
-			{
-				if (!currentSubtitle.fonts[k].registered)
-				{
-					captions.loadFontSwf(currentSubtitle.fonts[k]);
-					return;
-				}
-			}
-			
-			loadCaptions();
+			loadFonts();
 		}
 		
 		private function loadCaptions():void

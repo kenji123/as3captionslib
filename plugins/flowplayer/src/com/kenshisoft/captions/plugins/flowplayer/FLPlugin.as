@@ -5,6 +5,8 @@ package com.kenshisoft.captions.plugins.flowplayer
 	import flash.geom.Rectangle;
 	import flash.text.TextField;
 	
+	import com.adobe.serialization.json.JSONDecoder;
+	
 	import org.flowplayer.model.ClipEvent;
 	import org.flowplayer.model.Plugin;
     import org.flowplayer.model.PluginModel;
@@ -52,14 +54,15 @@ package com.kenshisoft.captions.plugins.flowplayer
 			var args:Object;
 			try
 			{
-				args = JSON.parse(model.config.args);
+				var jd:JSONDecoder = new JSONDecoder(model.config.args);
+				args = jd.getValue();
 			}
 			catch (error:Error)
 			{
 				trace(error.getStackTrace());
 			}
 			
-			this.config = new Config(args);
+			config = new Config(args);
 			
 			currentSubtitle = config.getDefaultCaption();
 			
@@ -92,12 +95,19 @@ package com.kenshisoft.captions.plugins.flowplayer
 		
 		public function onResized(event:ClipEvent):void
 		{
-			if (player.currentClip.getContent().parent)
+			try
 			{
-				var currentClip:DisplayObjectContainer = player.currentClip.getContent().parent;
-				captions.setVideoRect(new Rectangle(currentClip.x, currentClip.y, currentClip.width, currentClip.height));
-				captions.flush();
-				captionsContainer.addChild(new TextField()); // quickfix. not sure why it needs this to work
+				if (player.currentClip.getContent().parent)
+				{
+					var currentClip:DisplayObjectContainer = player.currentClip.getContent().parent;
+					captions.setVideoRect(new Rectangle(currentClip.x, currentClip.y, currentClip.width, currentClip.height));
+					captions.flush();
+					captionsContainer.addChild(new TextField()); // quickfix. not sure why it needs this to work
+				}
+			}
+			catch (error:Error)
+			{
+				trace(error.getStackTrace());
 			}
         }
 		
@@ -106,23 +116,22 @@ package com.kenshisoft.captions.plugins.flowplayer
 			var currentClip:DisplayObjectContainer = player.currentClip.getContent().parent;
 			captions.setVideoRect(new Rectangle(currentClip.x, currentClip.y, currentClip.width, currentClip.height));
 			
+			if (player.currentClip.duration == 0) return;
+			
 			loadFonts();
 		}
 		
 		private function loadFonts():void
 		{
-			if (currentSubtitle.fonts.length < 1)
+			if (currentSubtitle.fonts.length > 0)
 			{
-				loadCaptions();
-				return;
-			}
-			
-			for (var k:int = 0, l:int = currentSubtitle.fonts.length; k < l; k++)
-			{
-				if (!currentSubtitle.fonts[k].registered)
+				for (var k:int = 0, l:int = currentSubtitle.fonts.length; k < l; k++)
 				{
-					captions.loadFontSwf(currentSubtitle.fonts[k]);
-					return;
+					if (!currentSubtitle.fonts[k].registered)
+					{
+						captions.loadFontSwf(currentSubtitle.fonts[k]);
+						return;
+					}
 				}
 			}
 			
@@ -137,16 +146,7 @@ package com.kenshisoft.captions.plugins.flowplayer
 					currentSubtitle.fonts[i].registered = true;
 			}
 			
-			for (var k:int = 0, l:int = currentSubtitle.fonts.length; k < l; k++)
-			{
-				if (!currentSubtitle.fonts[k].registered)
-				{
-					captions.loadFontSwf(currentSubtitle.fonts[k]);
-					return;
-				}
-			}
-			
-			loadCaptions();
+			loadFonts();
 		}
 		
 		private function loadCaptions():void

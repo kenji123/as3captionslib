@@ -425,7 +425,7 @@ package com.kenshisoft.captions.formats.cr
 				textStr = (match[1] == null && match[2] == null) ? match[3] : match[2]; textStr = textStr ? textStr : "";
 				
 				var beginIndex:int = caption.textField.text.length - 1;
-				caption.textField.text += textStr;
+				caption.textField.appendText(textStr);
 				
 				if (styleStr.length > 0)
 					style = styleModifier(caption, _parser.parseTag(styleStr), style, orgStyle, beginIndex, caption.textField.text.length - 1);
