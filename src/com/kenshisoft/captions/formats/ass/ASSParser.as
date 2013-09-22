@@ -59,8 +59,8 @@ package com.kenshisoft.captions.formats.ass
 			_fontClasses = fontClasses;
 			
 			// comment, picture, sound, movie, and command events are ignored
-			var styleV5RegExp:RegExp = /(.*),(.*),(\d*),&H(.{0,8}?),&H(.{0,8}?),&H(.{0,8}?),&H(.{0,8}?),(-?\d),(-?\d),(-?\d),(-?\d),(\d*),(\d*),(\d*\.?\d*?),(\d*\.?\d*?),(\d*),(\d*\.?\d*?),(\d*\.?\d*?),(\d*),(\d*),(\d*),(\d*),(\d*)/im;
-			var eventV5RegExp:RegExp = /(\d),(\d:\d\d:\d\d.\d\d),(\d:\d\d:\d\d.\d\d),(.*?),(.*?),(\d{4}),(\d{4}),(\d{4}),(.*?),(.*)/i;
+			var styleV5RegExp:RegExp = /(.*),(.*),(\d*),&H(.{0,8}?),&H(.{0,8}?),&H(.{0,8}?),&H(.{0,8}?),(-?\d),(-?\d),(-?\d),(-?\d),(\d*),(\d*),(\d*\.?\d*?),(\d*\.?\d*?),(\d*),(\d*\.?\d*?),(\d*\.?\d*?),(\d*),(\d+?),(\d+?),(\d+?),(\d*)/i;
+			var eventV5RegExp:RegExp = /(\d),(\d:\d{2}:\d{2}.\d{2}),(\d:\d{2}:\d{2}.\d{2}),(.*?),(.*?),(\d+?),(\d+?),(\d+?),(.*?),(.*)/i;
 			
 			var subtitle:ASSSubtitle = new ASSSubtitle();
 			var index:int;
@@ -71,8 +71,7 @@ package com.kenshisoft.captions.formats.ass
 				if (Util.trim(lines[i]).charAt(0) == ";") continue;
 				
 				var line:Vector.<String> = Vector.<String>([lines[i].substr(0, lines[i].indexOf(":")), lines[i].substr(lines[i].indexOf(":")+1)]);
-				line[0] = Util.trim(line[0]);
-				line[0] = line[0].toLocaleLowerCase();
+				line[0] = Util.trim(line[0]).toLocaleLowerCase();
 				line[1] = Util.trim(line[1]);
 				
 				if (line[0] == "playresx")
